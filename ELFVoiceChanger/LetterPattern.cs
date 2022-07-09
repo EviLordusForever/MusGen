@@ -2,7 +2,7 @@
 {
 	public class LetterPattern
 	{
-		public string name;
-		public Wav wav;
+		public string name { get; set; }
+		public Wav wav { get; set; }
 	}
 }
