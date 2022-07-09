@@ -1,0 +1,198 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ELFVoiceChanger
+{
+    public class Wav
+    {
+        float[] L;
+        float[] R;
+
+        uint chunkID;
+        uint fileSize;
+        uint riffType;
+        uint fmtID;
+        uint fmtSize;
+
+        uint fmtCode;
+        uint channels;
+        uint sampleRate;
+        uint byteRate;
+        ushort fmtBlockAlign;
+        ushort bitDepth;
+
+        public double BytesToDouble(byte firstByte, byte secondByte)
+        {
+            // convert two bytes to one double in the range -1 to 1
+
+            // convert two bytes to one short (little endian)
+            int s = (secondByte << 8) | firstByte;
+            // convert to range from -1 to (just below) 1
+            return s / 32768.0;
+        }
+
+        public byte[] FloatToBytes(float d)
+        {
+            return BitConverter.GetBytes(d);
+        }
+
+        public bool ReadWav(string filename)
+        {
+            L = R = null;
+
+            try
+            {
+                using (FileStream fs = File.Open(filename, FileMode.Open))
+                {
+                    BinaryReader reader = new BinaryReader(fs);
+
+                    // chunk 0
+                    chunkID = reader.ReadUInt32();
+                    fileSize = reader.ReadUInt32();
+                    riffType = reader.ReadUInt32();
+
+
+                    // chunk 1
+                    fmtID = reader.ReadUInt32();
+                    fmtSize = reader.ReadUInt32(); // bytes for this chunk (expect 16 or 18)
+
+                    // 16 bytes coming...
+                    fmtCode = reader.ReadUInt16();
+                    channels = reader.ReadUInt16();
+                    sampleRate = reader.ReadUInt32();
+                    byteRate = reader.ReadUInt32();
+                    fmtBlockAlign = reader.ReadUInt16();
+                    bitDepth = reader.ReadUInt16();
+
+                    if (fmtSize == 18)
+                    {
+                        // Read any extra values
+                        int fmtExtraSize = reader.ReadInt16();
+                        reader.ReadBytes(fmtExtraSize);
+                    }
+
+                    // chunk 2
+                    int dataID = reader.ReadInt32();
+                    int bytes = reader.ReadInt32();
+
+                    // DATA!
+                    byte[] byteArray = reader.ReadBytes(bytes);
+
+                    int bytesForSamp = bitDepth / 8;
+                    int nValues = bytes / bytesForSamp;
+
+
+                    float[] asFloat = null;
+                    switch (bitDepth)
+                    {
+                        case 64:
+                            double[]
+                                asDouble = new double[nValues];
+                            Buffer.BlockCopy(byteArray, 0, asDouble, 0, bytes);
+                            asFloat = Array.ConvertAll(asDouble, e => (float)e);
+                            break;
+                        case 32:
+                            asFloat = new float[nValues];
+                            Buffer.BlockCopy(byteArray, 0, asFloat, 0, bytes);
+                            break;
+                        case 16:
+                            Int16[]
+                                asInt16 = new Int16[nValues];
+                            Buffer.BlockCopy(byteArray, 0, asInt16, 0, bytes);
+                            asFloat = Array.ConvertAll(asInt16, e => e / (float)(Int16.MaxValue + 1));
+                            break;
+                        default:
+                            return false;
+                    }
+
+                    switch (channels)
+                    {
+                        case 1:
+                            L = asFloat;
+                            R = null;
+                            return true;
+                        case 2:
+                            // de-interleave
+                            int nSamps = nValues / 2;
+                            L = new float[nSamps];
+                            R = new float[nSamps];
+                            for (int s = 0, v = 0; s < nSamps; s++)
+                            {
+                                L[s] = asFloat[v++];
+                                R[s] = asFloat[v++];
+                            }
+                            return true;
+                        default:
+                            return false;
+                    }
+                }
+            }
+            catch
+            {
+                //Debug.Log("...Failed to load: " + filename);
+                return false;
+            }
+
+            return false;
+        }
+
+        public void SaveWav(string filename)
+        {
+            //sampleRate;
+
+            FileStream f = new FileStream(filename, FileMode.Create);
+
+            f.Write(StringToByteArray("RIFF")); //RIFF
+            f.Write(BitConverter.GetBytes((uint)(44 + L.Length * bitDepth * channels))); //?
+            f.Write(StringToByteArray("WAVE"));
+            f.Write(StringToByteArray("fmt "));
+            f.Write(BitConverter.GetBytes(16)); //Subchunk 1 size = 16
+
+            f.Write(BitConverter.GetBytes((ushort)1)); //type format = 1 PCM
+            f.Write(BitConverter.GetBytes((ushort)channels)); //Channels
+            f.Write(BitConverter.GetBytes((uint)sampleRate)); //
+            f.Write(BitConverter.GetBytes((uint)(sampleRate * bitDepth * channels / 8))); //CORRECT
+            f.Write(BitConverter.GetBytes((ushort)fmtBlockAlign)); //Block align
+            f.Write(BitConverter.GetBytes((ushort)bitDepth)); //Bits per sample
+            f.Write(StringToByteArray("data"));
+            f.Write(BitConverter.GetBytes(L.Length * bitDepth * channels));
+
+            for (int i = 0; i < L.Length; i++)
+            {
+                WriteSample(L[i]);
+                if (channels == 2)
+                    WriteSample(R[i]);
+
+                void WriteSample(float v)
+                {
+                    if (bitDepth == 16)
+                    {
+                        Int16 a = Convert.ToInt16(v * Math.Pow(2, bitDepth - 1));
+                        f.Write(BitConverter.GetBytes(a));
+                    }
+                    if (bitDepth == 32)
+                    {
+                        Int32 a = Convert.ToInt32(v * Math.Pow(2, bitDepth - 1));
+                        f.Write(BitConverter.GetBytes(a));
+                    }
+                    if (bitDepth == 64)
+                    {
+                        Int64 a = Convert.ToInt64(v * Math.Pow(2, bitDepth - 1));
+                        f.Write(BitConverter.GetBytes(a));
+                    }
+                }
+            }
+        }
+
+        public static byte[] StringToByteArray(string hex)
+        {
+            return Encoding.ASCII.GetBytes(hex);
+        }
+    }
+}
+
+//Старый альбом Виктора пелюра
+//Старый альбом Ласкового Мая Розы
