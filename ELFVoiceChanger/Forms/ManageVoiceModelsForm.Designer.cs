@@ -28,31 +28,35 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.comboBox1 = new System.Windows.Forms.ComboBox();
+			this.voiceModelsBox = new System.Windows.Forms.ComboBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
-			this.comboBox2 = new System.Windows.Forms.ComboBox();
+			this.letterPatternBox = new System.Windows.Forms.ComboBox();
 			this.panel1 = new System.Windows.Forms.Panel();
+			this.button4 = new System.Windows.Forms.Button();
 			this.button1 = new System.Windows.Forms.Button();
-			this.textBox1 = new System.Windows.Forms.TextBox();
+			this.voiceModelNameBox = new System.Windows.Forms.TextBox();
 			this.label3 = new System.Windows.Forms.Label();
 			this.label6 = new System.Windows.Forms.Label();
 			this.panel2 = new System.Windows.Forms.Panel();
+			this.button5 = new System.Windows.Forms.Button();
 			this.button3 = new System.Windows.Forms.Button();
 			this.button2 = new System.Windows.Forms.Button();
-			this.textBox2 = new System.Windows.Forms.TextBox();
+			this.letterPatternName = new System.Windows.Forms.TextBox();
 			this.label4 = new System.Windows.Forms.Label();
 			this.panel1.SuspendLayout();
 			this.panel2.SuspendLayout();
 			this.SuspendLayout();
 			// 
-			// comboBox1
+			// voiceModelsBox
 			// 
-			this.comboBox1.FormattingEnabled = true;
-			this.comboBox1.Location = new System.Drawing.Point(113, 4);
-			this.comboBox1.Name = "comboBox1";
-			this.comboBox1.Size = new System.Drawing.Size(473, 23);
-			this.comboBox1.TabIndex = 0;
+			this.voiceModelsBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.voiceModelsBox.FormattingEnabled = true;
+			this.voiceModelsBox.Location = new System.Drawing.Point(113, 4);
+			this.voiceModelsBox.Name = "voiceModelsBox";
+			this.voiceModelsBox.Size = new System.Drawing.Size(473, 23);
+			this.voiceModelsBox.TabIndex = 0;
+			this.voiceModelsBox.SelectedIndexChanged += new System.EventHandler(this.voiceModelsBox_SelectedIndexChanged);
 			// 
 			// label1
 			// 
@@ -78,26 +82,40 @@
 			this.label2.Text = "Letter Pattern:";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 			// 
-			// comboBox2
+			// letterPatternBox
 			// 
-			this.comboBox2.FormattingEnabled = true;
-			this.comboBox2.Location = new System.Drawing.Point(113, 4);
-			this.comboBox2.Name = "comboBox2";
-			this.comboBox2.Size = new System.Drawing.Size(473, 23);
-			this.comboBox2.TabIndex = 3;
+			this.letterPatternBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.letterPatternBox.FormattingEnabled = true;
+			this.letterPatternBox.Location = new System.Drawing.Point(113, 4);
+			this.letterPatternBox.Name = "letterPatternBox";
+			this.letterPatternBox.Size = new System.Drawing.Size(473, 23);
+			this.letterPatternBox.TabIndex = 3;
 			// 
 			// panel1
 			// 
 			this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.panel1.Controls.Add(this.button4);
 			this.panel1.Controls.Add(this.button1);
-			this.panel1.Controls.Add(this.textBox1);
+			this.panel1.Controls.Add(this.voiceModelNameBox);
 			this.panel1.Controls.Add(this.label3);
 			this.panel1.Controls.Add(this.label1);
-			this.panel1.Controls.Add(this.comboBox1);
+			this.panel1.Controls.Add(this.voiceModelsBox);
 			this.panel1.Location = new System.Drawing.Point(12, 12);
 			this.panel1.Name = "panel1";
-			this.panel1.Size = new System.Drawing.Size(592, 85);
+			this.panel1.Size = new System.Drawing.Size(592, 111);
 			this.panel1.TabIndex = 6;
+			// 
+			// button4
+			// 
+			this.button4.FlatAppearance.BorderColor = System.Drawing.Color.Black;
+			this.button4.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+			this.button4.Location = new System.Drawing.Point(4, 82);
+			this.button4.Name = "button4";
+			this.button4.Size = new System.Drawing.Size(582, 23);
+			this.button4.TabIndex = 15;
+			this.button4.Text = "Delete This Voice Model";
+			this.button4.UseVisualStyleBackColor = true;
+			this.button4.Click += new System.EventHandler(this.button4_Click);
 			// 
 			// button1
 			// 
@@ -109,13 +127,15 @@
 			this.button1.TabIndex = 14;
 			this.button1.Text = "Create New Voice Model";
 			this.button1.UseVisualStyleBackColor = true;
+			this.button1.Click += new System.EventHandler(this.button1_Click);
 			// 
-			// textBox1
+			// voiceModelNameBox
 			// 
-			this.textBox1.Location = new System.Drawing.Point(113, 30);
-			this.textBox1.Name = "textBox1";
-			this.textBox1.Size = new System.Drawing.Size(473, 23);
-			this.textBox1.TabIndex = 10;
+			this.voiceModelNameBox.Location = new System.Drawing.Point(113, 30);
+			this.voiceModelNameBox.Name = "voiceModelNameBox";
+			this.voiceModelNameBox.Size = new System.Drawing.Size(473, 23);
+			this.voiceModelNameBox.TabIndex = 10;
+			this.voiceModelNameBox.TextChanged += new System.EventHandler(this.voiceModelNameBox_TextChanged);
 			// 
 			// label3
 			// 
@@ -144,17 +164,29 @@
 			// panel2
 			// 
 			this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.panel2.Controls.Add(this.button5);
 			this.panel2.Controls.Add(this.button3);
 			this.panel2.Controls.Add(this.button2);
 			this.panel2.Controls.Add(this.label6);
-			this.panel2.Controls.Add(this.textBox2);
+			this.panel2.Controls.Add(this.letterPatternName);
 			this.panel2.Controls.Add(this.label2);
 			this.panel2.Controls.Add(this.label4);
-			this.panel2.Controls.Add(this.comboBox2);
-			this.panel2.Location = new System.Drawing.Point(12, 123);
+			this.panel2.Controls.Add(this.letterPatternBox);
+			this.panel2.Location = new System.Drawing.Point(12, 178);
 			this.panel2.Name = "panel2";
-			this.panel2.Size = new System.Drawing.Size(592, 112);
+			this.panel2.Size = new System.Drawing.Size(592, 138);
 			this.panel2.TabIndex = 7;
+			// 
+			// button5
+			// 
+			this.button5.FlatAppearance.BorderColor = System.Drawing.Color.Black;
+			this.button5.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+			this.button5.Location = new System.Drawing.Point(4, 109);
+			this.button5.Name = "button5";
+			this.button5.Size = new System.Drawing.Size(582, 23);
+			this.button5.TabIndex = 14;
+			this.button5.Text = "Delete This Letter Pattern";
+			this.button5.UseVisualStyleBackColor = true;
 			// 
 			// button3
 			// 
@@ -178,12 +210,12 @@
 			this.button2.Text = "Add New Letter Pattern";
 			this.button2.UseVisualStyleBackColor = true;
 			// 
-			// textBox2
+			// letterPatternName
 			// 
-			this.textBox2.Location = new System.Drawing.Point(113, 30);
-			this.textBox2.Name = "textBox2";
-			this.textBox2.Size = new System.Drawing.Size(473, 23);
-			this.textBox2.TabIndex = 12;
+			this.letterPatternName.Location = new System.Drawing.Point(113, 30);
+			this.letterPatternName.Name = "letterPatternName";
+			this.letterPatternName.Size = new System.Drawing.Size(473, 23);
+			this.letterPatternName.TabIndex = 12;
 			// 
 			// label4
 			// 
@@ -201,9 +233,10 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(613, 249);
+			this.ClientSize = new System.Drawing.Size(616, 328);
 			this.Controls.Add(this.panel2);
 			this.Controls.Add(this.panel1);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.Name = "ManageVoiceModelsForm";
 			this.Text = "Manage Voice Models";
 			this.Load += new System.EventHandler(this.ManageVoiceModelsForm_Load);
@@ -216,20 +249,21 @@
 		}
 
 		#endregion
-
-		private ComboBox comboBox1;
 		private Label label1;
 		private Label label2;
-		private ComboBox comboBox2;
 		private Panel panel1;
 		private Button button1;
 		private Label label6;
-		private TextBox textBox1;
 		private Label label3;
 		private Panel panel2;
 		private Button button3;
 		private Button button2;
-		private TextBox textBox2;
 		private Label label4;
+		private Button button4;
+		private Button button5;
+		public ComboBox voiceModelsBox;
+		public ComboBox letterPatternBox;
+		public TextBox voiceModelNameBox;
+		public TextBox letterPatternName;
 	}
 }

@@ -10,6 +10,7 @@ namespace ELFVoiceChanger.Forms
 	{
 		public static MainForm mainForm;
 		public static ManageVoiceModelsForm manageVoiceModelsForm;
+		public static CreateVoiceModelForm createVoiceModelForm;
 
 		public static void OpenManageVoiceModelForm()
 		{
@@ -19,6 +20,16 @@ namespace ELFVoiceChanger.Forms
 			manageVoiceModelsForm.WindowState = FormWindowState.Normal;
 			manageVoiceModelsForm.Show();
 			manageVoiceModelsForm.BringToFront();
+		}
+
+		public static void OpenCreateVoiceModelForm()
+		{
+			if (createVoiceModelForm == null || createVoiceModelForm.IsDisposed)
+				createVoiceModelForm = new CreateVoiceModelForm();
+
+			createVoiceModelForm.WindowState = FormWindowState.Normal;
+			createVoiceModelForm.Show();
+			createVoiceModelForm.BringToFront();
 		}
 	}
 }

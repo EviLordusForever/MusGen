@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <None Remove="LetterPattern.cs~RFf601786.TMP" />
+    <None Remove="VoiceModel.cs~RFf681ba6.TMP" />
   </ItemGroup>
 
 </Project>
