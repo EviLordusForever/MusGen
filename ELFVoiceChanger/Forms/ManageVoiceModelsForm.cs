@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ELFVoiceChanger.Core;
+using ELFVoiceChanger.Voice;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -31,7 +33,17 @@ namespace ELFVoiceChanger.Forms
 
 		private void voiceModelsBox_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			voiceModelNameBox.Text = voiceModelsBox.SelectedItem as string;
+			if (voiceModelsBox.SelectedIndex > -1)
+			{
+				voiceModelNameBox.Text = voiceModelsBox.SelectedItem as string;
+				if (FormsManager.addLetterPatternForm != null && !FormsManager.addLetterPatternForm.IsDisposed)
+					FormsManager.addLetterPatternForm.voiceModelNameBox.Text = voiceModelsBox.SelectedItem as string;
+			}
+			else
+			{
+				voiceModelNameBox.Text = "";
+				FormsManager.CloseAddLetterPatternForm();
+			}
 		}
 
 		private void button4_Click(object sender, EventArgs e)
@@ -50,6 +62,7 @@ namespace ELFVoiceChanger.Forms
 				{
 					voiceModelsBox.SelectedIndex = -1;
 					voiceModelNameBox.Enabled = false;
+					FormsManager.CloseAddLetterPatternForm();
 				}
 			}				
 		}
@@ -76,6 +89,11 @@ namespace ELFVoiceChanger.Forms
 			voiceModelsBox.SelectedIndex = id;
 
 			VoiceModelsManager.Rename(oldName, name);
+		}
+
+		private void button2_Click(object sender, EventArgs e)
+		{
+			FormsManager.OpenAddLetterPatternForm();
 		}
 	}
 }

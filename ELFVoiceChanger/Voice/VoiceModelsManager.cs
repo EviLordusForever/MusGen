@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ELFVoiceChanger.Core;
 
-namespace ELFVoiceChanger
+namespace ELFVoiceChanger.Voice
 {
 	public static class VoiceModelsManager
 	{

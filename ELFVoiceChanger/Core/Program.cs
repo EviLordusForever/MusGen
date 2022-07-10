@@ -1,4 +1,4 @@
-namespace ELFVoiceChanger
+namespace ELFVoiceChanger.Core
 {
 	internal static class Program
 	{
