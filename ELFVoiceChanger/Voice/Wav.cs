@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ELFVoiceChanger.Core;
 
 namespace ELFVoiceChanger.Voice
 {
@@ -190,6 +191,18 @@ namespace ELFVoiceChanger.Voice
 		public static byte[] StringToByteArray(string hex)
 		{
 			return Encoding.ASCII.GetBytes(hex);
+		}
+
+		public static bool CheckWav(string path)
+		{
+			if (TextMethods.StringAfterLast(path, ".").ToLower() != "wav")
+				return false;
+
+			Wav localWav = new Wav();
+			bool isReadable = localWav.ReadWav(path);
+			if (!isReadable) return false;
+			if (localWav.L.Length < 10) return false;
+			return true;
 		}
 	}
 }
