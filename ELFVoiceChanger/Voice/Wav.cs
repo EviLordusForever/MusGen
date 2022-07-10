@@ -45,7 +45,7 @@ namespace ELFVoiceChanger.Voice
 			return BitConverter.GetBytes(d);
 		}
 
-		public bool ReadWav(string filename)
+		public bool ReadWav(string filename, int bytesLimit)
 		{
 			L = R = null;
 
@@ -83,7 +83,7 @@ namespace ELFVoiceChanger.Voice
 
 						// chunk 2
 						dataID = reader.ReadInt32();
-						bytes = reader.ReadInt32();
+						bytes = Math.Min(bytesLimit, reader.ReadInt32());
 
 						// DATA!
 						byteArray = reader.ReadBytes(bytes);
@@ -138,9 +138,9 @@ namespace ELFVoiceChanger.Voice
 						return false;
 				}
 			}
-			catch
+			catch (Exception ex)
 			{
-				//Debug.Log("...Failed to load: " + filename);
+				UserAsker.Ask(ex.Message);
 				return false;
 			}
 
@@ -206,7 +206,7 @@ namespace ELFVoiceChanger.Voice
 				return false;
 
 			Wav localWav = new Wav();
-			bool isReadable = localWav.ReadWav(path);
+			bool isReadable = localWav.ReadWav(path, (int)Math.Pow(2, 20));
 			if (!isReadable) return false;
 			if (localWav.L.Length < 10) return false;
 			return true;
