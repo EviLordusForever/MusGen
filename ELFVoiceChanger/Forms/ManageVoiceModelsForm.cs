@@ -195,7 +195,26 @@ namespace ELFVoiceChanger.Forms
 
 		private void deleteLetterPatternButton_Click(object sender, EventArgs e)
 		{
+			string voiceModelName = voiceModelNameBox.Text;
+			string name = letterPatternNameBox.Text;
 
+			if (letterPatternsBox.Items.Count > 0)
+			{
+				if (UserAsker.Ask("A you really want to delete " + name + "?"))
+				{
+					VoiceModelsManager.DeleteLetterPattern(voiceModelName, name);
+					
+					int selectedIndex = letterPatternsBox.SelectedIndex;
+					letterPatternsBox.Items.Remove(name);
+
+					if (selectedIndex > 0)
+						letterPatternsBox.SelectedIndex = selectedIndex - 1;
+					else if (letterPatternsBox.Items.Count > 0)
+						letterPatternsBox.SelectedIndex = selectedIndex;
+					else
+						IfNoLetterPatterns();
+				}
+			}
 		}
 
 		private void selectAudioFileButton_Click(object sender, EventArgs e)

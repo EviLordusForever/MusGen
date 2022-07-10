@@ -30,6 +30,13 @@ namespace ELFVoiceChanger.Voice
 			voiceModelsNames.Remove(name);
 		}
 
+		public static void DeleteLetterPattern(string voiceModelName, string name)
+		{
+			string path = "VoiceModels\\" + voiceModelName + "\\LetterPatterns\\" + name + ".wav";
+
+			Disk.DeleteFileFromProgramFiles(path);
+		}
+
 		public static void Rename(string oldName, string name)
 		{
 			int id = voiceModelsNames.IndexOf(oldName);
