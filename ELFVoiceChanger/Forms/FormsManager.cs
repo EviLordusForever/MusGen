@@ -12,6 +12,7 @@ namespace ELFVoiceChanger.Forms
 		public static ManageVoiceModelsForm manageVoiceModelsForm;
 		public static CreateVoiceModelForm createVoiceModelForm;
 		public static AddLetterPatternForm addLetterPatternForm;
+		public static VoiceChangingForm voiceChangingForm;
 
 		public static void OpenManageVoiceModelForm()
 		{
@@ -41,6 +42,17 @@ namespace ELFVoiceChanger.Forms
 			addLetterPatternForm.WindowState = FormWindowState.Normal;
 			addLetterPatternForm.Show();
 			addLetterPatternForm.BringToFront();
+		}
+
+
+		public static void OpenVoiceChangingForm()
+		{
+			if (voiceChangingForm == null || voiceChangingForm.IsDisposed)
+				voiceChangingForm = new VoiceChangingForm();
+
+			voiceChangingForm.WindowState = FormWindowState.Normal;
+			voiceChangingForm.Show();
+			voiceChangingForm.BringToFront();
 		}
 
 		public static void CloseAddLetterPatternForm()
