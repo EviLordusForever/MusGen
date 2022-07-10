@@ -19,8 +19,9 @@ namespace ELFVoiceChanger.Forms
 
 		private void button1_Click(object sender, EventArgs e)
 		{
-			string name = textBox1.Text;
-			if (name.Length > 0 && name.Trim().Length > 0)
+			string name = textBox1.Text.Trim();
+
+			if (name.Length > 0 && !VoiceModelsManager.voiceModelsNames.Contains(name))
 			{
 				VoiceModelsManager.AddVoiceModel(name);
 				FormsManager.manageVoiceModelsForm.voiceModelsBox.Items.Add(name);

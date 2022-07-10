@@ -61,7 +61,7 @@ namespace ELFVoiceChanger.Forms
 
 		private void voiceModelNameBox_TextChanged(object sender, EventArgs e)
 		{
-			string name = voiceModelNameBox.Text;
+			string name = voiceModelNameBox.Text.Trim();
 			string oldName = voiceModelsBox.SelectedItem as string;
 
 			if (name == oldName || Directory.Exists(Disk.programFiles + "\\VoiceModels\\" + name) || name.Trim().Length < 0)
