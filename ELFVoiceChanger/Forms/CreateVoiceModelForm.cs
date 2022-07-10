@@ -28,6 +28,10 @@ namespace ELFVoiceChanger.Forms
 				FormsManager.manageVoiceModelsForm.voiceModelsBox.Items.Add(name);
 				FormsManager.manageVoiceModelsForm.voiceModelsBox.SelectedIndex = FormsManager.manageVoiceModelsForm.voiceModelsBox.Items.Count - 1;
 				FormsManager.manageVoiceModelsForm.voiceModelNameBox.Enabled = true;
+
+				if (FormsManager.manageVoiceModelsForm.voiceModelsBox.Items.Count == 1)
+					FormsManager.manageVoiceModelsForm.IfVoiceModelsExist();
+
 				this.Close();
 			}
 		}

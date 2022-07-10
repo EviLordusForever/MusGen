@@ -26,9 +26,11 @@ namespace ELFVoiceChanger.Forms
 				foreach (string str in VoiceModelsManager.voiceModelsNames)
 					voiceModelsBox.Items.Add(str);
 				voiceModelsBox.SelectedIndex = 0;
+
+				IfVoiceModelsExist();
 			}
 			else
-				voiceModelNameBox.Enabled = false;
+				IfNoVoiceModels();
 		}
 
 		private void voiceModelsBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -38,12 +40,11 @@ namespace ELFVoiceChanger.Forms
 				voiceModelNameBox.Text = voiceModelsBox.SelectedItem as string;
 				if (FormsManager.addLetterPatternForm != null && !FormsManager.addLetterPatternForm.IsDisposed)
 					FormsManager.addLetterPatternForm.voiceModelNameBox.Text = voiceModelsBox.SelectedItem as string;
+				letterPatternBox.Enabled = true;
+				letterPatternName.Enabled = true;
 			}
 			else
-			{
-				voiceModelNameBox.Text = "";
-				FormsManager.CloseAddLetterPatternForm();
-			}
+				IfNoVoiceModels();
 		}
 
 		private void button4_Click(object sender, EventArgs e)
@@ -59,11 +60,7 @@ namespace ELFVoiceChanger.Forms
 				else if (voiceModelsBox.Items.Count > 0)
 					voiceModelsBox.SelectedIndex = selectedIndex;
 				else
-				{
-					voiceModelsBox.SelectedIndex = -1;
-					voiceModelNameBox.Enabled = false;
-					FormsManager.CloseAddLetterPatternForm();
-				}
+					IfNoVoiceModels();
 			}				
 		}
 
@@ -93,7 +90,34 @@ namespace ELFVoiceChanger.Forms
 
 		private void button2_Click(object sender, EventArgs e)
 		{
-			FormsManager.OpenAddLetterPatternForm();
+			if (voiceModelsBox.Items.Count > 0)
+				FormsManager.OpenAddLetterPatternForm();
+		}
+
+		public void IfNoVoiceModels()
+		{
+			voiceModelNameBox.Enabled = false;
+			letterPatternBox.Enabled = false;
+			letterPatternName.Enabled = false;
+
+			voiceModelNameBox.Text = "";
+			letterPatternName.Text = "";
+
+			FormsManager.CloseAddLetterPatternForm();
+		}
+
+		public void IfVoiceModelsExist()
+		{
+			voiceModelNameBox.Enabled = true;
+			letterPatternBox.Enabled = true;
+			letterPatternName.Enabled = true;
+
+
+		}
+
+		public void LoadLetterPatternsList()
+		{
+
 		}
 	}
 }
