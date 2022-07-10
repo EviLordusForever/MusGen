@@ -119,5 +119,11 @@ namespace ELFVoiceChanger.Forms
 		{
 
 		}
+
+		private void ManageVoiceModelsForm_FormClosed(object sender, FormClosedEventArgs e)
+		{
+			FormsManager.CloseAddLetterPatternForm();
+			FormsManager.CloseCreateVoiceModelForm();
+		}
 	}
 }

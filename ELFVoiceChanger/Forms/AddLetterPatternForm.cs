@@ -51,5 +51,23 @@ namespace ELFVoiceChanger.Forms
 				button3.ForeColor = Color.Red;
 			}
 		}
+
+		private void button1_Click(object sender, EventArgs e)
+		{
+			string name = textBox1.Text;
+			if (button3.ForeColor == Color.Green && name.Length > 0)
+			{
+				try
+				{
+					VoiceModelsManager.AddLetterPattern(voiceModelNameBox.Text, name, openFileDialog1.FileName);
+					FormsManager.manageVoiceModelsForm.letterPatternBox.Items.Add(name);
+					FormsManager.manageVoiceModelsForm.letterPatternName.Text = name;
+					this.Close();
+				}
+				catch
+				{
+				}
+			}
+		}
 	}
 }

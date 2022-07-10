@@ -240,6 +240,7 @@
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.Name = "ManageVoiceModelsForm";
 			this.Text = "Manage Voice Models";
+			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.ManageVoiceModelsForm_FormClosed);
 			this.Load += new System.EventHandler(this.ManageVoiceModelsForm_Load);
 			this.panel1.ResumeLayout(false);
 			this.panel1.PerformLayout();

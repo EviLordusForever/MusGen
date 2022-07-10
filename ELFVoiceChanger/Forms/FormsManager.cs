@@ -48,5 +48,11 @@ namespace ELFVoiceChanger.Forms
 			if (addLetterPatternForm != null && !addLetterPatternForm.IsDisposed)
 				addLetterPatternForm.Close();
 		}
+
+		public static void CloseCreateVoiceModelForm()
+		{
+			if (createVoiceModelForm != null && !createVoiceModelForm.IsDisposed)
+				createVoiceModelForm.Close();
+		}
 	}
 }
