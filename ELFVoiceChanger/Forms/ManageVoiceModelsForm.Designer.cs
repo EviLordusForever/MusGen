@@ -44,6 +44,7 @@
 			this.button2 = new System.Windows.Forms.Button();
 			this.letterPatternNameBox = new System.Windows.Forms.TextBox();
 			this.label4 = new System.Windows.Forms.Label();
+			this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
 			this.panel1.SuspendLayout();
 			this.panel2.SuspendLayout();
 			this.SuspendLayout();
@@ -200,6 +201,7 @@
 			this.selectAudioFileButton.TabIndex = 13;
 			this.selectAudioFileButton.Text = "Select Audio File";
 			this.selectAudioFileButton.UseVisualStyleBackColor = true;
+			this.selectAudioFileButton.Click += new System.EventHandler(this.selectAudioFileButton_Click);
 			// 
 			// button2
 			// 
@@ -231,6 +233,11 @@
 			this.label4.TabIndex = 11;
 			this.label4.Text = "Name:";
 			this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+			// 
+			// openFileDialog1
+			// 
+			this.openFileDialog1.FileName = "openFileDialog1";
+			this.openFileDialog1.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog1_FileOk);
 			// 
 			// ManageVoiceModelsForm
 			// 
@@ -269,5 +276,6 @@
 		public ComboBox letterPatternsBox;
 		public TextBox voiceModelNameBox;
 		public TextBox letterPatternNameBox;
+		private OpenFileDialog openFileDialog1;
 	}
 }

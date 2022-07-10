@@ -112,6 +112,8 @@ namespace ELFVoiceChanger.Forms
 			letterPatternsBox.Enabled = false;
 			letterPatternNameBox.Enabled = false;
 			button4.Enabled = false;
+			button2.Enabled = false;
+			selectAudioFileButton.Enabled = false;
 
 			voiceModelNameBox.Text = "";
 			letterPatternNameBox.Text = "";
@@ -149,6 +151,7 @@ namespace ELFVoiceChanger.Forms
 			voiceModelsBox.Enabled = true;
 			voiceModelNameBox.Enabled = true;
 			button4.Enabled = true;
+			button2.Enabled = true;
 		}
 
 		public void LoadLetterPatternsList()
@@ -193,6 +196,21 @@ namespace ELFVoiceChanger.Forms
 		private void deleteLetterPatternButton_Click(object sender, EventArgs e)
 		{
 
+		}
+
+		private void selectAudioFileButton_Click(object sender, EventArgs e)
+		{
+			if (UserAsker.Ask("Are you shure you want change audio file? (If you have no origin or copy for previous audio it will be replaced)"))
+				openFileDialog1.ShowDialog();
+		}
+
+		private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
+		{
+			string newPath = openFileDialog1.FileName;
+			bool isGood = Wav.CheckWav(newPath);
+
+			if (isGood)
+				VoiceModelsManager.ChangeLetterPattern(voiceModelNameBox.Text, letterPatternNameBox.Text, newPath);
 		}
 	}
 }

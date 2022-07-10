@@ -47,6 +47,15 @@ namespace ELFVoiceChanger.Voice
 			File.Copy(wavPath, newWavPath);
 		}
 
+		public static void ChangeLetterPattern(string voiceModel, string pattern, string wavPath)
+		{
+			string newWavPath = Disk.programFiles + "\\VoiceModels\\" + voiceModel + "\\LetterPatterns\\" + pattern + ".wav";
+			if (!File.Exists(newWavPath))
+				throw new Exception();
+			File.Delete(newWavPath);
+			File.Move(wavPath, newWavPath);
+		}
+
 		static VoiceModelsManager()
 		{
 			voiceModelsNames = new List<string>();
