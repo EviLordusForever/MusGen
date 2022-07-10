@@ -60,8 +60,11 @@ namespace ELFVoiceChanger.Forms
 				try
 				{
 					VoiceModelsManager.AddLetterPattern(voiceModelNameBox.Text, name, openFileDialog1.FileName);
-					FormsManager.manageVoiceModelsForm.letterPatternBox.Items.Add(name);
-					FormsManager.manageVoiceModelsForm.letterPatternName.Text = name;
+					FormsManager.manageVoiceModelsForm.letterPatternsBox.Items.Add(name);
+					FormsManager.manageVoiceModelsForm.letterPatternNameBox.Text = name;
+					FormsManager.manageVoiceModelsForm.letterPatternsBox.SelectedIndex = FormsManager.manageVoiceModelsForm.letterPatternsBox.Items.Count - 1;
+					if (FormsManager.manageVoiceModelsForm.letterPatternsBox.Items.Count == 1)
+						FormsManager.manageVoiceModelsForm.IfLetterPatternsExist();
 					this.Close();
 				}
 				catch

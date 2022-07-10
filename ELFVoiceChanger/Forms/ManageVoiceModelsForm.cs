@@ -28,9 +28,13 @@ namespace ELFVoiceChanger.Forms
 				voiceModelsBox.SelectedIndex = 0;
 
 				IfVoiceModelsExist();
+				LoadLetterPatternsList();
 			}
 			else
+			{
 				IfNoVoiceModels();
+				IfNoLetterPatterns();
+			}
 		}
 
 		private void voiceModelsBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -40,8 +44,9 @@ namespace ELFVoiceChanger.Forms
 				voiceModelNameBox.Text = voiceModelsBox.SelectedItem as string;
 				if (FormsManager.addLetterPatternForm != null && !FormsManager.addLetterPatternForm.IsDisposed)
 					FormsManager.addLetterPatternForm.voiceModelNameBox.Text = voiceModelsBox.SelectedItem as string;
-				letterPatternBox.Enabled = true;
-				letterPatternName.Enabled = true;
+				letterPatternsBox.Enabled = true;
+				letterPatternNameBox.Enabled = true;
+				LoadLetterPatternsList();
 			}
 			else
 				IfNoVoiceModels();
@@ -49,18 +54,23 @@ namespace ELFVoiceChanger.Forms
 
 		private void button4_Click(object sender, EventArgs e)
 		{
+			string name = voiceModelNameBox.Text;
+
 			if (voiceModelsBox.Items.Count > 0)
 			{
-				VoiceModelsManager.DeleteVoiceModel(voiceModelNameBox.Text);
-				int selectedIndex = voiceModelsBox.SelectedIndex;
-				voiceModelsBox.Items.Remove(voiceModelNameBox.Text);
+				if (UserAsker.Ask("A you really want to delete " + name + "?"))
+				{
+					VoiceModelsManager.DeleteVoiceModel(name);
+					int selectedIndex = voiceModelsBox.SelectedIndex;
+					voiceModelsBox.Items.Remove(name);
 
-				if (selectedIndex > 0)
-					voiceModelsBox.SelectedIndex = selectedIndex - 1;
-				else if (voiceModelsBox.Items.Count > 0)
-					voiceModelsBox.SelectedIndex = selectedIndex;
-				else
-					IfNoVoiceModels();
+					if (selectedIndex > 0)
+						voiceModelsBox.SelectedIndex = selectedIndex - 1;
+					else if (voiceModelsBox.Items.Count > 0)
+						voiceModelsBox.SelectedIndex = selectedIndex;
+					else
+						IfNoVoiceModels();
+				}
 			}				
 		}
 
@@ -83,9 +93,10 @@ namespace ELFVoiceChanger.Forms
 			int id = voiceModelsBox.Items.IndexOf(oldName);
 			voiceModelsBox.Items.RemoveAt(id);
 			voiceModelsBox.Items.Insert(id, name);
-			voiceModelsBox.SelectedIndex = id;
 
 			VoiceModelsManager.Rename(oldName, name);
+
+			voiceModelsBox.SelectedIndex = id;
 		}
 
 		private void button2_Click(object sender, EventArgs e)
@@ -96,34 +107,92 @@ namespace ELFVoiceChanger.Forms
 
 		public void IfNoVoiceModels()
 		{
+			voiceModelsBox.Enabled = false;
 			voiceModelNameBox.Enabled = false;
-			letterPatternBox.Enabled = false;
-			letterPatternName.Enabled = false;
+			letterPatternsBox.Enabled = false;
+			letterPatternNameBox.Enabled = false;
+			button4.Enabled = false;
 
 			voiceModelNameBox.Text = "";
-			letterPatternName.Text = "";
+			letterPatternNameBox.Text = "";
 
 			FormsManager.CloseAddLetterPatternForm();
+
+			IfNoLetterPatterns();
+		}
+
+		public void IfNoLetterPatterns()
+		{
+			letterPatternNameBox.Enabled = false;
+			letterPatternsBox.Enabled = false;
+			deleteLetterPatternButton.Enabled = false;
+			selectAudioFileButton.Enabled = false;
+
+			letterPatternNameBox.Text = "";
+			selectAudioFileButton.Text = "Select audio file";
+		}
+
+		public void IfLetterPatternsExist()
+		{
+			letterPatternNameBox.Enabled = true;
+			letterPatternsBox.Enabled = true;
+			deleteLetterPatternButton.Enabled = true;
+			selectAudioFileButton.Enabled = true;
+
+			letterPatternNameBox.Text = letterPatternsBox.SelectedItem as string;
+			selectAudioFileButton.Text = letterPatternsBox.SelectedItem as string + ".wav";
+
 		}
 
 		public void IfVoiceModelsExist()
 		{
+			voiceModelsBox.Enabled = true;
 			voiceModelNameBox.Enabled = true;
-			letterPatternBox.Enabled = true;
-			letterPatternName.Enabled = true;
-
-
+			button4.Enabled = true;
 		}
 
 		public void LoadLetterPatternsList()
 		{
+			int previousCount = letterPatternsBox.Items.Count;
 
+			letterPatternsBox.Items.Clear();
+			string[] patterns = Directory.GetFiles(Disk.programFiles + "\\VoiceModels\\" + voiceModelNameBox.Text + "\\LetterPatterns\\");
+
+			if (patterns.Count() > 0)
+			{
+				foreach (string pattern in patterns)
+					letterPatternsBox.Items.Add(TextMethods.StringBeforeLast(TextMethods.StringAfterLast(pattern, "\\"), "."));
+
+				letterPatternsBox.SelectedIndex = 0;
+
+				if (previousCount == 0)
+					IfLetterPatternsExist();
+			}
+			else
+				IfNoLetterPatterns();
 		}
 
 		private void ManageVoiceModelsForm_FormClosed(object sender, FormClosedEventArgs e)
 		{
 			FormsManager.CloseAddLetterPatternForm();
 			FormsManager.CloseCreateVoiceModelForm();
+		}
+
+		private void letterPatternBox_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			if (letterPatternsBox.SelectedIndex > -1)
+			{
+				letterPatternNameBox.Text = letterPatternsBox.SelectedItem as string;
+
+				selectAudioFileButton.Text = letterPatternsBox.SelectedItem as string + ".wav";
+			}
+			else
+				IfNoLetterPatterns();
+		}
+
+		private void deleteLetterPatternButton_Click(object sender, EventArgs e)
+		{
+
 		}
 	}
 }

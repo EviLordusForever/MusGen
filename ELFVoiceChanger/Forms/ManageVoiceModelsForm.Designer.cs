@@ -31,7 +31,7 @@
 			this.voiceModelsBox = new System.Windows.Forms.ComboBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
-			this.letterPatternBox = new System.Windows.Forms.ComboBox();
+			this.letterPatternsBox = new System.Windows.Forms.ComboBox();
 			this.panel1 = new System.Windows.Forms.Panel();
 			this.button4 = new System.Windows.Forms.Button();
 			this.button1 = new System.Windows.Forms.Button();
@@ -39,10 +39,10 @@
 			this.label3 = new System.Windows.Forms.Label();
 			this.label6 = new System.Windows.Forms.Label();
 			this.panel2 = new System.Windows.Forms.Panel();
-			this.button5 = new System.Windows.Forms.Button();
-			this.button3 = new System.Windows.Forms.Button();
+			this.deleteLetterPatternButton = new System.Windows.Forms.Button();
+			this.selectAudioFileButton = new System.Windows.Forms.Button();
 			this.button2 = new System.Windows.Forms.Button();
-			this.letterPatternName = new System.Windows.Forms.TextBox();
+			this.letterPatternNameBox = new System.Windows.Forms.TextBox();
 			this.label4 = new System.Windows.Forms.Label();
 			this.panel1.SuspendLayout();
 			this.panel2.SuspendLayout();
@@ -82,14 +82,15 @@
 			this.label2.Text = "Letter Pattern:";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 			// 
-			// letterPatternBox
+			// letterPatternsBox
 			// 
-			this.letterPatternBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.letterPatternBox.FormattingEnabled = true;
-			this.letterPatternBox.Location = new System.Drawing.Point(113, 4);
-			this.letterPatternBox.Name = "letterPatternBox";
-			this.letterPatternBox.Size = new System.Drawing.Size(473, 23);
-			this.letterPatternBox.TabIndex = 3;
+			this.letterPatternsBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.letterPatternsBox.FormattingEnabled = true;
+			this.letterPatternsBox.Location = new System.Drawing.Point(113, 4);
+			this.letterPatternsBox.Name = "letterPatternsBox";
+			this.letterPatternsBox.Size = new System.Drawing.Size(473, 23);
+			this.letterPatternsBox.TabIndex = 3;
+			this.letterPatternsBox.SelectedIndexChanged += new System.EventHandler(this.letterPatternBox_SelectedIndexChanged);
 			// 
 			// panel1
 			// 
@@ -164,40 +165,41 @@
 			// panel2
 			// 
 			this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.panel2.Controls.Add(this.button5);
-			this.panel2.Controls.Add(this.button3);
+			this.panel2.Controls.Add(this.deleteLetterPatternButton);
+			this.panel2.Controls.Add(this.selectAudioFileButton);
 			this.panel2.Controls.Add(this.button2);
 			this.panel2.Controls.Add(this.label6);
-			this.panel2.Controls.Add(this.letterPatternName);
+			this.panel2.Controls.Add(this.letterPatternNameBox);
 			this.panel2.Controls.Add(this.label2);
 			this.panel2.Controls.Add(this.label4);
-			this.panel2.Controls.Add(this.letterPatternBox);
+			this.panel2.Controls.Add(this.letterPatternsBox);
 			this.panel2.Location = new System.Drawing.Point(12, 178);
 			this.panel2.Name = "panel2";
 			this.panel2.Size = new System.Drawing.Size(592, 138);
 			this.panel2.TabIndex = 7;
 			// 
-			// button5
+			// deleteLetterPatternButton
 			// 
-			this.button5.FlatAppearance.BorderColor = System.Drawing.Color.Black;
-			this.button5.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.button5.Location = new System.Drawing.Point(4, 109);
-			this.button5.Name = "button5";
-			this.button5.Size = new System.Drawing.Size(582, 23);
-			this.button5.TabIndex = 14;
-			this.button5.Text = "Delete This Letter Pattern";
-			this.button5.UseVisualStyleBackColor = true;
+			this.deleteLetterPatternButton.FlatAppearance.BorderColor = System.Drawing.Color.Black;
+			this.deleteLetterPatternButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+			this.deleteLetterPatternButton.Location = new System.Drawing.Point(4, 109);
+			this.deleteLetterPatternButton.Name = "deleteLetterPatternButton";
+			this.deleteLetterPatternButton.Size = new System.Drawing.Size(582, 23);
+			this.deleteLetterPatternButton.TabIndex = 14;
+			this.deleteLetterPatternButton.Text = "Delete This Letter Pattern";
+			this.deleteLetterPatternButton.UseVisualStyleBackColor = true;
+			this.deleteLetterPatternButton.Click += new System.EventHandler(this.deleteLetterPatternButton_Click);
 			// 
-			// button3
+			// selectAudioFileButton
 			// 
-			this.button3.FlatAppearance.BorderColor = System.Drawing.Color.Black;
-			this.button3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.button3.Location = new System.Drawing.Point(113, 56);
-			this.button3.Name = "button3";
-			this.button3.Size = new System.Drawing.Size(473, 23);
-			this.button3.TabIndex = 13;
-			this.button3.Text = "Select Audio File";
-			this.button3.UseVisualStyleBackColor = true;
+			this.selectAudioFileButton.FlatAppearance.BorderColor = System.Drawing.Color.Black;
+			this.selectAudioFileButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+			this.selectAudioFileButton.Location = new System.Drawing.Point(113, 56);
+			this.selectAudioFileButton.Name = "selectAudioFileButton";
+			this.selectAudioFileButton.Size = new System.Drawing.Size(473, 23);
+			this.selectAudioFileButton.TabIndex = 13;
+			this.selectAudioFileButton.Text = "Select Audio File";
+			this.selectAudioFileButton.UseVisualStyleBackColor = true;
 			// 
 			// button2
 			// 
@@ -211,12 +213,12 @@
 			this.button2.UseVisualStyleBackColor = true;
 			this.button2.Click += new System.EventHandler(this.button2_Click);
 			// 
-			// letterPatternName
+			// letterPatternNameBox
 			// 
-			this.letterPatternName.Location = new System.Drawing.Point(113, 30);
-			this.letterPatternName.Name = "letterPatternName";
-			this.letterPatternName.Size = new System.Drawing.Size(473, 23);
-			this.letterPatternName.TabIndex = 12;
+			this.letterPatternNameBox.Location = new System.Drawing.Point(113, 30);
+			this.letterPatternNameBox.Name = "letterPatternNameBox";
+			this.letterPatternNameBox.Size = new System.Drawing.Size(473, 23);
+			this.letterPatternNameBox.TabIndex = 12;
 			// 
 			// label4
 			// 
@@ -258,14 +260,14 @@
 		private Label label6;
 		private Label label3;
 		private Panel panel2;
-		private Button button3;
+		private Button selectAudioFileButton;
 		private Button button2;
 		private Label label4;
 		private Button button4;
-		private Button button5;
+		private Button deleteLetterPatternButton;
 		public ComboBox voiceModelsBox;
-		public ComboBox letterPatternBox;
+		public ComboBox letterPatternsBox;
 		public TextBox voiceModelNameBox;
-		public TextBox letterPatternName;
+		public TextBox letterPatternNameBox;
 	}
 }
