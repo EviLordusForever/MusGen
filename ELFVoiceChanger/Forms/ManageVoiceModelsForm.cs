@@ -1,14 +1,6 @@
 ﻿using ELFVoiceChanger.Core;
 using ELFVoiceChanger.Voice;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace ELFVoiceChanger.Forms
 {
@@ -84,7 +76,7 @@ namespace ELFVoiceChanger.Forms
 			string name = voiceModelNameBox.Text.Trim();
 			string oldName = voiceModelsBox.SelectedItem as string;
 
-			if (name == oldName || Directory.Exists(Disk.programFiles + "\\VoiceModels\\" + name) || name.Trim().Length < 0)
+			if (name == oldName || Directory.Exists(Disk.programFiles + "\\VoiceModels\\" + name) || name.Trim().Length <= 0)
 			{
 				voiceModelNameBox.Text = oldName;
 				return;
@@ -230,6 +222,27 @@ namespace ELFVoiceChanger.Forms
 
 			if (isGood)
 				VoiceModelsManager.ChangeLetterPattern(voiceModelNameBox.Text, letterPatternNameBox.Text, newPath);
+		}
+
+		private void letterPatternNameBox_TextChanged(object sender, EventArgs e)
+		{
+			string voiceModelName = voiceModelNameBox.Text;
+			string name = letterPatternNameBox.Text.Trim();
+			string oldName = letterPatternsBox.SelectedItem as string;
+
+			if (name == oldName || File.Exists(Disk.programFiles + "\\VoiceModels\\" + voiceModelName + "\\LetterPatterns\\" + name + ".wav") || name.Trim().Length <= 0)
+			{
+				letterPatternNameBox.Text = oldName;
+				return;
+			}
+
+			int id = letterPatternsBox.Items.IndexOf(oldName);
+			letterPatternsBox.Items.RemoveAt(id);
+			letterPatternsBox.Items.Insert(id, name);
+
+			VoiceModelsManager.RenameLetterPattern(voiceModelName, oldName, name);
+
+			letterPatternsBox.SelectedIndex = id;
 		}
 	}
 }

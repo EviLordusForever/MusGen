@@ -221,6 +221,7 @@
 			this.letterPatternNameBox.Name = "letterPatternNameBox";
 			this.letterPatternNameBox.Size = new System.Drawing.Size(473, 23);
 			this.letterPatternNameBox.TabIndex = 12;
+			this.letterPatternNameBox.TextChanged += new System.EventHandler(this.letterPatternNameBox_TextChanged);
 			// 
 			// label4
 			// 
