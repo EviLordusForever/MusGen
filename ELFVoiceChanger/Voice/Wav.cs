@@ -9,8 +9,8 @@ namespace ELFVoiceChanger.Voice
 {
 	public class Wav
 	{
-		float[] L;
-		float[] R;
+		public float[] L;
+		public float[] R;
 
 		uint chunkID;
 		uint fileSize;
@@ -19,7 +19,7 @@ namespace ELFVoiceChanger.Voice
 		uint fmtSize;
 
 		uint fmtCode;
-		uint channels;
+		public uint channels;
 		uint sampleRate;
 		uint byteRate;
 		ushort fmtBlockAlign;
@@ -83,7 +83,9 @@ namespace ELFVoiceChanger.Voice
 
 						// chunk 2
 						dataID = reader.ReadInt32();
-						bytes = Math.Min(bytesLimit, reader.ReadInt32());
+						bytes = reader.ReadInt32();
+						if (bytesLimit > 0)
+							bytes = Math.Min(bytesLimit, bytes);
 
 						// DATA!
 						byteArray = reader.ReadBytes(bytes);
@@ -151,45 +153,46 @@ namespace ELFVoiceChanger.Voice
 		{
 			//sampleRate;
 
-			FileStream f = new FileStream(filename, FileMode.Create);
-
-			f.Write(StringToByteArray("RIFF")); //RIFF
-			f.Write(BitConverter.GetBytes((uint)(44 + L.Length * bitDepth * channels))); //?
-			f.Write(StringToByteArray("WAVE"));
-			f.Write(StringToByteArray("fmt "));
-			f.Write(BitConverter.GetBytes(16)); //Subchunk 1 size = 16
-
-			f.Write(BitConverter.GetBytes((ushort)1)); //type format = 1 PCM
-			f.Write(BitConverter.GetBytes((ushort)channels)); //Channels
-			f.Write(BitConverter.GetBytes(sampleRate)); //
-			f.Write(BitConverter.GetBytes(sampleRate * bitDepth * channels / 8)); //CORRECT
-			f.Write(BitConverter.GetBytes(fmtBlockAlign)); //Block align
-			f.Write(BitConverter.GetBytes(bitDepth)); //Bits per sample
-			f.Write(StringToByteArray("data"));
-			f.Write(BitConverter.GetBytes(L.Length * bitDepth * channels));
-
-			for (int i = 0; i < L.Length; i++)
+			using (FileStream f = new FileStream(filename, FileMode.Create))
 			{
-				WriteSample(L[i]);
-				if (channels == 2)
-					WriteSample(R[i]);
+				f.Write(StringToByteArray("RIFF")); //RIFF
+				f.Write(BitConverter.GetBytes((uint)(44 + L.Length * bitDepth * channels))); //?
+				f.Write(StringToByteArray("WAVE"));
+				f.Write(StringToByteArray("fmt "));
+				f.Write(BitConverter.GetBytes(16)); //Subchunk 1 size = 16
 
-				void WriteSample(float v)
+				f.Write(BitConverter.GetBytes((ushort)1)); //type format = 1 PCM
+				f.Write(BitConverter.GetBytes((ushort)channels)); //Channels
+				f.Write(BitConverter.GetBytes(sampleRate)); //
+				f.Write(BitConverter.GetBytes(sampleRate * bitDepth * channels / 8)); //CORRECT
+				f.Write(BitConverter.GetBytes(fmtBlockAlign)); //Block align
+				f.Write(BitConverter.GetBytes(bitDepth)); //Bits per sample
+				f.Write(StringToByteArray("data"));
+				f.Write(BitConverter.GetBytes(L.Length * bitDepth * channels));
+
+				for (int i = 0; i < L.Length; i++)
 				{
-					if (bitDepth == 16)
+					WriteSample(L[i]);
+					if (channels == 2)
+						WriteSample(R[i]);
+
+					void WriteSample(float v)
 					{
-						short a = Convert.ToInt16(v * Math.Pow(2, bitDepth - 1));
-						f.Write(BitConverter.GetBytes(a));
-					}
-					if (bitDepth == 32)
-					{
-						int a = Convert.ToInt32(v * Math.Pow(2, bitDepth - 1));
-						f.Write(BitConverter.GetBytes(a));
-					}
-					if (bitDepth == 64)
-					{
-						long a = Convert.ToInt64(v * Math.Pow(2, bitDepth - 1));
-						f.Write(BitConverter.GetBytes(a));
+						if (bitDepth == 16)
+						{
+							short a = Convert.ToInt16(v * Math.Pow(2, bitDepth - 1));
+							f.Write(BitConverter.GetBytes(a));
+						}
+						if (bitDepth == 32)
+						{
+							int a = Convert.ToInt32(v * Math.Pow(2, bitDepth - 1));
+							f.Write(BitConverter.GetBytes(a));
+						}
+						if (bitDepth == 64)
+						{
+							long a = Convert.ToInt64(v * Math.Pow(2, bitDepth - 1));
+							f.Write(BitConverter.GetBytes(a));
+						}
 					}
 				}
 			}

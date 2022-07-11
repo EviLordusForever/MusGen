@@ -61,5 +61,10 @@ namespace ELFVoiceChanger.Forms
 			else
 				this.Close();
 		}
+
+		private void button1_Click(object sender, EventArgs e)
+		{
+			AudioProcessor.ProcessAudio(openFileDialog1.FileName, exportFileName.Text);
+		}
 	}
 }
