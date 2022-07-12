@@ -180,17 +180,17 @@ namespace ELFVoiceChanger.Voice
 					{
 						if (bitDepth == 16)
 						{
-							short a = Convert.ToInt16(v * Math.Pow(2, bitDepth - 1));
+							short a = Convert.ToInt16(Math.Floor(v * Math.Pow(2, bitDepth - 1)));
 							f.Write(BitConverter.GetBytes(a));
 						}
 						if (bitDepth == 32)
 						{
-							int a = Convert.ToInt32(v * Math.Pow(2, bitDepth - 1));
+							int a = Convert.ToInt32(Math.Floor(v * Math.Pow(2, bitDepth - 1)));
 							f.Write(BitConverter.GetBytes(a));
 						}
 						if (bitDepth == 64)
 						{
-							long a = Convert.ToInt64(v * Math.Pow(2, bitDepth - 1));
+							long a = Convert.ToInt64(Math.Floor(v * Math.Pow(2, bitDepth - 1)));
 							f.Write(BitConverter.GetBytes(a));
 						}
 					}
