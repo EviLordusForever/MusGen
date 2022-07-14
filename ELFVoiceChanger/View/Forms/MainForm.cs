@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static ELFVoiceChanger.Forms.FormsManager;
+using static ELFVoiceChanger.View.FormsManager;
 using ELFVoiceChanger.Core;
 
 namespace ELFVoiceChanger.Forms

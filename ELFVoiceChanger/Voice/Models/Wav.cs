@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ELFVoiceChanger.Core;
+using ELFVoiceChanger.View;
 
 namespace ELFVoiceChanger.Voice
 {

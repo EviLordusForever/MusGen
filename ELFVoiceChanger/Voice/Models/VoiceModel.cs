@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ELFVoiceChanger.Voice
+namespace ELFVoiceChanger.Voice.Models
 {
 	public class VoiceModel
 	{

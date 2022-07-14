@@ -1,4 +1,4 @@
-﻿namespace ELFVoiceChanger.Voice
+﻿namespace ELFVoiceChanger.Voice.Models
 {
 	public class LetterPattern
 	{
