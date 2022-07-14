@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ELFVoiceChanger.Core;
-using ELFVoiceChanger.View;
+using ELFVoiceChanger.Forms;
 
 namespace ELFVoiceChanger.Voice
 {
@@ -21,7 +21,7 @@ namespace ELFVoiceChanger.Voice
 
 		uint fmtCode;
 		public uint channels;
-		uint sampleRate;
+		public uint sampleRate;
 		uint byteRate;
 		ushort fmtBlockAlign;
 		ushort bitDepth;
@@ -46,13 +46,13 @@ namespace ELFVoiceChanger.Voice
 			return BitConverter.GetBytes(d);
 		}
 
-		public bool ReadWav(string filename, int bytesLimit)
+		public bool ReadWav(string path, int bytesLimit)
 		{
 			L = R = null;
 
-			try
+			//try
 			{
-				using (FileStream fs = File.Open(filename, FileMode.Open))
+				using (FileStream fs = File.Open(path, FileMode.Open))
 				{
 					using (BinaryReader reader = new BinaryReader(fs))
 					{
@@ -141,9 +141,14 @@ namespace ELFVoiceChanger.Voice
 						return false;
 				}
 			}
-			catch (Exception ex)
+			//catch (ArgumentException ex)
 			{
-				UserAsker.Ask(ex.Message);
+				//UserAsker.Ask("Похоже, слишком короткое аудио: " + x.Message);
+				return false;
+			}
+			//catch (Exception ex)
+			{
+				//UserAsker.Ask(ex.Message);
 				return false;
 			}
 

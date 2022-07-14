@@ -1,13 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using static ELFVoiceChanger.View.FormsManager;
 using ELFVoiceChanger.Core;
 
 namespace ELFVoiceChanger.Forms
@@ -27,16 +19,18 @@ namespace ELFVoiceChanger.Forms
 			//Wav wav = new Wav();
 			//wav.ReadWav(Disk.programFiles + "Amongus.wav");
 			//wav.SaveWav(Disk.programFiles + "Amongus2.wav");
+
+
 		}
 
 		private void button1_Click(object sender, EventArgs e)
 		{
-			OpenManageVoiceModelForm();
+			FormsManager.OpenManageVoiceModelForm();
 		}
 
 		private void button2_Click(object sender, EventArgs e)
 		{
-			OpenVoiceChangingForm();
+			FormsManager.OpenVoiceChangingForm();
 		}
 	}
 }

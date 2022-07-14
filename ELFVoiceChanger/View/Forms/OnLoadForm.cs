@@ -1,5 +1,5 @@
 using ELFVoiceChanger.Forms;
-using ELFVoiceChanger.View;
+using ELFVoiceChanger.Core;
 
 namespace ELFVoiceChanger
 {
@@ -15,6 +15,12 @@ namespace ELFVoiceChanger
 		private void OnLoadForm_Shown(object sender, EventArgs e)
 		{
 			this.Visible = false;
+		}
+
+		private void OnLoadForm_Load(object sender, EventArgs e)
+		{
+			Tests.Test1();
+			//Tests.Test2();
 		}
 	}
 }

@@ -28,20 +28,36 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
+			this.label1 = new System.Windows.Forms.Label();
 			this.SuspendLayout();
+			// 
+			// label1
+			// 
+			this.label1.AutoSize = true;
+			this.label1.Font = new System.Drawing.Font("MV Boli", 72F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+			this.label1.Location = new System.Drawing.Point(-1, 0);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(715, 125);
+			this.label1.TabIndex = 0;
+			this.label1.Text = "I am not exist";
 			// 
 			// OnLoadForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(800, 450);
+			this.ClientSize = new System.Drawing.Size(713, 141);
+			this.Controls.Add(this.label1);
 			this.Name = "OnLoadForm";
 			this.Text = "I am not exist";
+			this.Load += new System.EventHandler(this.OnLoadForm_Load);
 			this.Shown += new System.EventHandler(this.OnLoadForm_Shown);
 			this.ResumeLayout(false);
+			this.PerformLayout();
 
 		}
 
 		#endregion
+
+		private Label label1;
 	}
 }
