@@ -15,7 +15,7 @@ namespace ELFVoiceChanger.Core
 			wav.ReadWav(Disk.programFiles + "test.wav", 0);
 			UserAsker.Ask(wav.L.Length.ToString());
 
-			PerioudFinder.FindFrequency(wav, 30000, 33000);
+			PerioudFinder.FindPeriod(wav, 30000, 33000);
 		}
 
 		public static void Test2()
@@ -34,6 +34,7 @@ namespace ELFVoiceChanger.Core
 
 		public static void Test3()
 		{
+
 		}
 	}
 }

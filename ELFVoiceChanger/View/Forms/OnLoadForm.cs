@@ -19,7 +19,7 @@ namespace ELFVoiceChanger
 
 		private void OnLoadForm_Load(object sender, EventArgs e)
 		{
-			Tests.Test1();
+			//Tests.Test1();
 			//Tests.Test2();
 		}
 	}

@@ -184,21 +184,27 @@ namespace ELFVoiceChanger.Voice
 
 					void WriteSample(float v)
 					{
-						if (bitDepth == 16)
+						try
 						{
-							short a = Convert.ToInt16(Math.Floor(v * Math.Pow(2, bitDepth - 1)));
-							f.Write(BitConverter.GetBytes(a));
+							if (bitDepth == 16)
+							{
+								short a = Convert.ToInt16(Math.Floor(v * Math.Pow(2, bitDepth - 1)));
+								f.Write(BitConverter.GetBytes(a));
+							}
+							if (bitDepth == 32)
+							{
+								int a = Convert.ToInt32(Math.Floor(v * Math.Pow(2, bitDepth - 1)));
+								f.Write(BitConverter.GetBytes(a));
+							}
+							if (bitDepth == 64)
+							{
+								long a = Convert.ToInt64(Math.Floor(v * Math.Pow(2, bitDepth - 1)));
+								f.Write(BitConverter.GetBytes(a));
+							}
 						}
-						if (bitDepth == 32)
-						{
-							int a = Convert.ToInt32(Math.Floor(v * Math.Pow(2, bitDepth - 1)));
-							f.Write(BitConverter.GetBytes(a));
-						}
-						if (bitDepth == 64)
-						{
-							long a = Convert.ToInt64(Math.Floor(v * Math.Pow(2, bitDepth - 1)));
-							f.Write(BitConverter.GetBytes(a));
-						}
+						catch (System.OverflowException ex)
+						{ 
+						}					
 					}
 				}
 			}

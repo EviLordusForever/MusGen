@@ -9,25 +9,26 @@ namespace ELFVoiceChanger.Voice
 {
 	public static class PerioudFinder
 	{
-		public static int minPeriod = 10;    //
-		public static int maxPeriod = 1000;
-		public static int points = 30;
+		public static int minPeriod = 80;    //
+		public static int maxPeriod = 600;
+		public static int points = 50;
 
-		public static double FindFrequency(Wav wav, int start, int end)
+		public static double FindPeriod(Wav wav, int start, int end)
 		{
+			//end - start MORE than maxPeriod
 			int t = 0;
 			float[] mismatches = new float[maxPeriod - minPeriod];
 
-			double actualFrequency = 0;
+			double actualPeriod = 1;
 			double minMismatch = 1;
 
-			int delta = (end - start) / points;
+			int delta = ((end - start) - maxPeriod) / points;
 
-			for (double perioud = minPeriod; perioud < maxPeriod; perioud *= 1.05)
+			for (double perioud = minPeriod; perioud < maxPeriod; perioud *= 1.025)
 			{
 				double mismatch = 0;
 
-				for (int sample = start; sample < end - 1; sample += delta)
+				for (int sample = start; sample < end - maxPeriod; sample += delta)
 				{
 						mismatch += Math.Abs(wav.L[sample] - wav.L[sample + (int)perioud]);
 						if (wav.channels == 2) //Is this necessary?
@@ -40,13 +41,13 @@ namespace ELFVoiceChanger.Voice
 				if (mismatch < minMismatch)
 				{
 					minMismatch = mismatch;
-					actualFrequency = perioud;
+					actualPeriod = perioud;
 				}
 			}
 
-			GraficsMaker.MakeGrafic(mismatches, 2000); //
-			UserAsker.Ask("Период: " + actualFrequency);
-			return actualFrequency;
+			//GraficsMaker.MakeGrafic(mismatches, 2000); //
+			//UserAsker.Ask("Период: " + actualFrequency);
+			return actualPeriod;
 		}
 
 		public static double goertzel(double[] sngData, long N, float freq, int samplerate)
