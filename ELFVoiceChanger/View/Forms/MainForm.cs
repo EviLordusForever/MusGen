@@ -19,8 +19,6 @@ namespace ELFVoiceChanger.Forms
 			//Wav wav = new Wav();
 			//wav.ReadWav(Disk.programFiles + "Amongus.wav");
 			//wav.SaveWav(Disk.programFiles + "Amongus2.wav");
-
-
 		}
 
 		private void button1_Click(object sender, EventArgs e)
@@ -31,6 +29,11 @@ namespace ELFVoiceChanger.Forms
 		private void button2_Click(object sender, EventArgs e)
 		{
 			FormsManager.OpenVoiceChangingForm();
+		}
+
+		private void button3_Click(object sender, EventArgs e)
+		{
+			FormsManager.OpenEffectsForm();
 		}
 	}
 }

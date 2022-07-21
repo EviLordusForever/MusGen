@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ELFVoiceChanger.Forms;
+using ELFVoiceChanger.View.Forms;
 
 namespace ELFVoiceChanger.Forms
 {
@@ -14,6 +14,7 @@ namespace ELFVoiceChanger.Forms
 		public static CreateVoiceModelForm createVoiceModelForm;
 		public static AddLetterPatternForm addLetterPatternForm;
 		public static VoiceChangingForm voiceChangingForm;
+		public static EffectsForm effectsForm;
 
 		public static void OpenManageVoiceModelForm()
 		{
@@ -44,8 +45,6 @@ namespace ELFVoiceChanger.Forms
 			addLetterPatternForm.Show();
 			addLetterPatternForm.BringToFront();
 		}
-
-
 		public static void OpenVoiceChangingForm()
 		{
 			if (voiceChangingForm == null || voiceChangingForm.IsDisposed)
@@ -54,6 +53,16 @@ namespace ELFVoiceChanger.Forms
 			voiceChangingForm.WindowState = FormWindowState.Normal;
 			voiceChangingForm.Show();
 			voiceChangingForm.BringToFront();
+		}
+
+		public static void OpenEffectsForm()
+		{
+			if (effectsForm == null || effectsForm.IsDisposed)
+				effectsForm = new EffectsForm();
+
+			effectsForm.WindowState = FormWindowState.Normal;
+			effectsForm.Show();
+			effectsForm.BringToFront();
 		}
 
 		public static void CloseAddLetterPatternForm()
