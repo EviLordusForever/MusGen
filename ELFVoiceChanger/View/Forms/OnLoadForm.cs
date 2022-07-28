@@ -1,4 +1,3 @@
-using ELFVoiceChanger.Forms;
 using ELFVoiceChanger.Core;
 
 namespace ELFVoiceChanger.View.Forms

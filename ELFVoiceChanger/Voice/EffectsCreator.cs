@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ELFVoiceChanger.Core;
 using ELFVoiceChanger.Voice.Models;
 using ELFVoiceChanger.View;
+using System.Threading;
 
 namespace ELFVoiceChanger.Voice
 {
@@ -43,6 +44,10 @@ namespace ELFVoiceChanger.Voice
 		public static void Save(string outName)
 		{
 			wavOut.SaveWav(Disk.programFiles + "Export\\" + outName + ".wav");
+		}
+
+		public static void StartEffectAsync(string originPath, string outName, int effectNUmber)
+		{
 		}
 
 		public static void Effect1(string originPath, string outName)
@@ -130,65 +135,71 @@ namespace ELFVoiceChanger.Voice
 
 		public static void Effect4(string originPath, string outName, int limitSec)
 		{
-			Startup(originPath);
+			Thread tr = new Thread(Tr);
+			tr.Start();
 
-			double pi2 = Math.PI * 2;
-			double period = 0;
-			double periodNew = 0;
-			double t = 0;
-			float sint = 0;
-			float A = 1;
-			double AA = 1;
-
-			double i2 = 0;
-
-			double mismatch = 1;
-
-			UserAsker.ShowProgress("Effect4 making");
-
-			for (int i = 0; i < wavIn.sampleRate * limitSec; i++)
+			void Tr()
 			{
-				if (i % 500 == 0)
-					if (i < wavIn.L.Length - 1001)
-					{
-						if (i > i2)
+				Startup(originPath);
+
+				double pi2 = Math.PI * 2;
+				double period = 0;
+				double periodNew = 0;
+				double t = 0;
+				float sint = 0;
+				float A = 1;
+				double AA = 1;
+
+				double i2 = 0;
+
+				double mismatch = 1;
+
+				UserAsker.ShowProgress("Effect4 making");
+
+				for (int i = 0; i < wavIn.sampleRate * limitSec; i++)
+				{
+					if (i % 500 == 0)
+						if (i < wavIn.L.Length - 1001)
 						{
-							i2 += (wavIn.sampleRate / 60.0);
+							if (i > i2)
+							{
+								i2 += (wavIn.sampleRate / 60.0);
 
-							periodNew = PerioudFinder.FindPeriod_WithAnimation(wavIn, i, i + 1000, out mismatch, i) / 2;
+								periodNew = PerioudFinder.FindPeriod_WithAnimation(wavIn, i, i + 1000, out mismatch, i) / 2;
+							}
+							else
+								periodNew = PerioudFinder.FindPeriod(wavIn, i, i + 1000, out mismatch) / 2;
+
+							if (mismatch < 0.1)
+								period = periodNew;
+
+							A = FindA(i, i + 500);
+
+							UserAsker.SetProgress(Convert.ToInt32(100.0 * i / (wavIn.sampleRate * limitSec)));
 						}
-						else
-							periodNew = PerioudFinder.FindPeriod(wavIn, i, i + 1000, out mismatch) / 2;
 
-						if (mismatch < 0.1)
-							period = periodNew;
+					AA = AA * 0.98 + A * 0.02;
 
-						A = FindA(i, i + 500);
+					t += pi2 / period;
+					sint = (float)(Math.Sin(t) * 0.99 * AA);
 
-						UserAsker.SetProgress(Convert.ToInt32(100.0 * i / wavIn.sampleRate * limitSec));
-					}
+					wavOut.L[i] = sint;
+					if (wavIn.channels == 2)
+						wavOut.R[i] = sint;
+				}
 
-				AA = AA * 0.98 + A * 0.02;
+				Save(outName);
 
-				t += pi2 / period;
-				sint = (float)(Math.Sin(t) * 0.99 * AA);
+				UserAsker.CloseProgressForm();
 
-				wavOut.L[i] = sint;
-				if (wavIn.channels == 2)
-					wavOut.R[i] = sint;
-			}
-
-			Save(outName);
-
-			UserAsker.CloseProgressForm();
-
-			float FindA(int from, int to)
-			{
-				float A = 0;
-				for (int i = from; i < to; i++)
-					if (Math.Abs(wavIn.L[i]) > A)
-						A = Math.Abs(wavIn.L[i]);
-				return A;
+				float FindA(int from, int to)
+				{
+					float A = 0;
+					for (int i = from; i < to; i++)
+						if (Math.Abs(wavIn.L[i]) > A)
+							A = Math.Abs(wavIn.L[i]);
+					return A;
+				}
 			}
 		}
 	}

@@ -48,6 +48,7 @@ namespace ELFVoiceChanger.Core
 			gr.DrawLine(greenPen, Convert.ToInt32(greenLine * xScale), 0, Convert.ToInt32(greenLine * xScale), 1080);
 
 			Disk.SaveImage(bmp, Disk.programFiles + "Grafics\\g_" + name + ".bmp");
+			bmp.Dispose(); //
 		}
 	}
 }
