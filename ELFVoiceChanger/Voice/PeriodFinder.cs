@@ -30,6 +30,41 @@ namespace ELFVoiceChanger.Voice
 
 				for (int sample = start; sample < end - maxPeriod; sample += delta)
 				{
+					mismatch += Math.Abs(wav.L[sample] - wav.L[sample + (int)perioud]);
+					if (wav.channels == 2) //Is this necessary?
+						mismatch += Math.Abs(wav.R[sample] - wav.R[sample + (int)perioud]);
+				}
+				mismatch /= points;
+
+				mismatches[t++] = (float)mismatch;
+
+				if (mismatch < minMismatch)
+				{
+					minMismatch = mismatch;
+					actualPeriod = perioud;
+				}
+			}
+
+			return actualPeriod;
+		}
+
+		public static double FindPeriod_WithAnimation(Wav wav, int start, int end, int n)
+		{
+			//end - start MORE than maxPeriod
+			int t = 0;
+			float[] mismatches = new float[maxPeriod - minPeriod];
+
+			double actualPeriod = 1;
+			double minMismatch = 1;
+
+			int delta = ((end - start) - maxPeriod) / points;
+
+			for (double perioud = minPeriod; perioud < maxPeriod; perioud *= 1.025)
+			{
+				double mismatch = 0;
+
+				for (int sample = start; sample < end - maxPeriod; sample += delta)
+				{
 						mismatch += Math.Abs(wav.L[sample] - wav.L[sample + (int)perioud]);
 						if (wav.channels == 2) //Is this necessary?
 							mismatch += Math.Abs(wav.R[sample] - wav.R[sample + (int)perioud]);
@@ -45,8 +80,7 @@ namespace ELFVoiceChanger.Voice
 				}
 			}
 
-			//GraficsMaker.MakeGrafic(mismatches, 2000); //
-			//UserAsker.Ask("Период: " + actualFrequency);
+			GraficsMaker.MakeGraficPlus(n.ToString(), mismatches, 2000, minPeriod, maxPeriod, Convert.ToInt32(actualPeriod));
 			return actualPeriod;
 		}
 
