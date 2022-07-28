@@ -183,8 +183,8 @@ namespace ELFVoiceChanger.Voice
 
 					void WriteSample(float v)
 					{
-						try
-						{
+						//try
+						//{
 							if (bitDepth == 16)
 							{
 								short a = Convert.ToInt16(Math.Floor(v * Math.Pow(2, bitDepth - 1)));
@@ -200,10 +200,10 @@ namespace ELFVoiceChanger.Voice
 								long a = Convert.ToInt64(Math.Floor(v * Math.Pow(2, bitDepth - 1)));
 								f.Write(BitConverter.GetBytes(a));
 							}
-						}
-						catch (System.OverflowException ex)
-						{ 
-						}					
+						//}
+						//catch (System.OverflowException ex)
+						//{ 
+						//}					
 					}
 				}
 			}

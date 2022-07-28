@@ -46,9 +46,9 @@ namespace ELFVoiceChanger.Core
 			gr.DrawLine(redPen, Convert.ToInt32(redLine1 * xScale), 0, Convert.ToInt32(redLine1 * xScale), 1080);
 			gr.DrawLine(redPen, Convert.ToInt32(redLine2 * xScale), 0, Convert.ToInt32(redLine2 * xScale), 1080);
 			gr.DrawLine(greenPen, Convert.ToInt32(greenLine * xScale), 0, Convert.ToInt32(greenLine * xScale), 1080);
-			gr.DrawLine(greenPen, 0, Convert.ToInt32(limit * yScale), 1080, Convert.ToInt32(limit * yScale));
+			gr.DrawLine(greenPen, 0, Convert.ToInt32(limit * yScale), 1920, Convert.ToInt32(limit * yScale));
 
-			Disk.SaveImage(bmp, Disk.programFiles + "Grafics\\g_" + name + ".bmp");
+			Disk.SaveImage(bmp, Disk.programFiles + "Grafics\\g\\g_" + name + ".bmp");
 			bmp.Dispose(); //
 		}
 	}

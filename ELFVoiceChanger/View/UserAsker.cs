@@ -23,14 +23,16 @@ namespace ELFVoiceChanger.View
 			{
 				FormsManager.OpenProgressForm();
 				FormsManager.progressForm.Text = text;
+				FormsManager.progressForm.progress.Maximum = 1000;
+				//FormsManager.progressForm.progress.Minimum = 0;
 			}));
 		}
 
-		public static void SetProgress(int value)
+		public static void SetProgress(double value)
 		{
 			FormsManager.mainForm.Invoke(new Action(() =>
 			{
-				FormsManager.progressForm.progress.Value = value;
+				FormsManager.progressForm.progress.Value = (int)(value * 1000);
 			}));
 		}
 

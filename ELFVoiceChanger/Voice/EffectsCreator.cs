@@ -153,7 +153,7 @@ namespace ELFVoiceChanger.Voice
 				double i2 = 0;
 
 				double mismatch = 1;
-				double limit = 0.1;
+				double mismatchLimit = 0.2;
 
 				UserAsker.ShowProgress("Effect4 making");
 
@@ -166,17 +166,17 @@ namespace ELFVoiceChanger.Voice
 							{
 								i2 += (wavIn.sampleRate / 60.0);
 
-								periodNew = PerioudFinder.FindPeriod_WithAnimation(wavIn, i, i + 1000, out mismatch, limit, i) / 2;
+								periodNew = PerioudFinder.FindPeriod_WithAnimation(wavIn, i, i + 1000, out mismatch, mismatchLimit, i) / 2;
 							}
 							else
 								periodNew = PerioudFinder.FindPeriod(wavIn, i, i + 1000, out mismatch) / 2;
 
-							if (mismatch < 0.1)
-								period = periodNew;
+							if (mismatch < mismatchLimit)
+								period = period * 0.9 + periodNew * 0.1; //
 
 							A = FindA(i, i + 500);
 
-							UserAsker.SetProgress(Convert.ToInt32(100.0 * i / (wavIn.sampleRate * limitSec)));
+							UserAsker.SetProgress(1.0 * i / (wavIn.sampleRate * limitSec));
 						}
 
 					AA = AA * 0.98 + A * 0.02;
