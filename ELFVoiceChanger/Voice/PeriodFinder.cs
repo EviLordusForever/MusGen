@@ -13,14 +13,14 @@ namespace ELFVoiceChanger.Voice
 		public static int maxPeriod = 600;
 		public static int points = 50;
 
-		public static double FindPeriod(Wav wav, int start, int end)
+		public static double FindPeriod(Wav wav, int start, int end, out double minMismatch)
 		{
 			//end - start MORE than maxPeriod
 			int t = 0;
 			float[] mismatches = new float[maxPeriod - minPeriod];
 
 			double actualPeriod = 1;
-			double minMismatch = 1;
+			minMismatch = 1;
 
 			int delta = ((end - start) - maxPeriod) / points;
 
@@ -48,13 +48,13 @@ namespace ELFVoiceChanger.Voice
 			return actualPeriod;
 		}
 
-		public static double FindPeriod_WithAnimation(Wav wav, int start, int end, int n)
+		public static double FindPeriod_WithAnimation(Wav wav, int start, int end, out double minMismatch, int n)
 		{
 			//end - start MORE than maxPeriod
 			float[] mismatches = new float[maxPeriod];
 
 			double actualPeriod = 1;
-			double minMismatch = 1;
+			minMismatch = 1;
 
 			int delta = ((end - start) - maxPeriod) / points;
 

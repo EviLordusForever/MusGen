@@ -77,6 +77,7 @@ namespace ELFVoiceChanger.Voice
 
 			double pi2 = Math.PI * 2;
 			double period = 0;
+			double mismatch = 0;
 			double t = 0;
 			float sint = 0;
 			float A = 1;
@@ -87,7 +88,7 @@ namespace ELFVoiceChanger.Voice
 				if (i % 500 == 0)
 					if (i < wavIn.L.Length - 1001)
 					{
-						period = PerioudFinder.FindPeriod(wavIn, i, i + 1000) / 2;
+						period = PerioudFinder.FindPeriod(wavIn, i, i + 1000, out mismatch) / 2;
 						A = FindA(i, i + 500);
 					}
 
@@ -119,12 +120,15 @@ namespace ELFVoiceChanger.Voice
 
 			double pi2 = Math.PI * 2;
 			double period = 0;
+			double periodNew = 0;
 			double t = 0;
 			float sint = 0;
 			float A = 1;
 			double AA = 1;
 
 			double i2 = 0;
+
+			double mismatch = 1;
 			for (int i = 0; i < wavIn.L.Length; i++)
 			{
 				if (i % 500 == 0)
@@ -132,12 +136,15 @@ namespace ELFVoiceChanger.Voice
 					{
 						if (i > i2)
 						{
-							i2 += (wavIn.sampleRate / 24.0);
+							i2 += (wavIn.sampleRate / 60.0);
 
-							period = PerioudFinder.FindPeriod_WithAnimation(wavIn, i, i + 1000, i) / 2;
+							periodNew = PerioudFinder.FindPeriod_WithAnimation(wavIn, i, i + 1000, out mismatch, i) / 2;
 						}
 						else
-							period = PerioudFinder.FindPeriod(wavIn, i, i + 1000) / 2;
+							periodNew = PerioudFinder.FindPeriod(wavIn, i, i + 1000, out mismatch) / 2;
+
+						if (mismatch < 0.1)
+							period = periodNew;
 
 						A = FindA(i, i + 500);
 					}
