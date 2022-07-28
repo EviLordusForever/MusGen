@@ -26,6 +26,19 @@ namespace ELFVoiceChanger.Voice
 				wavOut.R = new float[wavIn.R.Length];
 		}
 
+		public static void Startup(string originPath, int limitSec)
+		{
+			wavIn = new Wav();
+			wavIn.ReadWav(originPath, 0);
+
+			wavOut = new Wav();
+			wavOut.ReadWav(originPath, 0);
+
+			wavOut.L = new float[limitSec * wavIn.sampleRate];
+			if (wavOut.channels == 2)
+				wavOut.R = new float[limitSec * wavIn.sampleRate];
+		}
+
 		public static void Save(string outName)
 		{
 			wavOut.SaveWav(Disk.programFiles + "Export\\" + outName + ".wav");
@@ -114,7 +127,7 @@ namespace ELFVoiceChanger.Voice
 			}
 		}
 
-		public static void Effect4(string originPath, string outName)
+		public static void Effect4(string originPath, string outName, int limitSec)
 		{
 			Startup(originPath);
 
@@ -129,7 +142,7 @@ namespace ELFVoiceChanger.Voice
 			double i2 = 0;
 
 			double mismatch = 1;
-			for (int i = 0; i < wavIn.L.Length; i++)
+			for (int i = 0; i < wavIn.sampleRate * limitSec; i++)
 			{
 				if (i % 500 == 0)
 					if (i < wavIn.L.Length - 1001)
