@@ -143,8 +143,8 @@ namespace ELFVoiceChanger.Voice
 				Startup(originPath);
 
 				double pi2 = Math.PI * 2;
-				double period = 0;
-				double periodNew = 0;
+				double period = 0.01;
+				double periodNew = 0.01;
 				double t = 0;
 				float sint = 0;
 				float A = 1;
