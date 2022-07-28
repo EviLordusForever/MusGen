@@ -124,7 +124,7 @@ namespace ELFVoiceChanger.Voice
 			float A = 1;
 			double AA = 1;
 
-			uint i2 = 0;
+			double i2 = 0;
 			for (int i = 0; i < wavIn.L.Length; i++)
 			{
 				if (i % 500 == 0)
@@ -132,7 +132,7 @@ namespace ELFVoiceChanger.Voice
 					{
 						if (i > i2)
 						{
-							i2 += wavIn.sampleRate;
+							i2 += (wavIn.sampleRate / 24.0);
 
 							period = PerioudFinder.FindPeriod_WithAnimation(wavIn, i, i + 1000, i) / 2;
 						}
