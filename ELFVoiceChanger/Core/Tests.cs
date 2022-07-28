@@ -14,8 +14,9 @@ namespace ELFVoiceChanger.Core
 			Wav wav = new Wav();
 			wav.ReadWav(Disk.programFiles + "test.wav", 0);
 			UserAsker.Ask(wav.L.Length.ToString());
+			double mismatch;
 
-			PerioudFinder.FindPeriod(wav, 30000, 33000);
+			PerioudFinder.FindPeriod(wav, 30000, 33000, out mismatch);
 		}
 
 		public static void Test2()
