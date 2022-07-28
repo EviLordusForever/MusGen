@@ -11,7 +11,7 @@ namespace ELFVoiceChanger.Voice
 	{
 		public static int minPeriod = 40;    //80
 		public static int maxPeriod = 1200;   //600
-		public static int points = 50;
+		public static int points = 120;
 		public static float[] mismatches;
 
 		public static double FindPeriod(Wav wav, int start, int length, out double minMismatch)
@@ -31,7 +31,7 @@ namespace ELFVoiceChanger.Voice
 
 			int delta = (length - maxPeriod) / points;
 
-			for (double period = minPeriod; period < maxPeriod; period *= 1.025)
+			for (double period = minPeriod; period < maxPeriod; period *= 1.015)
 			{
 				double mismatch = 0;
 
@@ -51,6 +51,56 @@ namespace ELFVoiceChanger.Voice
 					actualPeriod = period;
 				}
 			}
+
+			while (true)
+			{				
+				int half = (int)(1.05 * actualPeriod / 2);
+				int half2 = (int)(0.95 * actualPeriod / 2);
+
+				while (half > half2)
+				{
+					half--;
+					if (half < minPeriod)
+						break;
+					if (mismatches[half] > 0 && mismatches[half] < mismatches[(int)actualPeriod] * 1.5)
+					{
+						actualPeriod = half;
+						continue;
+					}
+				}
+
+				int third = (int)(1.05 * actualPeriod / 3);
+				int third2 = (int)(0.95 * actualPeriod / 3);
+
+				while (third > third2)
+				{
+					third--;
+					if (third < minPeriod)
+						break;
+					if (mismatches[third] > 0 && mismatches[third] < mismatches[(int)actualPeriod] * 1.5)
+					{
+						actualPeriod = third;
+						continue;
+					}
+				}
+
+				int fourth = (int)(1.05 * actualPeriod / 4);
+				int fourth2 = (int)(0.95 * actualPeriod / 4);
+
+				while (fourth > fourth2)
+				{
+					fourth--;
+					if (fourth < minPeriod)
+						break;
+					if (mismatches[fourth] > 0 && mismatches[fourth] < mismatches[(int)actualPeriod] * 1.5)
+					{
+						actualPeriod = fourth;
+						continue;
+					}
+				}
+
+				break;
+			} //important fix
 
 			return actualPeriod;
 		}
