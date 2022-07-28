@@ -80,7 +80,7 @@ namespace ELFVoiceChanger.Voice
 				}
 			}
 
-			GraficsMaker.MakeGraficPlus(n.ToString(), mismatches, 2000, minPeriod, maxPeriod, Convert.ToInt32(actualPeriod));
+			GraficsMaker.MakeGraficPlus(n.ToString(), mismatches, minPeriod, maxPeriod, Convert.ToInt32(actualPeriod));
 			return actualPeriod;
 		}
 
