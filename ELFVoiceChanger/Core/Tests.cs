@@ -17,7 +17,7 @@ namespace ELFVoiceChanger.Core
 			UserAsker.Ask(wav.L.Length.ToString());
 			double mismatch;
 
-			PerioudFinder.FindPeriod(wav, 30000, 33000, out mismatch);
+			PeriodFinder.FindPeriod(wav, 30000, 33000, out mismatch);
 		}
 
 		public static void Test2()
@@ -31,7 +31,7 @@ namespace ELFVoiceChanger.Core
 			for (int i = 1; i < 1000; i++)
 				a[i] = wav.L[i];
 
-			UserAsker.Ask(PerioudFinder.goertzel(a, 100, 44800, (int)wav.sampleRate).ToString());
+			UserAsker.Ask(PeriodFinder.goertzel(a, 100, 44800, (int)wav.sampleRate).ToString());
 		}
 
 		public static void Test3()
