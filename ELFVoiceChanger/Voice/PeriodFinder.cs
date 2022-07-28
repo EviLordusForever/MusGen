@@ -48,7 +48,7 @@ namespace ELFVoiceChanger.Voice
 			return actualPeriod;
 		}
 
-		public static double FindPeriod_WithAnimation(Wav wav, int start, int end, out double minMismatch, int n)
+		public static double FindPeriod_WithAnimation(Wav wav, int start, int end, out double minMismatch, double limit, int n)
 		{
 			//end - start MORE than maxPeriod
 			float[] mismatches = new float[maxPeriod];
@@ -79,7 +79,7 @@ namespace ELFVoiceChanger.Voice
 				}
 			}
 
-			GraficsMaker.MakeGraficPlus(n.ToString(), mismatches, minPeriod, maxPeriod, Convert.ToInt32(actualPeriod));
+			GraficsMaker.MakeGraficPlus(n.ToString(), mismatches, minPeriod, maxPeriod, Convert.ToInt32(actualPeriod), limit);
 			return actualPeriod;
 		}
 

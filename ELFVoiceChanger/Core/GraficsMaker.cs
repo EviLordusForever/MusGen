@@ -21,7 +21,7 @@ namespace ELFVoiceChanger.Core
 			Disk.SaveImage(bmp, Disk.programFiles + "Grafics\\grafic.bmp");
 		}
 
-		public static void MakeGraficPlus(string name, float[] a, int redLine1, int redLine2, int greenLine)
+		public static void MakeGraficPlus(string name, float[] a, int redLine1, int redLine2, int greenLine, double limit)
 		{
 			Bitmap bmp = new Bitmap(1920, 1080);
 			Graphics gr = Graphics.FromImage(bmp);
@@ -46,6 +46,7 @@ namespace ELFVoiceChanger.Core
 			gr.DrawLine(redPen, Convert.ToInt32(redLine1 * xScale), 0, Convert.ToInt32(redLine1 * xScale), 1080);
 			gr.DrawLine(redPen, Convert.ToInt32(redLine2 * xScale), 0, Convert.ToInt32(redLine2 * xScale), 1080);
 			gr.DrawLine(greenPen, Convert.ToInt32(greenLine * xScale), 0, Convert.ToInt32(greenLine * xScale), 1080);
+			gr.DrawLine(greenPen, 0, Convert.ToInt32(limit * yScale), 1080, Convert.ToInt32(limit * yScale));
 
 			Disk.SaveImage(bmp, Disk.programFiles + "Grafics\\g_" + name + ".bmp");
 			bmp.Dispose(); //

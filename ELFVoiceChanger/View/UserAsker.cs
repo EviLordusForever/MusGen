@@ -19,18 +19,27 @@ namespace ELFVoiceChanger.View
 
 		public static void ShowProgress(string text)
 		{
-			FormsManager.OpenProgressForm();
-			FormsManager.progressForm.Text = text;
+			FormsManager.mainForm.Invoke(new Action(() =>
+			{
+				FormsManager.OpenProgressForm();
+				FormsManager.progressForm.Text = text;
+			}));
 		}
 
 		public static void SetProgress(int value)
 		{
-			FormsManager.progressForm.progress.Value = value;
+			FormsManager.mainForm.Invoke(new Action(() =>
+			{
+				FormsManager.progressForm.progress.Value = value;
+			}));
 		}
 
 		public static void CloseProgressForm()
 		{
-			FormsManager.CloseProgressForm();
+			FormsManager.mainForm.Invoke(new Action(() =>
+			{
+				FormsManager.CloseProgressForm();
+			}));
 		}
 	}
 }
