@@ -10,7 +10,7 @@ using System.Windows.Forms;
 using ELFVoiceChanger.Voice;
 using ELFVoiceChanger.Core;
 
-namespace ELFVoiceChanger.Forms
+namespace ELFVoiceChanger.View.Forms
 {
 	public partial class AddLetterPatternForm : Form
 	{

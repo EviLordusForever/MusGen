@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace ELFVoiceChanger.Forms
+namespace ELFVoiceChanger.View.Forms
 {
 	public partial class CreateVoiceModelForm : Form
 	{
@@ -37,6 +37,11 @@ namespace ELFVoiceChanger.Forms
 		}
 
 		private void textBox1_TextChanged(object sender, EventArgs e)
+		{
+
+		}
+
+		private void CreateVoiceModelForm_Load(object sender, EventArgs e)
 		{
 
 		}

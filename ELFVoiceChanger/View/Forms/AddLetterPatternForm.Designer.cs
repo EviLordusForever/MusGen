@@ -1,4 +1,4 @@
-﻿namespace ELFVoiceChanger.Forms
+﻿namespace ELFVoiceChanger.View.Forms
 {
 	partial class AddLetterPatternForm
 	{

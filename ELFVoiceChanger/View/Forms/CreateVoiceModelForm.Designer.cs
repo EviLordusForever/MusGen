@@ -1,4 +1,4 @@
-﻿namespace ELFVoiceChanger.Forms
+﻿namespace ELFVoiceChanger.View.Forms
 {
 	partial class CreateVoiceModelForm
 	{
@@ -87,6 +87,7 @@
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.Name = "CreateVoiceModelForm";
 			this.Text = "CreateVoiceModelForm";
+			this.Load += new System.EventHandler(this.CreateVoiceModelForm_Load);
 			this.panel1.ResumeLayout(false);
 			this.panel1.PerformLayout();
 			this.ResumeLayout(false);

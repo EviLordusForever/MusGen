@@ -2,7 +2,7 @@
 using ELFVoiceChanger.Voice;
 using System.ComponentModel;
 
-namespace ELFVoiceChanger.Forms
+namespace ELFVoiceChanger.View.Forms
 {
 	public partial class ManageVoiceModelsForm : Form
 	{

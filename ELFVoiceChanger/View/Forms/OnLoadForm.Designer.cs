@@ -1,4 +1,4 @@
-﻿namespace ELFVoiceChanger
+﻿namespace ELFVoiceChanger.View.Forms
 {
 	partial class OnLoadForm
 	{

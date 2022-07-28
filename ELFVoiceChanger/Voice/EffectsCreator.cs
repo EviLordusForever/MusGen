@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ELFVoiceChanger.Core;
 using ELFVoiceChanger.Voice.Models;
+using ELFVoiceChanger.View;
 
 namespace ELFVoiceChanger.Voice
 {
@@ -142,6 +143,9 @@ namespace ELFVoiceChanger.Voice
 			double i2 = 0;
 
 			double mismatch = 1;
+
+			UserAsker.ShowProgress("Effect4 making");
+
 			for (int i = 0; i < wavIn.sampleRate * limitSec; i++)
 			{
 				if (i % 500 == 0)
@@ -160,6 +164,8 @@ namespace ELFVoiceChanger.Voice
 							period = periodNew;
 
 						A = FindA(i, i + 500);
+
+						UserAsker.SetProgress(Convert.ToInt32(100.0 * i / wavIn.sampleRate * limitSec));
 					}
 
 				AA = AA * 0.98 + A * 0.02;
@@ -173,6 +179,8 @@ namespace ELFVoiceChanger.Voice
 			}
 
 			Save(outName);
+
+			UserAsker.CloseProgressForm();
 
 			float FindA(int from, int to)
 			{

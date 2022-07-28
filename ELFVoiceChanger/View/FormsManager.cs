@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ELFVoiceChanger.View.Forms;
 
-namespace ELFVoiceChanger.Forms
+namespace ELFVoiceChanger.View
 {
 	public static class FormsManager
 	{
@@ -15,6 +15,7 @@ namespace ELFVoiceChanger.Forms
 		public static AddLetterPatternForm addLetterPatternForm;
 		public static VoiceChangingForm voiceChangingForm;
 		public static EffectsForm effectsForm;
+		public static ProgressForm progressForm;
 
 		public static void OpenManageVoiceModelForm()
 		{
@@ -65,6 +66,16 @@ namespace ELFVoiceChanger.Forms
 			effectsForm.BringToFront();
 		}
 
+		public static void OpenProgressForm()
+		{
+			if (progressForm == null || progressForm.IsDisposed)
+				progressForm = new ProgressForm();
+
+			progressForm.WindowState = FormWindowState.Normal;
+			progressForm.Show();
+			progressForm.BringToFront();
+		}
+
 		public static void CloseAddLetterPatternForm()
 		{
 			if (addLetterPatternForm != null && !addLetterPatternForm.IsDisposed)
@@ -75,6 +86,12 @@ namespace ELFVoiceChanger.Forms
 		{
 			if (createVoiceModelForm != null && !createVoiceModelForm.IsDisposed)
 				createVoiceModelForm.Close();
+		}
+
+		public static void CloseProgressForm()
+		{
+			if (progressForm != null && !progressForm.IsDisposed)
+				progressForm.Close();
 		}
 	}
 }

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using ELFVoiceChanger.Core;
+using ELFVoiceChanger.View;
 
-namespace ELFVoiceChanger.Forms
+namespace ELFVoiceChanger.View.Forms
 {
 	public partial class MainForm : Form
 	{

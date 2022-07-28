@@ -1,7 +1,7 @@
 using ELFVoiceChanger.Forms;
 using ELFVoiceChanger.Core;
 
-namespace ELFVoiceChanger
+namespace ELFVoiceChanger.View.Forms
 {
 	public partial class OnLoadForm : Form
 	{
