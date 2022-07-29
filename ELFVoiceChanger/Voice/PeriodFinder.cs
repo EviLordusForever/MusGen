@@ -144,16 +144,16 @@ namespace ELFVoiceChanger.Voice
 			return dft;
 		}
 
-		public static double FP_DFT_ANI(Wav wav, int start, int length, out double minMismatch, double limit, double periodShow, int n)
+		public static double FP_DFT_ANI(Wav wav, int start, int L, int step, out double minMismatch, double limit, double periodShow, int n)
 		{
-			double actualPeriod = FP_DFT(wav, start, length, out minMismatch);
+			double actualPeriod = FP_DFT(wav, start, L, step, out minMismatch);
 
 			GraficsMaker.MakeGraficPlus(n.ToString(), dft, minPeriod, maxPeriod, Convert.ToInt32(actualPeriod), limit, periodShow);
 
 			return actualPeriod;
 		}
 
-		public static double FP_DFT(Wav wav, int start, int L, out double minMismatch)
+		public static double FP_DFT(Wav wav, int start, int L, int step, out double minMismatch)
 		{
 			if (start + L >= wav.L.Length - 1)
 			{
@@ -173,7 +173,7 @@ namespace ELFVoiceChanger.Voice
 				float re = 0;
 				float im = 0;
 
-				for (int n = start; n < start + L; n += 10)
+				for (int n = start; n < start + L; n += step)
 				{
 					re += wav.L[n] * (float)Math.Cos(2.0f * Math.PI * k * n / L);
 					im += wav.L[n] * (float)Math.Sin(2.0f * Math.PI * k * n / L);
@@ -193,6 +193,75 @@ namespace ELFVoiceChanger.Voice
 			minMismatch = 0; ////
 
 			return 1000 / frequency;
+		}
+
+		public static void FP_DFT_MULTI(ref double[] periods, ref double[] amplitudes, Wav wav, int start, int L, int step)
+		{
+			if (start + L >= wav.L.Length - 1)
+				return;
+
+			double frequency = 0;
+			float maxv = 0;
+
+			dft = new float[300];
+			double[] ks = new double[300];
+
+			int t = 0;
+
+			for (double k = 0.12; t < dft.Length; k += 1 / 6.0)
+			{
+				float re = 0;
+				float im = 0;
+
+				for (int n = start; n < start + L; n += step)
+				{
+					re += wav.L[n] * (float)Math.Cos(2.0f * Math.PI * k * n / L);
+					im += wav.L[n] * (float)Math.Sin(2.0f * Math.PI * k * n / L);
+				}
+
+				dft[t] = (float)Math.Sqrt(re * re + im * im);
+
+				ks[t] = k;
+				if (dft[t] > maxv)
+				{
+					maxv = dft[t];
+					frequency = k;
+				}
+
+				t++;
+			}
+
+			double maxmaxv = Math.Max(Math.Abs(maxv), 1);
+			periods[0] = 1000 / frequency;
+			amplitudes[0] = maxv / maxmaxv;
+
+			int t2 = t;
+
+			for (int i = 1; i < periods.Count(); i++)
+			{
+				for (t = Math.Max(t2 - 10, 0); t < Math.Min(t2 + 10, dft.Length - 1); t++)
+					dft[t] = 0;
+
+				maxv = 0;
+				t = 0;
+
+				for (double k = 0.12; t < dft.Length; k += 1 / 6.0)
+				{
+					ks[t] = k;
+
+					if (dft[t] > maxv)
+					{
+						maxv = dft[t];
+						frequency = k;
+						t2 = t;
+					}
+
+					t++;
+				}
+
+				periods[i] = 1000 / frequency;
+				amplitudes[i] = maxv / maxmaxv;
+			}
 		}
 
 		public static double[] DFT2(double[] inreal, double[] inimag, double[] outreal, double[] outimag)

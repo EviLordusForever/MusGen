@@ -64,7 +64,7 @@ namespace ELFVoiceChanger.View.Forms
 
 		private void button1_Click(object sender, EventArgs e)
 		{
-			EffectsCreator.Effect5(openFileDialog1.FileName, exportFileName.Text, 300);
+			EffectsCreator.Effect7(openFileDialog1.FileName, exportFileName.Text, 300);
 		}
 	}
 }
