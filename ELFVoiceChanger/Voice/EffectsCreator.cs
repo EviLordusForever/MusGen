@@ -237,7 +237,6 @@ namespace ELFVoiceChanger.Voice
 
 				double pi2 = Math.PI * 2;
 				double period = 0.01;
-				double periodNew = 0.01;
 				double t = 0;
 				float sint = 0;
 				float A = 1;
@@ -259,12 +258,10 @@ namespace ELFVoiceChanger.Voice
 							{
 								i2 += (wavIn.sampleRate / 60.0);
 
-								periodNew = PeriodFinder.FP_DFT_ANI(wavIn, i, 2000, out mismatch, mismatchLimit, period, i) / 2;
+								period = PeriodFinder.FP_DFT_ANI(wavIn, i, 2000, out mismatch, mismatchLimit, period, i) / 2;
 							}
 							else
-								periodNew = PeriodFinder.FP_DFT(wavIn, i, 2000, out mismatch) / 2;
-
-								period = period * 0.75 + periodNew * 0.25; //
+								period = PeriodFinder.FP_DFT(wavIn, i, 2000, out mismatch) / 2;
 
 							if (i < limit - 500)
 								A = FindA(i, i + 500);

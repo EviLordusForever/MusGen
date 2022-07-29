@@ -161,27 +161,33 @@ namespace ELFVoiceChanger.Voice
 				return 80;
 			}
 
-			int frequency = 0;
+			double frequency = 0;
 			float maxv = 0;
 
-			float[] re = new float[250];
-			float[] im = new float[250];
-			dft = new float[250];
+			dft = new float[300];
 
-			for (int k = 0; k < 250; k++)
+			int t = 0;
+
+			for (double k = 0.12; t < dft.Length; k += 1/6.0)
 			{
-				for (int n = start; n < start + L; n += 5)
-				{
-					re[k] += wav.L[n] * (float)Math.Cos(2.0f * Math.PI * k * n / L);
-					im[k] += wav.L[n] * (float)Math.Sin(2.0f * Math.PI * k * n / L);
-				}
-				dft[k] = (float)Math.Sqrt(re[k] * re[k] + im[k] * im[k]);
+				float re = 0;
+				float im = 0;
 
-				if (dft[k] > maxv)
+				for (int n = start; n < start + L; n += 10)
 				{
-					maxv = dft[k];
+					re += wav.L[n] * (float)Math.Cos(2.0f * Math.PI * k * n / L);
+					im += wav.L[n] * (float)Math.Sin(2.0f * Math.PI * k * n / L);
+				}
+
+				dft[t] = (float)Math.Sqrt(re * re + im * im);
+
+				if (dft[t] > maxv)
+				{
+					maxv = dft[t];
 					frequency = k;
 				}
+
+				t++;
 			}
 
 			minMismatch = 0; ////
