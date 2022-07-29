@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using ELFVoiceChanger.Core;
 using ELFVoiceChanger.View;
+using ELFVoiceChanger.Voice;
 
 namespace ELFVoiceChanger.View.Forms
 {
@@ -20,6 +21,7 @@ namespace ELFVoiceChanger.View.Forms
 			//Wav wav = new Wav();
 			//wav.ReadWav(Disk.programFiles + "Amongus.wav");
 			//wav.SaveWav(Disk.programFiles + "Amongus2.wav");
+			PeriodFinder.DFT();
 		}
 
 		private void button1_Click(object sender, EventArgs e)

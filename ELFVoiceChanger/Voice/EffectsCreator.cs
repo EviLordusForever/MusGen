@@ -115,7 +115,7 @@ namespace ELFVoiceChanger.Voice
 				long limit = Math.Min(wavIn.L.Length, wavIn.sampleRate * limitSec);
 				for (int i = 0; i < limit; i++)
 				{
-					if (i % 100 == 0)
+					if (i % 500 == 0)
 						if (i < wavIn.L.Length)
 						{
 							periodNew = PeriodFinder.FindPeriod(wavIn, i, 8000, out mismatch) / 2;
@@ -123,9 +123,10 @@ namespace ELFVoiceChanger.Voice
 							if (mismatch < mismatchLimit)
 								period = period * 0.75 + periodNew * 0.25; //
 
-							A = FindA(i, i + 500);
+							if (i < limit - 500)
+								A = FindA(i, i + 500);
 
-							UserAsker.SetProgress(1.0 * i / (wavIn.sampleRate * limitSec));
+							UserAsker.SetProgress(1.0 * i / limit);
 						}
 
 					AA = AA * 0.98 + A * 0.02;
@@ -179,7 +180,7 @@ namespace ELFVoiceChanger.Voice
 				long limit = Math.Min(wavIn.L.Length, wavIn.sampleRate * limitSec);
 				for (int i = 0; i < limit; i++)
 				{
-					if (i % 100 == 0)
+					if (i % 500 == 0)
 						if (i < wavIn.L.Length)
 						{
 							if (i > i2)
@@ -194,9 +195,81 @@ namespace ELFVoiceChanger.Voice
 							if (mismatch < mismatchLimit)
 								period = period * 0.75 + periodNew * 0.25; //
 
-							A = FindA(i, i + 500);
+							if (i < limit - 500)
+								A = FindA(i, i + 500);
 
-							UserAsker.SetProgress(1.0 * i / (wavIn.sampleRate * limitSec));
+							UserAsker.SetProgress(1.0 * i / limit);
+						}
+
+					AA = AA * 0.98 + A * 0.02;
+
+					t += pi2 / period;
+					sint = (float)(Math.Sin(t) * 0.99 * AA);
+
+					wavOut.L[i] = sint;
+					if (wavIn.channels == 2)
+						wavOut.R[i] = sint;
+				}
+
+				Save(outName);
+
+				UserAsker.CloseProgressForm();
+
+				float FindA(int from, int to)
+				{
+					float A = 0;
+					for (int i = from; i < to; i++)
+						if (Math.Abs(wavIn.L[i]) > A)
+							A = Math.Abs(wavIn.L[i]);
+					return A;
+				}
+			}
+		}
+
+		public static void Effect5(string originPath, string outName, int limitSec)
+		{
+			Thread tr = new Thread(Tr);
+			tr.Start();
+
+			void Tr()
+			{
+				Startup(originPath);
+
+				double pi2 = Math.PI * 2;
+				double period = 0.01;
+				double periodNew = 0.01;
+				double t = 0;
+				float sint = 0;
+				float A = 1;
+				double AA = 1;
+
+				double i2 = 0;
+
+				double mismatch = 1;
+				double mismatchLimit = 1;
+
+				UserAsker.ShowProgress("Effect5 making");
+				long limit = Math.Min(wavIn.L.Length, wavIn.sampleRate * limitSec);
+				for (int i = 0; i < limit; i++)
+				{
+					if (i % 500 == 0)
+						if (i < wavIn.L.Length)
+						{
+							if (i > i2)
+							{
+								i2 += (wavIn.sampleRate / 60.0);
+
+								periodNew = PeriodFinder.FP_DFT_ANI(wavIn, i, 2000, out mismatch, mismatchLimit, period, i) / 2;
+							}
+							else
+								periodNew = PeriodFinder.FP_DFT(wavIn, i, 2000, out mismatch) / 2;
+
+								period = period * 0.75 + periodNew * 0.25; //
+
+							if (i < limit - 500)
+								A = FindA(i, i + 500);
+
+							UserAsker.SetProgress(1.0 * i / limit);
 						}
 
 					AA = AA * 0.98 + A * 0.02;

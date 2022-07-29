@@ -13,6 +13,7 @@ namespace ELFVoiceChanger.Voice
 		public static int maxPeriod = 1200;   //600
 		public static int points = 120;
 		public static float[] mismatches;
+		public static float[] dft;
 
 		public static double FindPeriod(Wav wav, int start, int length, out double minMismatch)
 		{
@@ -115,6 +116,98 @@ namespace ELFVoiceChanger.Voice
 
 			return actualPeriod;
 		}
+
+		public static float[] DFT()
+		{
+			int T = 2205;
+
+			float[] sign = new float[T];
+			for (int i = 0; i < T; i++)
+				sign[i] = (float)(Math.Sin(2.0f * Math.PI * 120.0f * i / 44100.0f) / 2 + Math.Sin(2.0f * Math.PI * 300.0f * i / 44100.0f) + Math.Sin(2.0f * Math.PI * 900.0f * i / 44100.0f));
+
+			float[] re = new float[T];
+			float[] im = new float[T];
+			float[] dft = new float[T];
+
+			for (int k = 0; k < T; k++)
+			{
+				for (int n = 0; n < T; n++)
+				{
+					re[k] += sign[n] * (float)Math.Cos(2.0f * Math.PI * k * n / T);
+					im[k] += sign[n] * (float)Math.Sin(2.0f * Math.PI * k * n / T);
+				}
+				dft[k] = (float)Math.Sqrt(re[k] * re[k] + im[k] * im[k]);
+			}
+
+			GraficsMaker.MakeGrafic(dft, 50);
+
+			return dft;
+		}
+
+		public static double FP_DFT_ANI(Wav wav, int start, int length, out double minMismatch, double limit, double periodShow, int n)
+		{
+			double actualPeriod = FP_DFT(wav, start, length, out minMismatch);
+
+			GraficsMaker.MakeGraficPlus(n.ToString(), dft, minPeriod, maxPeriod, Convert.ToInt32(actualPeriod), limit, periodShow);
+
+			return actualPeriod;
+		}
+
+		public static double FP_DFT(Wav wav, int start, int L, out double minMismatch)
+		{
+			if (start + L >= wav.L.Length - 1)
+			{
+				minMismatch = 0.99;
+				return 80;
+			}
+
+			int frequency = 0;
+			float maxv = 0;
+
+			float[] re = new float[250];
+			float[] im = new float[250];
+			dft = new float[250];
+
+			for (int k = 0; k < 250; k++)
+			{
+				for (int n = start; n < start + L; n += 5)
+				{
+					re[k] += wav.L[n] * (float)Math.Cos(2.0f * Math.PI * k * n / L);
+					im[k] += wav.L[n] * (float)Math.Sin(2.0f * Math.PI * k * n / L);
+				}
+				dft[k] = (float)Math.Sqrt(re[k] * re[k] + im[k] * im[k]);
+
+				if (dft[k] > maxv)
+				{
+					maxv = dft[k];
+					frequency = k;
+				}
+			}
+
+			minMismatch = 0; ////
+
+			return 1000 / frequency;
+		}
+
+		public static double[] DFT2(double[] inreal, double[] inimag, double[] outreal, double[] outimag)
+		{
+			int n = inreal.Length;
+			for (int k = 0; k < n; k++)
+			{  // For each output element
+				double sumreal = 0;
+				double sumimag = 0;
+				for (int t = 0; t < n; t++)
+				{  // For each input element
+					double angle = 2 * Math.PI * t * k / n;
+					sumreal += inreal[t] * Math.Cos(angle) + inimag[t] * Math.Sin(angle);
+					sumimag += -inreal[t] * Math.Sin(angle) + inimag[t] * Math.Cos(angle);
+				}
+				outreal[k] = sumreal;
+				outimag[k] = sumimag;
+			}
+			return outreal;
+		}
+
 
 		public static double goertzel(double[] sngData, long N, float freq, int samplerate)
 		{
