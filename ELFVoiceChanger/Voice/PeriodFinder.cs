@@ -235,12 +235,23 @@ namespace ELFVoiceChanger.Voice
 			periods[0] = 1000 / frequency;
 			amplitudes[0] = maxv / maxmaxv;
 
-			int t2 = t;
+			int t2 = Math.Min(t, dft.Length - 1);
+			int d = 3; //
 
 			for (int i = 1; i < periods.Count(); i++)
 			{
-				for (t = Math.Max(t2 - 10, 0); t < Math.Min(t2 + 10, dft.Length - 1); t++)
+				t = t2;
+				while (t + d < dft.Length - 1 && dft[t + d] <= dft[t])
+				{
 					dft[t] = 0;
+					t++;
+				}
+				t = t2;
+				while (t - d >= 0 && dft[t - d] <= dft[t])
+				{
+					dft[t] = 0;
+					t--;
+				} //important fix
 
 				maxv = 0;
 				t = 0;

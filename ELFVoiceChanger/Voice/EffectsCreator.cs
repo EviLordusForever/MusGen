@@ -375,10 +375,14 @@ namespace ELFVoiceChanger.Voice
 				double mismatch = 1;
 				double mismatchLimit = 1;
 
-				double[] periods = new double[4];
-				double[] amps1 = new double[4];
-				double[] amps2 = new double[4];
-				double[] t = new double[4];
+				int C = 10;
+
+				double[] periods1 = new double[C];
+				double[] periods2 = new double[C];
+				double[] amps1 = new double[C];
+				double[] amps2 = new double[C];
+				double[] t = new double[C];
+
 
 				UserAsker.ShowProgress("Effect7 making");
 				long limit = Math.Min(wavIn.L.Length, wavIn.sampleRate * limitSec);
@@ -387,37 +391,29 @@ namespace ELFVoiceChanger.Voice
 					if (i % 500 == 0)
 						if (i < wavIn.L.Length)
 						{
-							PeriodFinder.FP_DFT_MULTI(ref periods, ref amps1, wavIn, i, 2000, 10);
+							PeriodFinder.FP_DFT_MULTI(ref periods1, ref amps1, wavIn, i, 2000, 10);
 							UserAsker.SetProgress(1.0 * i / limit);
 						}
 
 					sint = 0;
 
-					for (int j = 0; j < 4; j++)
+					for (int j = 0; j < C; j++)
 					{
 						amps2[j] = amps2[j] * 0.98 + amps1[j] * 0.02;
+						periods2[j] = periods2[j] * 0.9 + periods1[j] * 0.1;
 
-						t[j] += pi2 / periods[j];
+						t[j] += pi2 / periods2[j];
 						sint += (float)(Math.Sin(t[j]) * 0.99 * amps2[j]);
 					}
 
-					wavOut.L[i] = sint / 4;
+					wavOut.L[i] = sint / C;
 					if (wavIn.channels == 2)
-						wavOut.R[i] = sint / 4;
+						wavOut.R[i] = sint / C;
 				}
 
 				Save(outName);
 
 				UserAsker.CloseProgressForm();
-
-				float FindA(int from, int to)
-				{
-					float A = 0;
-					for (int i = from; i < to; i++)
-						if (Math.Abs(wavIn.L[i]) > A)
-							A = Math.Abs(wavIn.L[i]);
-					return A;
-				}
 			}
 		}
 
