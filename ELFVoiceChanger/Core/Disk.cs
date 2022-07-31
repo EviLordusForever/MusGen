@@ -14,12 +14,6 @@ namespace ELFVoiceChanger.Core
 
 		public static string programFiles;
 
-		static Disk()
-		{
-			currentDirectory = Environment.CurrentDirectory;
-			programFiles = currentDirectory + "\\ProgramFiles\\";
-		}
-
 		public static void SaveImage(Bitmap image, string path)
 		{
 			image.Save(path);

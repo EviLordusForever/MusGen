@@ -36,18 +36,14 @@ namespace ELFVoiceChanger.Voice
 			wavOut = new Wav();
 			wavOut.ReadWav(originPath, 0);
 
-			wavOut.L = new float[limitSec * wavIn.sampleRate];
+			wavOut.L = new float[Math.Min(limitSec * wavIn.sampleRate, wavIn.L.Length)];
 			if (wavOut.channels == 2)
-				wavOut.R = new float[limitSec * wavIn.sampleRate];
+				wavOut.R = new float[Math.Min(limitSec * wavIn.sampleRate, wavIn.R.Length)];
 		}
 
-		public static void Save(string outName)
+		public static void Save(string name)
 		{
-			wavOut.SaveWav(Disk.programFiles + "Export\\" + outName + ".wav");
-		}
-
-		public static void StartEffectAsync(string originPath, string outName, int effectNUmber)
-		{
+			wavOut.SaveWav(Disk.programFiles + "Export\\" + name + ".wav");
 		}
 
 		public static void Effect1(string originPath, string outName)

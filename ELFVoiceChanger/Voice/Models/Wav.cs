@@ -158,10 +158,10 @@ namespace ELFVoiceChanger.Voice
 
 			using (FileStream f = new FileStream(filename, FileMode.Create))
 			{
-				f.Write(Brain.StringToByteArray("RIFF")); //RIFF
+				f.Write(Convertor.StringToByteArray("RIFF")); //RIFF
 				f.Write(BitConverter.GetBytes((uint)(44 + L.Length * bitDepth * channels))); //?
-				f.Write(Brain.StringToByteArray("WAVE"));
-				f.Write(Brain.StringToByteArray("fmt "));
+				f.Write(Convertor.StringToByteArray("WAVE"));
+				f.Write(Convertor.StringToByteArray("fmt "));
 				f.Write(BitConverter.GetBytes(16)); //Subchunk 1 size = 16
 
 				f.Write(BitConverter.GetBytes((ushort)1)); //type format = 1 PCM
@@ -170,7 +170,7 @@ namespace ELFVoiceChanger.Voice
 				f.Write(BitConverter.GetBytes(sampleRate * bitDepth * channels / 8)); //CORRECT
 				f.Write(BitConverter.GetBytes(fmtBlockAlign)); //Block align
 				f.Write(BitConverter.GetBytes(bitDepth)); //Bits per sample
-				f.Write(Brain.StringToByteArray("data"));
+				f.Write(Convertor.StringToByteArray("data"));
 				f.Write(BitConverter.GetBytes(L.Length * bitDepth * channels));
 
 				for (int i = 0; i < L.Length; i++)

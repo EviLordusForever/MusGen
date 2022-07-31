@@ -15,7 +15,6 @@ namespace ELFVoiceChanger.View.Forms
 
 		private void MainForm_Load(object sender, EventArgs e)
 		{
-			StartupManager.Startup();
 		}
 
 		private void button1_Click(object sender, EventArgs e)

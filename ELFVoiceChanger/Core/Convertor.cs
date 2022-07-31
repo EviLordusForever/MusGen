@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ELFVoiceChanger.Core
 {
-	public static class Brain
+	public static class Convertor
 	{
 		public static byte[] StringToByteArray(string hex)
 		{

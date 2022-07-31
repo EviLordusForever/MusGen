@@ -11,7 +11,7 @@ namespace ELFVoiceChanger.Core
 			// To customize application configuration such as set high DPI settings or default font,
 			// see https://aka.ms/applicationconfiguration.
 			ApplicationConfiguration.Initialize();
-			Application.Run(new ELFVoiceChanger.View.Forms.OnLoadForm());
+			Application.Run(new ELFVoiceChanger.View.Forms.StartupForm());
 		}
 	}
 }

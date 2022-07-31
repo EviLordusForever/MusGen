@@ -36,7 +36,6 @@ namespace ELFVoiceChanger.Core
 
 		public static void Test3()
 		{
-
 		}
 	}
 }

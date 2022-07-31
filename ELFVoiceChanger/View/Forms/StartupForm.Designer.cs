@@ -1,6 +1,6 @@
 ﻿namespace ELFVoiceChanger.View.Forms
 {
-	partial class OnLoadForm
+	partial class StartupForm
 	{
 		/// <summary>
 		///  Required designer variable.
@@ -41,16 +41,15 @@
 			this.label1.TabIndex = 0;
 			this.label1.Text = "I am not exist";
 			// 
-			// OnLoadForm
+			// StartupForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(713, 141);
 			this.Controls.Add(this.label1);
-			this.Name = "OnLoadForm";
+			this.Name = "StartupForm";
 			this.Text = "I am not exist";
-			this.Load += new System.EventHandler(this.OnLoadForm_Load);
-			this.Shown += new System.EventHandler(this.OnLoadForm_Shown);
+			this.Shown += new System.EventHandler(this.StartupForm_Shown);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

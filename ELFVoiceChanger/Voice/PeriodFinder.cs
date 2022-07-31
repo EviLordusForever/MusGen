@@ -197,11 +197,6 @@ namespace ELFVoiceChanger.Voice
 			return 1000 / frequency;
 		}
 
-		public static double GetA_actual()
-		{
-			return dft[t_leader];
-		}
-
 		public static void FP_DFT_MULTI(ref double[] periods, ref double[] amplitudes, Wav wav, int start, int L, int step)
 		{
 			if (start + L >= wav.L.Length - 1)
@@ -302,7 +297,7 @@ namespace ELFVoiceChanger.Voice
 		}
 
 
-		public static double goertzel(double[] sngData, long N, float freq, int samplerate)
+		public static double goertzel(double[] signal, long N, float freq, int samplerate)
 		{
 			double skn, skn1, skn2;
 			skn = skn1 = skn2 = 0;
@@ -314,7 +309,7 @@ namespace ELFVoiceChanger.Voice
 			{
 				skn2 = skn1;
 				skn1 = skn;
-				skn = 2 * cosan * skn1 - skn2 + sngData[i];
+				skn = 2 * cosan * skn1 - skn2 + signal[i];
 			}
 
 			return skn - Math.Exp(-c) * skn1;
