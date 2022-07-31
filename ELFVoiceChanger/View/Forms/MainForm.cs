@@ -21,7 +21,15 @@ namespace ELFVoiceChanger.View.Forms
 			//Wav wav = new Wav();
 			//wav.ReadWav(Disk.programFiles + "Amongus.wav");
 			//wav.SaveWav(Disk.programFiles + "Amongus2.wav");
-			PeriodFinder.DFT();
+
+			//PeriodFinder.DFT();
+
+			Wav wav = new Wav();
+			wav.ReadWav(Disk.programFiles + "Amongus.wav", 0);
+			for (int i = 0; i < wav.L.Length; i++)
+			{
+
+			}
 		}
 
 		private void button1_Click(object sender, EventArgs e)

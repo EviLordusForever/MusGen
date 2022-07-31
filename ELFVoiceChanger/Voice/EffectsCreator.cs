@@ -304,16 +304,19 @@ namespace ELFVoiceChanger.Voice
 				Startup(originPath);
 
 				double pi2 = Math.PI * 2;
-				double period = 0.01;
+				double period_actual = 40;
 				double t = 0;
-				float sint = 0;
-				float A = 1;
-				double AA = 1;
+				float signal = 0;
+
+				double a_smooth = 0;
 
 				double i2 = 0;
 
-				double mismatch = 1;
+				double a_new = 0;
+				double a_actual = 0;
 				double mismatchLimit = 1;
+
+				double period_new = period_actual;
 
 				UserAsker.ShowProgress("Effect6 making");
 				long limit = Math.Min(wavIn.L.Length, wavIn.sampleRate * limitSec);
@@ -322,22 +325,22 @@ namespace ELFVoiceChanger.Voice
 					if (i % 500 == 0)
 						if (i < wavIn.L.Length)
 						{
-							period = PeriodFinder.FP_DFT(wavIn, i, 2000, 10, out mismatch) / 2;
-
-							if (i < limit - 500)
-								A = FindA(i, i + 500);
+							period_actual = PeriodFinder.FP_DFT(wavIn, i, 2000, 10, out a_new);
 
 							UserAsker.SetProgress(1.0 * i / limit);
 						}
 
-					AA = AA * 0.98 + A * 0.02;
+					if (Math.Abs(a_actual) > 1)
+						a_actual *= 1 / Math.Abs(a_actual);
 
-					t += pi2 / period;
-					sint = (float)(Math.Sin(t) * 0.99 * AA);
+					a_smooth = a_smooth * 0.98 + a_actual * 0.02;
 
-					wavOut.L[i] = sint;
+					t += pi2 / period_actual;
+					signal = (float)(F(t) * 0.99 * a_smooth);
+
+					wavOut.L[i] = signal;
 					if (wavIn.channels == 2)
-						wavOut.R[i] = sint;
+						wavOut.R[i] = signal;
 				}
 
 				Save(outName);
@@ -393,6 +396,7 @@ namespace ELFVoiceChanger.Voice
 						{
 							PeriodFinder.FP_DFT_MULTI(ref periods1, ref amps1, wavIn, i, 2000, 10);
 							UserAsker.SetProgress(1.0 * i / limit);
+							GraficsMaker.MakeGraficPlus(i.ToString(), PeriodFinder.dft, -5, -5, -5, -5, -5);
 						}
 
 					sint = 0;
@@ -400,10 +404,10 @@ namespace ELFVoiceChanger.Voice
 					for (int j = 0; j < C; j++)
 					{
 						amps2[j] = amps2[j] * 0.98 + amps1[j] * 0.02;
-						periods2[j] = periods2[j] * 0.9 + periods1[j] * 0.1;
+						//periods2[j] = periods2[j] * 0.9 + periods1[j] * 0.1;
 
-						t[j] += pi2 / periods2[j];
-						sint += (float)(Math.Sin(t[j]) * 0.99 * amps2[j]);
+						t[j] += pi2 / periods1[j];
+						sint += (float)(F(t[j]) * 0.99 * amps2[j]);
 					}
 
 					wavOut.L[i] = sint / C;
@@ -417,5 +421,10 @@ namespace ELFVoiceChanger.Voice
 			}
 		}
 
+
+		public static double F(double t)
+		{
+			return Math.Sign(Math.Sin(t));
+		}
 	}
 }

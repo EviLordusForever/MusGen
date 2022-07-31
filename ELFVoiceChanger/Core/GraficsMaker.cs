@@ -29,7 +29,7 @@ namespace ELFVoiceChanger.Core
 
 			a[0] = 0.0001f;
 			double yScale = 1080 / a.Max();
-			double xScale = 1920.0 / Math.Min(a.Length, redLine2);
+			double xScale = 1920.0 / Math.Max(a.Length, redLine2);
 
 			Pen pen = new Pen(Color.Black, Convert.ToInt32(xScale) + 1);
 			Pen redPen = new Pen(Color.FromArgb(255, 0, 0), 4);

@@ -30,6 +30,19 @@ namespace ELFVoiceChanger.Voice
 
 		byte[] byteArray;
 
+		public void Initialize(string name)
+		{
+			ReadWav(Disk.programFiles + name + ".wav", 0);
+		}
+
+		public int Length
+		{
+			get
+			{
+				return L.Length;
+			}
+		}
+
 		public double BytesToDouble(byte firstByte, byte secondByte)
 		{
 			// convert two bytes to one double in the range -1 to 1

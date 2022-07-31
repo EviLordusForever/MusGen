@@ -14,6 +14,7 @@ namespace ELFVoiceChanger.Voice
 		public static int points = 120;
 		public static float[] mismatches;
 		public static float[] dft;
+		public static int t_leader = 0;
 
 		public static double FindPeriod(Wav wav, int start, int length, out double minMismatch)
 		{
@@ -153,11 +154,11 @@ namespace ELFVoiceChanger.Voice
 			return actualPeriod;
 		}
 
-		public static double FP_DFT(Wav wav, int start, int L, int step, out double minMismatch)
+		public static double FP_DFT(Wav wav, int start, int L, int step, out double a)
 		{
 			if (start + L >= wav.L.Length - 1)
 			{
-				minMismatch = 0.99;
+				a = 0.99;
 				return 80;
 			}
 
@@ -168,7 +169,7 @@ namespace ELFVoiceChanger.Voice
 
 			int t = 0;
 
-			for (double k = 0.12; t < dft.Length; k += 1/6.0)
+			for (double k = 0; t < dft.Length; k += 1/6.0)
 			{
 				float re = 0;
 				float im = 0;
@@ -185,14 +186,20 @@ namespace ELFVoiceChanger.Voice
 				{
 					maxv = dft[t];
 					frequency = k;
+					t_leader = t;
 				}
 
 				t++;
 			}
 
-			minMismatch = 0; ////
+			a = maxv; ////
 
 			return 1000 / frequency;
+		}
+
+		public static double GetA_actual()
+		{
+			return dft[t_leader];
 		}
 
 		public static void FP_DFT_MULTI(ref double[] periods, ref double[] amplitudes, Wav wav, int start, int L, int step)
