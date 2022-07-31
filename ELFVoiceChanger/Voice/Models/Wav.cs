@@ -152,11 +152,16 @@ namespace ELFVoiceChanger.Voice
 			return false;
 		}
 
-		public void SaveWav(string filename)
+		public void Export(string name)
+		{
+			Save(Disk.programFiles + "\\Export\\" + name + ".wav");
+		}
+
+		public void Save(string path)
 		{
 			//sampleRate;
 
-			using (FileStream f = new FileStream(filename, FileMode.Create))
+			using (FileStream f = new FileStream(path, FileMode.Create))
 			{
 				f.Write(Convertor.StringToByteArray("RIFF")); //RIFF
 				f.Write(BitConverter.GetBytes((uint)(44 + L.Length * bitDepth * channels))); //?

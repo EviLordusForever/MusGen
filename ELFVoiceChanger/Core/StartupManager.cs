@@ -31,7 +31,7 @@ namespace ELFVoiceChanger.Core
 			for (int i = 0; i < wav.Length; i++)
 				wav.L[i] = (float)(Math.Sin(i * Math.PI / 180) * 0.99);
 
-			wav.SaveWav("SIN");
+			wav.Export("SIN");
 		}
 	}
 }

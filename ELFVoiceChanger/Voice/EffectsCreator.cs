@@ -41,9 +41,9 @@ namespace ELFVoiceChanger.Voice
 				wavOut.R = new float[Math.Min(limitSec * wavIn.sampleRate, wavIn.R.Length)];
 		}
 
-		public static void Save(string name)
+		public static void Export(string name)
 		{
-			wavOut.SaveWav(Disk.programFiles + "Export\\" + name + ".wav");
+			wavOut.Export(name);
 		}
 
 		public static void Effect1(string originPath, string outName)
@@ -64,7 +64,7 @@ namespace ELFVoiceChanger.Voice
 				t += Math.Sin(i / 8080.0) + 1;
 			}
 
-			Save(outName);
+			Export(outName);
 		}
 
 		public static void Effect2(string originPath, string outName)
@@ -83,7 +83,7 @@ namespace ELFVoiceChanger.Voice
 				else
 					wavOut.R[i] = -(float)Math.Pow(-wavIn.R[(int)i], 0.5);
 
-			Save(outName);
+			Export(outName);
 		}
 
 		public static void Effect3(string originPath, string outName, int limitSec)
@@ -135,7 +135,7 @@ namespace ELFVoiceChanger.Voice
 						wavOut.R[i] = sint;
 				}
 
-				Save(outName);
+				Export(outName);
 
 				UserAsker.CloseProgressForm();
 
@@ -207,7 +207,7 @@ namespace ELFVoiceChanger.Voice
 						wavOut.R[i] = sint;
 				}
 
-				Save(outName);
+				Export(outName);
 
 				UserAsker.CloseProgressForm();
 
@@ -275,7 +275,7 @@ namespace ELFVoiceChanger.Voice
 						wavOut.R[i] = sint;
 				}
 
-				Save(outName);
+				Export(outName);
 
 				UserAsker.CloseProgressForm();
 
@@ -339,7 +339,7 @@ namespace ELFVoiceChanger.Voice
 						wavOut.R[i] = signal;
 				}
 
-				Save(outName);
+				Export(outName);
 
 				UserAsker.CloseProgressForm();
 
@@ -411,7 +411,7 @@ namespace ELFVoiceChanger.Voice
 						wavOut.R[i] = sint / C;
 				}
 
-				Save(outName);
+				Export(outName);
 
 				UserAsker.CloseProgressForm();
 			}
