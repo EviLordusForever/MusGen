@@ -15,21 +15,7 @@ namespace ELFVoiceChanger.View.Forms
 
 		private void MainForm_Load(object sender, EventArgs e)
 		{
-			pictureBox1.ImageLocation = Disk.programFiles + "Images\\img.png";
-			pictureBox1.Load();
-
-			//Wav wav = new Wav();
-			//wav.ReadWav(Disk.programFiles + "Amongus.wav");
-			//wav.SaveWav(Disk.programFiles + "Amongus2.wav");
-
-			//PeriodFinder.DFT();
-
-			Wav wav = new Wav();
-			wav.ReadWav(Disk.programFiles + "Amongus.wav", 0);
-			for (int i = 0; i < wav.L.Length; i++)
-			{
-
-			}
+			StartupManager.Startup();
 		}
 
 		private void button1_Click(object sender, EventArgs e)

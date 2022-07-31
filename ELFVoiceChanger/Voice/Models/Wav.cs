@@ -30,7 +30,7 @@ namespace ELFVoiceChanger.Voice
 
 		byte[] byteArray;
 
-		public void Initialize(string name)
+		public void InitializeFrom(string name)
 		{
 			ReadWav(Disk.programFiles + name + ".wav", 0);
 		}
