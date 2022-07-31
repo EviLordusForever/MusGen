@@ -43,21 +43,6 @@ namespace ELFVoiceChanger.Voice
 			}
 		}
 
-		public double BytesToDouble(byte firstByte, byte secondByte)
-		{
-			// convert two bytes to one double in the range -1 to 1
-
-			// convert two bytes to one short (little endian)
-			int s = secondByte << 8 | firstByte;
-			// convert to range from -1 to (just below) 1
-			return s / 32768.0;
-		}
-
-		public byte[] FloatToBytes(float d)
-		{
-			return BitConverter.GetBytes(d);
-		}
-
 		public bool ReadWav(string path, int bytesLimit)
 		{
 			L = R = null;
@@ -173,10 +158,10 @@ namespace ELFVoiceChanger.Voice
 
 			using (FileStream f = new FileStream(filename, FileMode.Create))
 			{
-				f.Write(StringToByteArray("RIFF")); //RIFF
+				f.Write(Brain.StringToByteArray("RIFF")); //RIFF
 				f.Write(BitConverter.GetBytes((uint)(44 + L.Length * bitDepth * channels))); //?
-				f.Write(StringToByteArray("WAVE"));
-				f.Write(StringToByteArray("fmt "));
+				f.Write(Brain.StringToByteArray("WAVE"));
+				f.Write(Brain.StringToByteArray("fmt "));
 				f.Write(BitConverter.GetBytes(16)); //Subchunk 1 size = 16
 
 				f.Write(BitConverter.GetBytes((ushort)1)); //type format = 1 PCM
@@ -185,7 +170,7 @@ namespace ELFVoiceChanger.Voice
 				f.Write(BitConverter.GetBytes(sampleRate * bitDepth * channels / 8)); //CORRECT
 				f.Write(BitConverter.GetBytes(fmtBlockAlign)); //Block align
 				f.Write(BitConverter.GetBytes(bitDepth)); //Bits per sample
-				f.Write(StringToByteArray("data"));
+				f.Write(Brain.StringToByteArray("data"));
 				f.Write(BitConverter.GetBytes(L.Length * bitDepth * channels));
 
 				for (int i = 0; i < L.Length; i++)
@@ -220,11 +205,6 @@ namespace ELFVoiceChanger.Voice
 					}
 				}
 			}
-		}
-
-		public static byte[] StringToByteArray(string hex)
-		{
-			return Encoding.ASCII.GetBytes(hex);
 		}
 
 		public static bool CheckWav(string path)
