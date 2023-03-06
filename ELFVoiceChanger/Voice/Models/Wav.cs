@@ -30,17 +30,9 @@ namespace ELFVoiceChanger.Voice
 
 		byte[] byteArray;
 
-		public void InitializeFrom(string name)
+		public bool ReadWav(string name)
 		{
-			ReadWav(Disk.programFiles + name + ".wav", 0);
-		}
-
-		public int Length
-		{
-			get
-			{
-				return L.Length;
-			}
+			return ReadWav(Disk.programFiles + name + ".wav", 0);
 		}
 
 		public bool ReadWav(string path, int bytesLimit)
@@ -152,12 +144,20 @@ namespace ELFVoiceChanger.Voice
 			return false;
 		}
 
-		public void Export(string name)
+		public int Length
 		{
-			Save(Disk.programFiles + "\\Export\\" + name + ".wav");
+			get
+			{
+				return L.Length;
+			}
 		}
 
-		public void Save(string path)
+		public void Export(string name)
+		{
+			SaveTo(Disk.programFiles + "\\Export\\" + name + ".wav");
+		}
+
+		public void SaveTo(string path)
 		{
 			//sampleRate;
 

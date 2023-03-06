@@ -17,9 +17,7 @@ namespace ELFVoiceChanger.Core
 		{
 			// convert two bytes to one double in the range -1 to 1
 
-			// convert two bytes to one short (little endian)
 			int s = secondByte << 8 | firstByte;
-			// convert to range from -1 to (just below) 1
 			return s / 32768.0;
 		}
 

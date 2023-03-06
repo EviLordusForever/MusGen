@@ -140,7 +140,7 @@ namespace ELFVoiceChanger.Voice
 				dft[k] = (float)Math.Sqrt(re[k] * re[k] + im[k] * im[k]);
 			}
 
-			GraficsMaker.MakeGrafic(dft, 50);
+			GraficsMaker.MakeGraficLite(dft, 50);
 
 			return dft;
 		}

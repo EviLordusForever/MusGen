@@ -8,7 +8,7 @@ namespace ELFVoiceChanger.Core
 {
 	public static class GraficsMaker
 	{
-		public static void MakeGrafic(float[] a, float yScale)
+		public static void MakeGraficLite(float[] a, float yScale)
 		{
 			Bitmap bmp = new Bitmap(a.Length, 1080);
 			Graphics gr = Graphics.FromImage(bmp);
@@ -62,8 +62,6 @@ namespace ELFVoiceChanger.Core
 
 			gr.DrawLine(redPen, Convert.ToInt32(1.05 * greenLine / 4 * xScale), 0, Convert.ToInt32(1.05 * greenLine / 4 * xScale), 1080);
 			gr.DrawLine(redPen, Convert.ToInt32(0.95 * greenLine / 4 * xScale), 0, Convert.ToInt32(0.95 * greenLine / 4 * xScale), 1080);
-
-
 
 			Disk.SaveImage(bmp, Disk.programFiles + "Grafics\\g\\g_" + name + ".bmp");
 			bmp.Dispose(); //

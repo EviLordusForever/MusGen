@@ -29,7 +29,10 @@ namespace ELFVoiceChanger.Core
 			Wav wav = new Wav();
 			wav.InitializeFrom("Colorful");
 			for (int i = 0; i < wav.Length; i++)
+			{
 				wav.L[i] = (float)(Math.Sin(i * Math.PI / 180) * 0.99);
+				wav.R[i] = (float)(Math.Sin(i * Math.PI / 180) * 0.99);
+			}
 
 			wav.Export("SIN");
 		}
