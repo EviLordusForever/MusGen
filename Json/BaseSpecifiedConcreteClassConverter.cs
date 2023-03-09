@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace ELFMusGen
+namespace MusGen
 {
 	public class BaseSpecifiedConcreteClassConverter : DefaultContractResolver
 	{

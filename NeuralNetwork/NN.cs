@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json;
-using static ELFMusGen.Logger;
-using static ELFMusGen.Params;
+using static MusGen.Logger;
+using static MusGen.Params;
 using Library;
 
-namespace ELFMusGen
+namespace MusGen
 {
 	public class NN
 	{

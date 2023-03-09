@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Library;
 
-namespace ELFMusGen
+namespace MusGen
 {
 	public class Node
 	{

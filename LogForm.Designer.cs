@@ -1,4 +1,4 @@
-﻿namespace ELFMusGen
+﻿namespace MusGen
 {
 	partial class LogForm
 	{

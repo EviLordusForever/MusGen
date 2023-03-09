@@ -1,4 +1,4 @@
-using static ELFMusGen.Logger;
+using static MusGen.Logger;
 
 namespace Library
 {

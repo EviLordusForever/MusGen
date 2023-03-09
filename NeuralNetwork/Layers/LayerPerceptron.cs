@@ -1,6 +1,6 @@
 ﻿using Library;
 
-namespace ELFMusGen
+namespace MusGen
 {
 	public class LayerPerceptron : Layer
 	{

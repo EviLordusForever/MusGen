@@ -1,8 +1,8 @@
 ﻿using System;
-using static ELFMusGen.Logger;
+using static MusGen.Logger;
 
 
-namespace ELFMusGen
+namespace MusGen
 {
 	public static class Builder
 	{

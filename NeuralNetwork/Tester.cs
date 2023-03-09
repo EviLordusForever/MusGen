@@ -1,8 +1,8 @@
-using static ELFMusGen.Logger;
+using static MusGen.Logger;
 using Newtonsoft.Json;
 using Library;
 
-namespace ELFMusGen
+namespace MusGen
 {
 	public class Tester
 	{

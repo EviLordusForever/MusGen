@@ -1,4 +1,4 @@
-﻿namespace ELFMusGen
+﻿namespace MusGen
 {
 	public abstract class ActivationFunction
 	{

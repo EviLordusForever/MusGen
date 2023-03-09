@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace ELFMusGen
+namespace MusGen
 {
 	public class AbstractConverterOfLayer : JsonConverter
 	{

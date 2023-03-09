@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace ELFMusGen
+namespace MusGen
 {
 	public partial class LogForm : Form
 	{

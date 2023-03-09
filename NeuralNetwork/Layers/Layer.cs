@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace ELFMusGen
+namespace MusGen
 {
 	public abstract class Layer
 	{

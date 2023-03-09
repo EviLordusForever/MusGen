@@ -8,7 +8,7 @@ using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.Multimedia;
 using Melanchall.DryWetMidi.Core;
 
-namespace ELFMusGen
+namespace MusGen
 {
 	public static class MidiManager
 	{
