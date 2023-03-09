@@ -1,4 +1,4 @@
 # ELF Voice Changer
-This is application to change voice, analyse sound and generate music.
+This is my app to change voice. 
 It is not done right now.
-Right now it will not work without "ProgramFiles" folder, but that folder isn't downloaded on github now.
+Also it will not work without ProgramFiles folder, but this folder not on github now.
