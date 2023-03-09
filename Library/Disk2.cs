@@ -131,7 +131,8 @@ namespace Library
 					File.Delete(file);
 				}
 				catch (Exception e)
-				{					
+				{
+					UserAsker.Ask($"I am so sorry, but {e}");
 				}
 			}
 

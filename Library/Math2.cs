@@ -1,10 +1,28 @@
-using static MusGen.Logger;
+using System.Text;
 
 namespace Library
 {
 	public static class Math2
 	{
 		public static Random rnd = new Random();
+
+		public static byte[] StringToByteArray(string hex)
+		{
+			return Encoding.ASCII.GetBytes(hex);
+		}
+
+		public static double BytesToDouble(byte firstByte, byte secondByte)
+		{
+			// convert two bytes to one double in the range -1 to 1
+
+			int s = secondByte << 8 | firstByte;
+			return s / 32768.0;
+		}
+
+		public static byte[] FloatToBytes(float d)
+		{
+			return BitConverter.GetBytes(d);
+		}
 
 		public static int Factorial(int number)
 		{

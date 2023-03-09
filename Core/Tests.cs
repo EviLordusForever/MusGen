@@ -13,16 +13,18 @@ namespace MusGen.Core
 		public static void Test1()
 		{
 			Wav wav = new Wav();
-			wav.ReadWav(Disk2._programFiles + "test.wav", 0);
+			wav.Read(Disk2._programFiles + "test.wav", 0);
 			UserAsker.Ask(wav.L.Length.ToString());
 
-			PerioudFinder.FindPeriod(wav, 30000, 33000);
+			double delme;
+
+			PeriodFinder.FindPeriod(wav, 30000, 33000, out delme);
 		}
 
 		public static void Test2()
 		{
 			Wav wav = new Wav();
-			wav.ReadWav(Disk2._programFiles + "test.wav", 0);
+			wav.Read(Disk2._programFiles + "test.wav", 0);
 			UserAsker.Ask(wav.L.Length.ToString());
 
 			double[] a = new double[1000];
@@ -30,7 +32,7 @@ namespace MusGen.Core
 			for (int i = 1; i < 1000; i++)
 				a[i] = wav.L[i];
 
-			UserAsker.Ask(PerioudFinder.goertzel(a, 100, 44800, (int)wav.sampleRate).ToString());
+			UserAsker.Ask(PeriodFinder.goertzel(a, 100, 44800, (int)wav.sampleRate).ToString());
 		}
 
 		public static void Test3()

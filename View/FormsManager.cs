@@ -11,11 +11,28 @@ namespace MusGen.Forms
 	{
 		public static MainForm _mainForm;
 		public static LogForm _logForm;
+		public static ProgressForm _progressForm;
 		public static ManageVoiceModelsForm manageVoiceModelsForm;
 		public static CreateVoiceModelForm createVoiceModelForm;
 		public static AddLetterPatternForm addLetterPatternForm;
 		public static VoiceChangingForm voiceChangingForm;
 		public static EffectsForm effectsForm;
+
+		public static void CloseProgressForm()
+		{
+			if (_progressForm != null && !_progressForm.IsDisposed)
+				_progressForm.Close();
+		}
+
+		public static void OpenProgressForm()
+		{
+			if (_progressForm == null || _progressForm.IsDisposed)
+				_progressForm = new ProgressForm();
+
+			_progressForm.WindowState = FormWindowState.Normal;
+			_progressForm.Show();
+			_progressForm.BringToFront();
+		}
 
 		public static void OpenLogForm()
 		{
