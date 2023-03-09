@@ -9,12 +9,29 @@ namespace MusGen.Forms
 {
 	public static class FormsManager
 	{
-		public static MainForm mainForm;
+		public static MainForm _mainForm;
+		public static LogForm _logForm;
 		public static ManageVoiceModelsForm manageVoiceModelsForm;
 		public static CreateVoiceModelForm createVoiceModelForm;
 		public static AddLetterPatternForm addLetterPatternForm;
 		public static VoiceChangingForm voiceChangingForm;
 		public static EffectsForm effectsForm;
+
+		public static void OpenLogForm()
+		{
+			_mainForm.Invoke(new Action(() =>
+			{
+				if (_logForm == null || _logForm.IsDisposed)
+				{
+					_logForm = new LogForm();
+					_logForm.BringToFront();
+					_logForm.Show();
+					_logForm.WindowState = FormWindowState.Normal;
+					_logForm.Location = new Point(-7, 0);
+					_logForm.rtb.ForeColor = Color.FromArgb(0, 255, 0);
+				}
+			}));
+		}
 
 		public static void OpenManageVoiceModelForm()
 		{
@@ -45,6 +62,7 @@ namespace MusGen.Forms
 			addLetterPatternForm.Show();
 			addLetterPatternForm.BringToFront();
 		}
+
 		public static void OpenVoiceChangingForm()
 		{
 			if (voiceChangingForm == null || voiceChangingForm.IsDisposed)

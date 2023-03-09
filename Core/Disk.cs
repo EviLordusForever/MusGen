@@ -52,7 +52,7 @@ namespace MusGen.Core
 				}
 				catch (IOException ex)
 				{
-					Thread.Sleep(50 + Storage.rnd.Next(250));
+					Thread.Sleep(50 + Params.rnd.Next(250));
 					goto again;
 				}
 			}

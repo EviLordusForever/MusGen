@@ -1,7 +1,6 @@
 ﻿using System;
 using static MusGen.Logger;
 
-
 namespace MusGen
 {
 	public static class Builder

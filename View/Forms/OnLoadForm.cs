@@ -8,8 +8,8 @@ namespace MusGen
 		public OnLoadForm()
 		{
 			InitializeComponent();
-			FormsManager.mainForm = new MainForm();
-			FormsManager.mainForm.Show();
+			FormsManager._mainForm = new MainForm();
+			FormsManager._mainForm.Show();
 		}
 
 		private void OnLoadForm_Shown(object sender, EventArgs e)
