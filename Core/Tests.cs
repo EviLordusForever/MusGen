@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MusGen.Voice;
+using Library;
 
 namespace MusGen.Core
 {
@@ -12,7 +13,7 @@ namespace MusGen.Core
 		public static void Test1()
 		{
 			Wav wav = new Wav();
-			wav.ReadWav(Disk.programFiles + "test.wav", 0);
+			wav.ReadWav(Disk2._programFiles + "test.wav", 0);
 			UserAsker.Ask(wav.L.Length.ToString());
 
 			PerioudFinder.FindPeriod(wav, 30000, 33000);
@@ -21,7 +22,7 @@ namespace MusGen.Core
 		public static void Test2()
 		{
 			Wav wav = new Wav();
-			wav.ReadWav(Disk.programFiles + "test.wav", 0);
+			wav.ReadWav(Disk2._programFiles + "test.wav", 0);
 			UserAsker.Ask(wav.L.Length.ToString());
 
 			double[] a = new double[1000];

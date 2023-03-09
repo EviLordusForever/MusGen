@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MusGen.Core;
+using Library;
 
 namespace MusGen.Voice
 {
@@ -13,7 +14,7 @@ namespace MusGen.Voice
 
 		public static void AddVoiceModel(string name)
 		{
-			string path = Disk.programFiles + "\\VoiceModels\\" + name;
+			string path = Disk2._programFiles + "\\VoiceModels\\" + name;
 			if (voiceModelsNames.Contains(name))
 				return;
 
@@ -24,9 +25,9 @@ namespace MusGen.Voice
 
 		public static void DeleteVoiceModel(string name)
 		{
-			string path = Disk.programFiles + "\\VoiceModels\\" + name;
+			string path = Disk2._programFiles + "\\VoiceModels\\" + name;
 
-			Disk.DeleteDirectoryWithFiles(path);
+			Disk2.DeleteDirectoryWithFiles(path);
 			voiceModelsNames.Remove(name);
 		}
 
@@ -34,7 +35,7 @@ namespace MusGen.Voice
 		{
 			string path = "VoiceModels\\" + voiceModelName + "\\LetterPatterns\\" + name + ".wav";
 
-			Disk.DeleteFileFromProgramFiles(path);
+			Disk2.DeleteFileFromProgramFiles(path);
 		}
 
 		public static void Rename(string oldName, string name)
@@ -43,20 +44,20 @@ namespace MusGen.Voice
 			voiceModelsNames.RemoveAt(id);
 			voiceModelsNames.Insert(id, name);
 
-			Directory.Move(Disk.programFiles + "VoiceModels\\" + oldName, Disk.programFiles + "VoiceModels\\" + name);
+			Directory.Move(Disk2._programFiles + "VoiceModels\\" + oldName, Disk2._programFiles + "VoiceModels\\" + name);
 		}
 
 		public static void RenameLetterPattern(string voiceModelName, string oldName, string name)
 		{
-			string oldPath = Disk.programFiles + "VoiceModels\\" + voiceModelName + "\\LetterPatterns\\" + oldName + ".wav";
-			string newPath = Disk.programFiles + "VoiceModels\\" + voiceModelName + "\\LetterPatterns\\" + name + ".wav";
+			string oldPath = Disk2._programFiles + "VoiceModels\\" + voiceModelName + "\\LetterPatterns\\" + oldName + ".wav";
+			string newPath = Disk2._programFiles + "VoiceModels\\" + voiceModelName + "\\LetterPatterns\\" + name + ".wav";
 
 			Directory.Move(oldPath, newPath);
 		}
 
 		public static void AddLetterPattern(string voiceModel, string pattern, string wavPath)
 		{
-			string newWavPath = Disk.programFiles + "\\VoiceModels\\" + voiceModel + "\\LetterPatterns\\" + pattern + ".wav";
+			string newWavPath = Disk2._programFiles + "\\VoiceModels\\" + voiceModel + "\\LetterPatterns\\" + pattern + ".wav";
 			if (File.Exists(newWavPath))
 				throw new Exception();
 			File.Copy(wavPath, newWavPath);
@@ -64,7 +65,7 @@ namespace MusGen.Voice
 
 		public static void ChangeLetterPattern(string voiceModel, string pattern, string wavPath)
 		{
-			string newWavPath = Disk.programFiles + "\\VoiceModels\\" + voiceModel + "\\LetterPatterns\\" + pattern + ".wav";
+			string newWavPath = Disk2._programFiles + "\\VoiceModels\\" + voiceModel + "\\LetterPatterns\\" + pattern + ".wav";
 			if (!File.Exists(newWavPath))
 				throw new Exception();
 			File.Delete(newWavPath);
@@ -74,7 +75,7 @@ namespace MusGen.Voice
 		static VoiceModelsManager()
 		{
 			voiceModelsNames = new List<string>();
-			string[] strs = Directory.GetDirectories(Disk.programFiles + "VoiceModels");
+			string[] strs = Directory.GetDirectories(Disk2._programFiles + "VoiceModels");
 			foreach (string str in strs)
 				voiceModelsNames.Add(TextMethods.StringAfterLast(str, "\\"));
 		}

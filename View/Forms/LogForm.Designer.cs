@@ -1,4 +1,4 @@
-﻿namespace AbsurdMoneySimulations
+﻿namespace MusGen.View.Forms
 {
 	partial class LogForm
 	{

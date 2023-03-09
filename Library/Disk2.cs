@@ -25,7 +25,7 @@ namespace Library
 			if (_programFiles[_programFiles.Length - 1] == '\\')
 				_programFiles = Text2.StringBeforeLast(_programFiles, "\\");
 
-			while (!Directory.Exists(_programFiles) || Text2.StringAfterLast(_programFiles, "\\") != "ProgramFiles")
+			while (!Directory.Exists(_programFiles))
 			{
 				UserAsker.SayWait(
 					"HELLO!\n" +
@@ -37,8 +37,6 @@ namespace Library
 
 				if (_programFiles[_programFiles.Length - 1] == '\\')
 					_programFiles = Text2.StringBeforeLast(_programFiles, "\\");
-				if (Text2.StringAfterLast(_programFiles, "\\") != "ProgramFiles")
-					UserAsker.SayWait($"The\"{_programFiles}\"\nis not \"ProgramFiles\" folder\n");
 			}
 			_programFiles += "\\";
 			File.WriteAllText($"{_currentDirectory}\\ProgramFilesPath.txt", _programFiles);
@@ -92,9 +90,14 @@ namespace Library
 
 		public static string ReadFromProgramFilesTxt(string path)
 		{
+			return ReadFromProgramFiles(path, "txt");
+		}
+
+		public static string ReadFromProgramFiles(string path, string ext)
+		{
 			string fileName = path;
 			path = _programFiles;
-			path += fileName + ".txt";
+			path += fileName + '.' + ext;
 			return File.ReadAllText(path, Encoding.UTF8);
 		}
 
@@ -118,6 +121,40 @@ namespace Library
 			File.Move($"{_programFiles}\\{from}.txt", $"{_programFiles}\\{to}.txt");
 		}
 
+		public static void ClearDirectory(string path)
+		{
+			string[] files = Directory.GetFiles(path);
+			foreach (string file in files)
+			{
+				try
+				{
+					File.Delete(file);
+				}
+				catch (Exception e)
+				{					
+				}
+			}
+
+			string[] directories = Directory.GetDirectories(path);
+			foreach (string directory in directories)
+				DeleteDirectoryWithFiles(directory);
+		}
+
+		public static void DeleteFileFromProgramFiles(string path)
+		{
+			File.Delete($"{_programFiles}\\{path}");
+		}
+
+		public static string[] GetFilesFromProgramFiles(string directory)
+		{
+			return Directory.GetFiles($"{_programFiles}{directory}");
+		}
+
+		public static void RenameFileInProgramFiles(string from, string to,string ext)
+		{
+			File.Move($"{_programFiles}\\{from}.{ext}", $"{_programFiles}\\{to}.{ext}");
+		}
+
 		public static void DeleteDirectoryWithFiles(string path)
 		{
 			string[] files = Directory.GetFiles(path);
@@ -131,46 +168,27 @@ namespace Library
 			Directory.Delete(path);
 		}
 
-		public static void ClearDirectory(string path)
-		{
-			string[] files = Directory.GetFiles(path);
-			foreach (string file in files)
-				File.Delete(file);
-
-			string[] directories = Directory.GetDirectories(path);
-			foreach (string directory in directories)
-				DeleteDirectoryWithFiles(directory);
-		}
-
 		public static long DirSize(string path)
 		{
 			DirectoryInfo d = new DirectoryInfo(path);
 			return DirSize(d);
 		}
 
-		private static long DirSize(DirectoryInfo d)
+		public static long DirSize(DirectoryInfo d)
 		{
 			long size = 0;
 
+			// Add file sizes.
 			FileInfo[] fis = d.GetFiles();
 			foreach (FileInfo fi in fis)
 				size += fi.Length;
 
+			// Add subdirectory sizes.
 			DirectoryInfo[] dis = d.GetDirectories();
 			foreach (DirectoryInfo di in dis)
 				size += DirSize(di);
 
 			return size;
-		}
-
-		public static void DeleteFileFromProgramFiles(string path)
-		{
-			File.Delete($"{_programFiles}\\{path}");
-		}
-
-		public static string[] GetFilesFromProgramFiles(string directory)
-		{
-			return Directory.GetFiles($"{_programFiles}{directory}");
 		}
 	}
 }

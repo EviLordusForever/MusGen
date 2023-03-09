@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using MusGen.Core;
+using Library;
 
 namespace MusGen.Forms
 {
@@ -13,7 +14,7 @@ namespace MusGen.Forms
 
 		private void MainForm_Load(object sender, EventArgs e)
 		{
-			pictureBox1.ImageLocation = Disk.programFiles + "Images\\img.png";
+			pictureBox1.ImageLocation = Disk2._programFiles + "Images\\img.png";
 			pictureBox1.Load();
 
 			//Wav wav = new Wav();

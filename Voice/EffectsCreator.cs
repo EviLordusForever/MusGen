@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MusGen.Core;
 using MusGen.Voice.Models;
+using Library;
 
 namespace MusGen.Voice
 {
@@ -28,7 +29,7 @@ namespace MusGen.Voice
 
 		public static void Save(string outName)
 		{
-			wavOut.SaveWav(Disk.programFiles + "Export\\" + outName + ".wav");
+			wavOut.SaveWav(Disk2._programFiles + "Export\\" + outName + ".wav");
 		}
 
 		public static void Effect1(string originPath, string outName)

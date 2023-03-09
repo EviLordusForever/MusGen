@@ -1,6 +1,7 @@
 ﻿using MusGen.Core;
 using MusGen.Voice;
 using System.ComponentModel;
+using Library;
 
 namespace MusGen.Forms
 {
@@ -76,7 +77,7 @@ namespace MusGen.Forms
 			string name = voiceModelNameBox.Text.Trim();
 			string oldName = voiceModelsBox.SelectedItem as string;
 
-			if (name == oldName || Directory.Exists(Disk.programFiles + "\\VoiceModels\\" + name) || name.Trim().Length <= 0)
+			if (name == oldName || Directory.Exists(Disk2._programFiles + "\\VoiceModels\\" + name) || name.Trim().Length <= 0)
 			{
 				voiceModelNameBox.Text = oldName;
 				return;
@@ -151,7 +152,7 @@ namespace MusGen.Forms
 			int previousCount = letterPatternsBox.Items.Count;
 
 			letterPatternsBox.Items.Clear();
-			string[] patterns = Directory.GetFiles(Disk.programFiles + "\\VoiceModels\\" + voiceModelNameBox.Text + "\\LetterPatterns\\");
+			string[] patterns = Directory.GetFiles(Disk2._programFiles + "\\VoiceModels\\" + voiceModelNameBox.Text + "\\LetterPatterns\\");
 
 			if (patterns.Count() > 0)
 			{
@@ -230,7 +231,7 @@ namespace MusGen.Forms
 			string name = letterPatternNameBox.Text.Trim();
 			string oldName = letterPatternsBox.SelectedItem as string;
 
-			if (name == oldName || File.Exists(Disk.programFiles + "\\VoiceModels\\" + voiceModelName + "\\LetterPatterns\\" + name + ".wav") || name.Trim().Length <= 0)
+			if (name == oldName || File.Exists(Disk2._programFiles + "\\VoiceModels\\" + voiceModelName + "\\LetterPatterns\\" + name + ".wav") || name.Trim().Length <= 0)
 			{
 				letterPatternNameBox.Text = oldName;
 				return;

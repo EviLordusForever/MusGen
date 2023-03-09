@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Library;
 
 namespace MusGen.Core
 {
@@ -18,7 +19,7 @@ namespace MusGen.Core
 			for (int i = 0; i < a.Length; i++)
 				gr.DrawLine(pen, i, 0, i, a[i] * yScale);
 
-			Disk.SaveImage(bmp, Disk.programFiles + "grafic");
+			Disk2.SaveImage(bmp, Disk2._programFiles + "grafic");
 		}
 	}
 }
