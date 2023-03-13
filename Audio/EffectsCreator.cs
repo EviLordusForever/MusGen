@@ -393,7 +393,7 @@ namespace MusGen
 						{
 							PeriodFinder.FP_DFT_MULTI(ref periods1, ref amps1, wavIn, i, 2000, 10);
 							ProgressShower.SetProgress(1.0 * i / limit);
-							GraficsMaker.MakeGraficPlus(i.ToString(), PeriodFinder.dft, -5, -5, -5, -5, -5);
+							//GraficsMaker.MakeGraficPlus(i.ToString(), PeriodFinder.dft, -5, -5, -5, -5, -5);
 						}
 
 					sint = 0;

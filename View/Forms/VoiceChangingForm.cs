@@ -64,7 +64,7 @@ namespace MusGen.Forms
 
 		private void button1_Click(object sender, EventArgs e)
 		{
-			EffectsCreator.Effect3(openFileDialog1.FileName, exportFileName.Text, 10000);
+			EffectsCreator.Effect7(openFileDialog1.FileName, exportFileName.Text, 10000);
 		}
 	}
 }
