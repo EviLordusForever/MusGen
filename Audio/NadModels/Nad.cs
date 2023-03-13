@@ -55,13 +55,13 @@ namespace MusGen
 			float[] ampsOld = new float[channelsCount];
 			float[] t = new float[channelsCount];
 
-			for (int s = 0; s < samples.Count(); s++)
+			for (int s = 0; s < wavOut.Length; s++)
 			{
 				sint = 0;
 
 				float sampleRate = wavOut.sampleRate;
 				float sps = wavOut.sampleRate / bps;
-				int nadSampleNumber = (int)(s / sps);
+				int nadSampleNumber = Math.Min((int)(s / sps), samples.Length);
 
 				for (int a = 0; a < channelsCount; a++)
 				{
@@ -76,7 +76,7 @@ namespace MusGen
 				if (wavOut.channels == 2)
 					wavOut.R[s] = sint / channelsCount;
 
-				ProgressShower.SetProgress(1.0 * s / samples.Length);
+				ProgressShower.SetProgress(1.0 * s / wavOut.Length);
 			}
 
 			ProgressShower.CloseProgressForm();
