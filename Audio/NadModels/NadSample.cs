@@ -8,12 +8,12 @@ namespace MusGen
 {
 	public class NadSample
 	{
-		public float[] frequencies;
+		public float[] periods; //logarithmic?
 		public float[] amplitudes;
 
 		public NadSample(int channelsCount)
 		{
-			frequencies = new float[channelsCount];
+			periods = new float[channelsCount];
 			amplitudes = new float[channelsCount];
 		}
 	}

@@ -64,7 +64,22 @@ namespace MusGen.Forms
 
 		private void button1_Click(object sender, EventArgs e)
 		{
-			EffectsCreator.Effect7(openFileDialog1.FileName, exportFileName.Text, 10000);
+			Thread tr = new Thread(Tr);
+			tr.Start();
+
+			void Tr()
+			{
+				//EffectsCreator.Effect7(openFileDialog1.FileName, exportFileName.Text, 10000);
+				Nad nad = new Nad();
+				Wav wav = new Wav();
+				wav.Read(openFileDialog1.FileName);
+				nad.MakeNad(wav, 1);
+
+				Wav wavOut = new Wav();
+				wavOut.Read(openFileDialog1.FileName);
+				wavOut = nad.MakeWav(wavOut);
+				wavOut.Export(exportFileName.Text);
+			}
 		}
 	}
 }

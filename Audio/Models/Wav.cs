@@ -32,9 +32,9 @@ namespace MusGen
 
 		byte[] byteArray;
 
-		public bool ReadWav(string name)
+		public bool Read(string path)
 		{
-			return Read(Disk2._programFiles + name + ".wav", 0);
+			return Read(path, 0);
 		}
 
 		public bool Read(string path, int bytesLimit)

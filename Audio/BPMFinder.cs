@@ -8,9 +8,9 @@ namespace MusGen
 {
 	public static class BPMFinder
 	{
-		public static float FindBMP(Wav wav)
+		public static float FindBPS(Wav wav)
 		{
-			return 120;
+			return 4;
 		}
 	}
 }

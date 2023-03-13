@@ -377,10 +377,10 @@ namespace MusGen
 
 				int C = 10;
 
-				double[] periods1 = new double[C];
-				double[] periods2 = new double[C];
-				double[] amps1 = new double[C];
-				double[] amps2 = new double[C];
+				float[] periods1 = new float[C];
+				float[] periods2 = new float[C];
+				float[] amps1 = new float[C];
+				float[] amps2 = new float[C];
 				double[] t = new double[C];
 
 
@@ -400,7 +400,7 @@ namespace MusGen
 
 					for (int j = 0; j < C; j++)
 					{
-						amps2[j] = amps2[j] * 0.98 + amps1[j] * 0.02;
+						amps2[j] = amps2[j] * 0.98f + amps1[j] * 0.02f;
 						//periods2[j] = periods2[j] * 0.9 + periods1[j] * 0.1;
 
 						t[j] += pi2 / periods1[j];

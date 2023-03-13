@@ -197,7 +197,7 @@ namespace MusGen
 			return 1000 / frequency;
 		}
 
-		public static void FP_DFT_MULTI(ref double[] periods, ref double[] amplitudes, Wav wav, int start, int L, int step)
+		public static void FP_DFT_MULTI(ref float[] periods, ref float[] amplitudes, Wav wav, int start, int L, int step)
 		{
 			if (start + L >= wav.L.Length - 1)
 				return;
@@ -215,10 +215,10 @@ namespace MusGen
 				float re = 0;
 				float im = 0;
 
-				for (int n = start; n < start + L; n += step)
+				for (int s = start; s < start + L; s += step)
 				{
-					re += wav.L[n] * (float)Math.Cos(2.0f * Math.PI * k * n / L);
-					im += wav.L[n] * (float)Math.Sin(2.0f * Math.PI * k * n / L);
+					re += wav.L[s] * (float)Math.Cos(2.0f * Math.PI * k * s / L);
+					im += wav.L[s] * (float)Math.Sin(2.0f * Math.PI * k * s / L);
 				}
 
 				dft[t] = (float)Math.Sqrt(re * re + im * im);
@@ -234,8 +234,8 @@ namespace MusGen
 			}
 
 			double maxmaxv = Math.Max(Math.Abs(maxv), 1);
-			periods[0] = 1000 / frequency;
-			amplitudes[0] = maxv / maxmaxv;
+			periods[0] = (float)(1000 / frequency);
+			amplitudes[0] = (float)(maxv / maxmaxv);
 
 			int t2 = Math.Min(t, dft.Length - 1);
 			int d = 3; //
@@ -272,8 +272,8 @@ namespace MusGen
 					t++;
 				}
 
-				periods[i] = 1000 / frequency;
-				amplitudes[i] = maxv / maxmaxv;
+				periods[i] = (float)(1000 / frequency);
+				amplitudes[i] = (float)(maxv / maxmaxv);
 			}
 		}
 
