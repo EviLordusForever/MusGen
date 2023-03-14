@@ -277,6 +277,84 @@ namespace MusGen
 			}
 		}
 
+		public static void FP_DFT_MULTI_2(ref float[] periods, ref float[] amplitudes, Wav wav, int start, int L, int step)
+		{
+			if (start + L >= wav.L.Length - 1)
+				return;
+
+			float frequency = 0;
+			float aMax = 0;
+			int indexOfMax = 0;
+
+			dft = new float[300];
+			float[] dftClone = new float[300];
+
+			int j = 0;
+
+			for (float k = 0.12f; j < dft.Length; k += 1 / 6f)
+			{
+				float re = 0;
+				float im = 0;
+
+				for (int s = start; s < start + L; s += step)
+				{
+					re += wav.L[s] * (float)Math.Cos(2.0f * Math.PI * k * s / L);
+					im += wav.L[s] * (float)Math.Sin(2.0f * Math.PI * k * s / L);
+				}
+
+				dft[j] = (float)Math.Sqrt(re * re + im * im);
+				dftClone[j] = dft[j];
+
+				if (dft[j] > aMax)
+				{
+					aMax = dft[j];
+					frequency = k;
+				}
+
+				j++;
+			}
+
+			float aCeiling = MathF.Max(MathF.Abs(aMax), 1);
+
+			periods[0] = 1000f / frequency;
+			amplitudes[0] = aMax / aCeiling;
+
+			for (int i = 1; i < periods.Count(); i++)
+			{
+				RemoveTrash(indexOfMax, 10f); ///////size
+				FindFrequency();
+
+				periods[i] = (float)(1000 / frequency);
+				amplitudes[i] = (float)(aMax / aCeiling);
+			}
+
+			void FindFrequency()
+			{
+				aMax = 0;
+				j = 0;				
+
+				for (float k = 0.12f; j < dftClone.Length; k += 1 / 6f)
+				{
+					if (dftClone[j] > aMax)
+					{
+						aMax = dftClone[j];
+						frequency = k;
+						indexOfMax = j;
+					}
+
+					j++;
+				}
+
+				aMax = dft[indexOfMax];
+			}
+
+			void RemoveTrash(int point, float size)
+			{
+				for (int i = 0; i < dftClone.Length; i++)
+					dftClone[i] = dftClone[i] * MathF.Abs(MathF.Tanh((i - point)/size));
+			}
+		}
+
 		public static double[] DFT2(double[] inreal, double[] inimag, double[] outreal, double[] outimag)
 		{
 			int n = inreal.Length;

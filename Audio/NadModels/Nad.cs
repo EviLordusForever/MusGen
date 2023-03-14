@@ -12,25 +12,24 @@ namespace MusGen
 		public NadSample[] samples;
 		public float bps;
 
-		public void MakeNad(Wav wav, int n)
+		public void MakeNad(Wav wav, int channelsCount)
 		{
-			channelsCount = n;
-			bps = BPMFinder.FindBPS(wav);
+			this.channelsCount = channelsCount;
+			bps = BPSFinder.FindBPS(wav);
 			float sps = wav.sampleRate / bps;
 			int nadSamplesCount = (int)(wav.Length / sps);
 			samples = new NadSample[nadSamplesCount];
-			double m;
 
 			ProgressShower.ShowProgress("Making nad");
 
 			for (int s = 0; s < nadSamplesCount; s++)
 			{
-				samples[s] = new NadSample(n);
+				samples[s] = new NadSample(channelsCount);
 
-				float[] periods = new float[n];
-				float[] amplitudes = new float[n];
+				float[] periods = new float[channelsCount];
+				float[] amplitudes = new float[channelsCount];
 
-				PeriodFinder.FP_DFT_MULTI(ref samples[s].periods, ref samples[s].amplitudes, wav, (int)(sps * s), (int)sps, (int)(sps/200f));
+				PeriodFinder.FP_DFT_MULTI_2(ref samples[s].periods, ref samples[s].amplitudes, wav, (int)(sps * s), (int)600, (int)(3));
 				ProgressShower.SetProgress(1.0 * s / nadSamplesCount);
 			}
 
@@ -43,16 +42,10 @@ namespace MusGen
 
 			float pi2 = MathF.PI * 2;
 
-			float sint = 0;
-			float A = 1;
-			double AA = 1;
-
-			double i2 = 0;
-
-			double mismatch = 1;
-			double mismatchLimit = 1;
+			float sint;
 
 			float[] ampsOld = new float[channelsCount];
+			float[] periodsOld = new float[channelsCount];
 			float[] t = new float[channelsCount];
 
 			for (int s = 0; s < wavOut.Length; s++)
@@ -61,15 +54,15 @@ namespace MusGen
 
 				float sampleRate = wavOut.sampleRate;
 				float sps = wavOut.sampleRate / bps;
-				int nadSampleNumber = Math.Min((int)(s / sps), samples.Length);
+				int nadSampleNumber = Math.Min((int)(s / sps), samples.Length - 1); //////////
 
-				for (int a = 0; a < channelsCount; a++)
+				for (int c = 0; c < channelsCount; c++)
 				{
-					ampsOld[a] = ampsOld[a] * 0.98f + samples[nadSampleNumber].amplitudes[a] * 0.02f;
-					//periods2[j] = periods2[j] * 0.9 + periods1[j] * 0.1;
+					ampsOld[c] = ampsOld[c] * 0.98f + samples[nadSampleNumber].amplitudes[c] * 0.02f;
+					periodsOld[c] = periodsOld[c] * 0.98f + samples[nadSampleNumber].periods[c] * 0.02f;
 
-					t[a] += pi2 / samples[nadSampleNumber].periods[a];
-					sint += F(t[a]) * 0.99f * ampsOld[a];
+					t[c] += 1f * pi2 / samples[nadSampleNumber].periods[c]; ////////
+					sint += F(t[c]) * 0.99f * ampsOld[c];
 				}
 
 				wavOut.L[s] = sint / channelsCount;
