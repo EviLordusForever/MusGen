@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using MusGen.Voice;
 using MusGen.Core;
+using Library;
 
 namespace MusGen.Forms
 {
@@ -75,10 +76,13 @@ namespace MusGen.Forms
 				wav.Read(openFileDialog1.FileName);
 				nad.MakeNad(wav, 1);
 
-				Wav wavOut = new Wav();
-				wavOut.Read(openFileDialog1.FileName);
-				wavOut = nad.MakeWav(wavOut);
-				wavOut.Export(exportFileName.Text);
+				//Wav wavOut = new Wav();
+				//wavOut.Read(openFileDialog1.FileName);
+				//wavOut = nad.MakeWav(wavOut);
+				//wavOut.Export(exportFileName.Text);
+
+				var a = nad.MakeMidi();
+				a.Write($"{Disk2._programFiles}\\Export\\{exportFileName.Text}.midi");
 			}
 		}
 	}
