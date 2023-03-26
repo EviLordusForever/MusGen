@@ -333,7 +333,7 @@ namespace MusGen
 					a_smooth = a_smooth * 0.98 + a_actual * 0.02;
 
 					t += pi2 / period_actual;
-					signal = (float)(F(t) * 0.99 * a_smooth);
+					signal = (float)(F((float)t) * 0.99 * a_smooth);
 
 					wavOut.L[i] = signal;
 					if (wavIn.channels == 2)
@@ -364,9 +364,9 @@ namespace MusGen
 			{
 				Startup(originPath);
 
-				double pi2 = Math.PI * 2;
+				float pi2 = MathF.PI * 2;
 
-				float sint = 0;
+				float signal = 0;
 				float A = 1;
 				double AA = 1;
 
@@ -375,52 +375,73 @@ namespace MusGen
 				double mismatch = 1;
 				double mismatchLimit = 1;
 
-				int C = 10;
+				int channels = 5;
 
-				float[] periods1 = new float[C];
-				float[] periods2 = new float[C];
-				float[] amps1 = new float[C];
-				float[] amps2 = new float[C];
-				double[] t = new double[C];
+				float[] periods1 = new float[channels];
+				float[] periods2 = new float[channels];
+				float[] amps1 = new float[channels];
+				float[] amps2 = new float[channels];
+				float[] t = new float[channels];
 
 
 				ProgressShower.ShowProgress("Effect7 making");
 				long limit = Math.Min(wavIn.L.Length, wavIn.sampleRate * limitSec);
 				for (int i = 0; i < limit; i++)
 				{
-					if (i % 500 == 0)
+					if (i % 250 == 0)
 						if (i < wavIn.L.Length)
 						{
-							PeriodFinder.FP_DFT_MULTI(ref periods1, ref amps1, wavIn, i, 2000, 10);
+							PeriodFinder.FP_DFT_MULTI_2(ref periods1, ref amps1, wavIn, i, 4000, 20, 15, $"");
+							Sort();
 							ProgressShower.SetProgress(1.0 * i / limit);
-							//GraficsMaker.MakeGraficPlus(i.ToString(), PeriodFinder.dft, -5, -5, -5, -5, -5);
 						}
 
-					sint = 0;
+					signal = 0;
 
-					for (int j = 0; j < C; j++)
+					for (int c = 0; c < channels; c++)
 					{
-						amps2[j] = amps2[j] * 0.98f + amps1[j] * 0.02f;
-						//periods2[j] = periods2[j] * 0.9 + periods1[j] * 0.1;
+						amps2[c] = amps2[c] * 0.8f + amps1[c] * 0.2f;
+						periods2[c] = periods2[c] * 0.8f + periods1[c] * 0.2f;
 
-						t[j] += pi2 / periods1[j];
-						sint += (float)(F(t[j]) * 0.99 * amps2[j]);
+						t[c] += pi2 * 0.001f / periods2[c];
+
+						signal += (float)(F(t[c]) * amps2[c]);
 					}
 
-					wavOut.L[i] = sint / C;
+					wavOut.L[i] = signal / channels;
 					if (wavIn.channels == 2)
-						wavOut.R[i] = sint / C;
+						wavOut.R[i] = wavOut.L[i];
 				}
 
 				Export(outName);
 
 				ProgressShower.CloseProgressForm();
+
+				void Sort()
+				{
+					float[] periodsSorted = new float[periods1.Length];
+					float[] ampsSorted = new float[amps1.Length];
+
+					for (int i = 0; i < periods1.Length; i++)
+					{
+						int id = Math2.IndexOfMax(periods1);
+							
+						periodsSorted[i] = periods1[id];
+						ampsSorted[i] = amps1[id];
+
+						periods1[id] = 0;
+					}
+
+					periods1 = periodsSorted;
+					amps1 = ampsSorted;
+				}
 			}
 		}
 
 
-		public static double F(double t)
+		public static float F(float t)
 		{
+			//return MathF.Sin(t);
 			return Math.Sign(Math.Sin(t));
 		}
 	}

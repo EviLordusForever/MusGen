@@ -38,7 +38,7 @@ namespace MusGen
 				float[] periods = new float[channelsCount];
 				float[] amplitudes = new float[channelsCount];
 
-				PeriodFinder.FP_DFT_MULTI_2(ref samples[s].periods, ref samples[s].amplitudes, wav, (int)(sps * s), (int)30000, (int)(30));
+				PeriodFinder.FP_DFT_MULTI_2(ref samples[s].periods, ref samples[s].amplitudes, wav, (int)(sps * s), 4000, 20, 15, "");
 				ProgressShower.SetProgress(1.0 * s / nadSamplesCount);
 			}
 
@@ -111,7 +111,7 @@ namespace MusGen
 
             using (var chordsManager = trackChunk.ManageChords())
             {
-                for (int s = 0; s < 117; s++)
+                for (int s = 0; s < samples.Length; s++)
                 {
                     var chords = chordsManager.Objects;
 
@@ -120,74 +120,6 @@ namespace MusGen
                     chords.Add(new Chord(notes, s * 50));////
                 }
             }
-/*
-            using (var notesManager = trackChunk.ManageNotes())
-            {
-                var notes = notesManager.Objects;
-
-                // Convert time span of 1 minute and 30 seconds to MIDI ticks. See
-                // https://github.com/melanchall/drywetmidi/wiki/Time-and-length to learn more
-                // about time and length representations and conversion between them
-
-                var oneAndHalfMinute = TimeConverter.ConvertFrom(new MetricTimeSpan(0, 1, 30), tempoMap);
-
-                // Insert two notes:
-                // - A2 with length of 4/15 at 1 minute and 30 seconds from a file start
-                // - B4 with length of 4 beats (1 beat = 1 quarter length at this case) at the start of a file
-
-                notes.Add(new Note(noteName: mt.NoteName.A,
-                                   octave: 2,
-                                   length: LengthConverter.ConvertFrom(new MusicalTimeSpan(4, 15),
-                                                                       time: oneAndHalfMinute,
-                                                                       tempoMap: tempoMap),
-                                   time: oneAndHalfMinute),
-                          new Note(noteName: mt.NoteName.B,
-                                   octave: 4,
-                                   length: LengthConverter.ConvertFrom(new BarBeatTicksTimeSpan(0, 4),
-                                                                       time: 0,
-                                                                       tempoMap: tempoMap),
-                                   time: 0));
-            }
-
-            // Insert chords via ChordsManager class. See https://github.com/melanchall/drywetmidi/wiki/Chords
-            // to learn more about managing chords
-
-            using (var chordsManager = trackChunk.ManageChords())
-            {
-                var chords = chordsManager.Objects;
-
-                // Define notes for a chord:
-                // - C2 with length of 30 seconds and 600 milliseconds
-                // - C#3 with length of 300 milliseconds
-
-                var notes = new[]
-                {
-                     new Note(noteName: mt.NoteName.C,
-                     octave: 2,
-                     length: LengthConverter.ConvertFrom(new MetricTimeSpan(0, 0, 30, 600),
-                                                         time: 0,
-                                                         tempoMap: tempoMap)),
-                     new Note(noteName: mt.NoteName.CSharp,
-                     octave: 3,
-                     length: LengthConverter.ConvertFrom(new MetricTimeSpan(0, 0, 0, 300),
-                                                         time: 0,
-                                                         tempoMap: tempoMap))
-                };
-
-                // Insert the chord at different times:
-                // - at the start of a file
-                // - at 10 bars and 2 beats from a file start
-                // - at 10 hours from a file start
-
-                chords.Add(new Chord(notes,
-                                     time: 0),
-                           new Chord(notes,
-                                     time: TimeConverter.ConvertFrom(new BarBeatTicksTimeSpan(10, 2),
-                                                                     tempoMap)),
-                           new Chord(notes,
-                                     time: TimeConverter.ConvertFrom(new MetricTimeSpan(10, 0, 0),
-                                                                     tempoMap)));
-            }*/
 
             return trackChunk;
         }

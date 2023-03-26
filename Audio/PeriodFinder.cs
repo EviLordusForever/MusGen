@@ -11,14 +11,14 @@ namespace MusGen
 	{
 		public static int minPeriod = 40;    //80
 		public static int maxPeriod = 1200;   //600
-		public static int points = 120;
-		public static float[] mismatches;
 		public static float[] dft;
-		public static int t_leader = 0;
+		public static float[] mismatches;
 
 		public static double FindPeriod(Wav wav, int start, int length, out double minMismatch)
 		{
 			//length MORE then maxPeriod + 50;
+
+			int points = 120;
 
 			mismatches = new float[maxPeriod];
 
@@ -113,43 +113,16 @@ namespace MusGen
 
 			double actualPeriod = FindPeriod(wav, start, length, out minMismatch);
 
-			GraficsMaker.MakeGraficPlus(n.ToString(), mismatches, minPeriod, maxPeriod, Convert.ToInt32(actualPeriod), limit, periodShow);
+			//GraficsMaker.MakeGraficPlus(n.ToString(), mismatches, new int[] { minPeriod, maxPeriod });
 
 			return actualPeriod;
-		}
-
-		public static float[] DFT()
-		{
-			int T = 2205;
-
-			float[] sign = new float[T];
-			for (int i = 0; i < T; i++)
-				sign[i] = (float)(Math.Sin(2.0f * Math.PI * 120.0f * i / 44100.0f) / 2 + Math.Sin(2.0f * Math.PI * 300.0f * i / 44100.0f) + Math.Sin(2.0f * Math.PI * 900.0f * i / 44100.0f));
-
-			float[] re = new float[T];
-			float[] im = new float[T];
-			float[] dft = new float[T];
-
-			for (int k = 0; k < T; k++)
-			{
-				for (int n = 0; n < T; n++)
-				{
-					re[k] += sign[n] * (float)Math.Cos(2.0f * Math.PI * k * n / T);
-					im[k] += sign[n] * (float)Math.Sin(2.0f * Math.PI * k * n / T);
-				}
-				dft[k] = (float)Math.Sqrt(re[k] * re[k] + im[k] * im[k]);
-			}
-
-			GraficsMaker.MakeGraficLite(dft, 50);
-
-			return dft;
 		}
 
 		public static double FP_DFT_ANI(Wav wav, int start, int L, int step, out double minMismatch, double limit, double periodShow, int n)
 		{
 			double actualPeriod = FP_DFT(wav, start, L, step, out minMismatch);
 
-			GraficsMaker.MakeGraficPlus(n.ToString(), dft, minPeriod, maxPeriod, Convert.ToInt32(actualPeriod), limit, periodShow);
+			//GraficsMaker.MakeGraficPlus(n.ToString(), dft, new int[] { minPeriod, maxPeriod });
 
 			return actualPeriod;
 		}
@@ -186,7 +159,7 @@ namespace MusGen
 				{
 					maxv = dft[t];
 					frequency = k;
-					t_leader = t;
+					//t_leader = t;
 				}
 
 				t++;
@@ -277,75 +250,81 @@ namespace MusGen
 			}
 		}
 
-		public static void FP_DFT_MULTI_2(ref float[] periods, ref float[] amplitudes, Wav wav, int start, int L, int step)
+		public static void FP_DFT_MULTI_2(ref float[] periods, ref float[] amplitudes, Wav wav, int start, int L, int step, float frqSize, string graficName)
 		{
 			if (start + L >= wav.L.Length - 1)
 				return;
 
-			float frequency = 0;
-			float aMax = 0;
-			int indexOfMax = 0;
+			float pi2 = 2 * MathF.PI;
+			float leadFrequency = 0;
+			float leadAmplitude = 0;
+			int leadIndex = 0;
+
+			int[] leadIndexes = new int[periods.Length];
 
 			dft = new float[300];
 			float[] dftClone = new float[300];
 
-			int j = 0;
+			int index = 0;
 
-			for (float k = 0.12f; j < dft.Length; k += 1 / 6f)
+			for (float frequency = 0.12f; index < dft.Length; frequency += 1 / 6f)
 			{
 				float re = 0;
 				float im = 0;
 
 				for (int s = start; s < start + L; s += step)
 				{
-					re += wav.L[s] * (float)Math.Cos(2.0f * Math.PI * k * s / L);
-					im += wav.L[s] * (float)Math.Sin(2.0f * Math.PI * k * s / L);
+					float v = pi2 * frequency * s / L;
+					re += wav.L[s] * MathF.Cos(v);
+					im += wav.L[s] * MathF.Sin(v);
 				}
 
-				dft[j] = (float)Math.Sqrt(re * re + im * im);
-				dftClone[j] = dft[j];
+				dft[index] = 0.5f * MathF.Sqrt(re * re + im * im);
+				dftClone[index] = dft[index];
 
-				if (dft[j] > aMax)
-				{
-					aMax = dft[j];
-					frequency = k;
-				}
-
-				j++;
+				index++;
 			}
 
-			float aCeiling = MathF.Max(MathF.Abs(aMax), 1);
+			FindFrequency();
+			float amplitudeMax = leadAmplitude; //why abs?
+			float amplitudeOverflow = MathF.Max(leadAmplitude, 1);
 
-			periods[0] = 1000f / frequency;
-			amplitudes[0] = aMax / aCeiling;
-
-			for (int i = 1; i < periods.Count(); i++)
+			for (int i = 0; i < periods.Count(); i++)
 			{
-				RemoveTrash(indexOfMax, 10f); ///////size
 				FindFrequency();
 
-				periods[i] = (float)(1000 / frequency);
-				amplitudes[i] = (float)(aMax / aCeiling);
+				periods[i] = (float)(1 / leadFrequency);
+				amplitudes[i] = (float)(leadAmplitude / amplitudeOverflow);
+				leadIndexes[i] = leadIndex;
+
+				//GraficsMaker.MakeGraficPlus($"A {i}", dftClone, leadIndexes, amplitudes, amplitudeMax);
+
+				RemoveTrash(leadIndex, frqSize); ///////size
 			}
+
+			if (graficName != "")
+				GraficsMaker.MakeGraficPlus(graficName, dft, leadIndexes, amplitudes, amplitudeMax);
 
 			void FindFrequency()
 			{
-				aMax = 0;
-				j = 0;				
+				leadFrequency = 0;
+				leadAmplitude = 0;
+				leadIndex = 0;
+				index = 0;				
 
-				for (float k = 0.12f; j < dftClone.Length; k += 1 / 6f)
+				for (float frequency = 0.12f; index < dftClone.Length; frequency += 1 / 6f)
 				{
-					if (dftClone[j] > aMax)
+					if (dftClone[index] > leadAmplitude)
 					{
-						aMax = dftClone[j];
-						frequency = k;
-						indexOfMax = j;
+						leadAmplitude = dftClone[index];
+						leadFrequency = frequency;
+						leadIndex = index;
 					}
 
-					j++;
+					index++;
 				}
 
-				aMax = dft[indexOfMax];
+				//leadAmplitude = dft[leadIndex]; //stay ?
 			}
 
 			void RemoveTrash(int point, float size)
@@ -354,26 +333,6 @@ namespace MusGen
 					dftClone[i] = dftClone[i] * MathF.Abs(MathF.Tanh((i - point)/size));
 			}
 		}
-
-		public static double[] DFT2(double[] inreal, double[] inimag, double[] outreal, double[] outimag)
-		{
-			int n = inreal.Length;
-			for (int k = 0; k < n; k++)
-			{  // For each output element
-				double sumreal = 0;
-				double sumimag = 0;
-				for (int t = 0; t < n; t++)
-				{  // For each input element
-					double angle = 2 * Math.PI * t * k / n;
-					sumreal += inreal[t] * Math.Cos(angle) + inimag[t] * Math.Sin(angle);
-					sumimag += -inreal[t] * Math.Sin(angle) + inimag[t] * Math.Cos(angle);
-				}
-				outreal[k] = sumreal;
-				outimag[k] = sumimag;
-			}
-			return outreal;
-		}
-
 
 		public static double goertzel(double[] signal, long N, float freq, int samplerate)
 		{

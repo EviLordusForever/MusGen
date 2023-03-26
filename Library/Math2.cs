@@ -78,6 +78,27 @@ namespace Library
 			return max;
 		}
 
+		public static int IndexOfMax(float[] array)
+		{
+			float max = array[0];
+			int id = 0;
+			for (int i = 1; i < array.Length; i++)
+				if (array[i] > max)
+				{
+					id = i;
+				}
+			return id;
+		}
+
+		public static int Max(int[] array)
+		{
+			int max = array[0];
+			for (int i = 1; i < array.Length; i++)
+				if (array[i] > max)
+					max = array[i];
+			return max;
+		}
+
 		public static float Min(float[] array)
 		{
 			float min = array[0];

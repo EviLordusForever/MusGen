@@ -38,7 +38,7 @@ namespace MusGen
 			for (int n = 0; n < notes.Length; n++)
 			{
 				float frequency = 1 / periods[n];
-				byte note = (byte)(Math.Log2(frequency * 10000000000000000));
+				byte note = (byte)(Math.Log2(frequency) * 100000000);
 
 				SevenBitNumber sbn = new SevenBitNumber(note);
 				notes[n] = new Note(sbn); ////////////////////////////

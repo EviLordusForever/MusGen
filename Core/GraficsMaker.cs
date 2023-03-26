@@ -22,50 +22,77 @@ namespace MusGen.Core
 			Disk2.SaveImage(bmp, Disk2._programFiles + "Grafics\\grafic.bmp");
 		}
 
-		public static void MakeGraficPlus(string name, float[] a, int redLine1, int redLine2, int greenLine, double limit, double periodShow)
+		public static void MakeGraficPlus(string name, float[] input_array, int[] verticalRedLines, float[] theirSizes, float minimalY)
 		{
-			Bitmap bmp = new Bitmap(1920, 1080);
-			Graphics gr = Graphics.FromImage(bmp);
-			gr.Clear(Color.White);
+			Bitmap bmp;
+			Graphics gr;
+			double yScale;
+			double ampYScale;
+			double xScale;
+			Pen blackPen;
+			Pen redPen;
+			Pen greenPen;
+			Pen bluePen;
 
-			a[0] = 0.0001f;
-			double yScale = 1080 / a.Max();
-			double xScale = 1920.0 / Math.Max(a.Length, redLine2);
+			BaseStart();
+			Scales();
+			Pens();
+			DrawArray();
+			DrawVerticalRedLines();
+			Ending();
 
-			Pen pen = new Pen(Color.Black, Convert.ToInt32(xScale) + 1);
-			Pen redPen = new Pen(Color.FromArgb(255, 0, 0), 4);
-			Pen greenPen = new Pen(Color.Green, 7);
-			Pen bluePen = new Pen(Color.FromArgb(0, 0, 255), 7);
-			int buffer = 0;
-
-			for (int i = 0; i < a.Length; i++)
+			void DrawVerticalRedLines()
 			{
-				if (a[i] > 0)
-					buffer = Convert.ToInt32(a[i] * yScale);
-
-				gr.DrawLine(pen, Convert.ToInt32(i * xScale), 0, Convert.ToInt32(i * xScale), buffer);
+				for (int i = 0; i < verticalRedLines.Length; i++)
+				{
+					int x = Convert.ToInt32(verticalRedLines[i] * xScale);
+					int y = Convert.ToInt32(theirSizes[i] * ampYScale);
+					gr.DrawLine(redPen, x, 0, x, y);
+				}
 			}
 
-			gr.DrawLine(redPen, Convert.ToInt32(redLine1 * xScale), 0, Convert.ToInt32(redLine1 * xScale), 1080);
-			gr.DrawLine(redPen, Convert.ToInt32(redLine2 * xScale), 0, Convert.ToInt32(redLine2 * xScale), 1080);
+			void DrawArray()
+			{
+				for (int i = 0; i < input_array.Length; i++)
+				{
+					int y = 0;
+					if (input_array[i] > 0)
+						y = Convert.ToInt32(input_array[i] * yScale);
 
-			gr.DrawLine(greenPen, Convert.ToInt32(greenLine * xScale), 0, Convert.ToInt32(greenLine * xScale), 1080);
-			gr.DrawLine(bluePen, Convert.ToInt32(periodShow * xScale), 0, Convert.ToInt32(periodShow * xScale), 1080);
+					int x = Convert.ToInt32(i * xScale);
 
-			gr.DrawLine(greenPen, 0, Convert.ToInt32(limit * yScale), 1920, Convert.ToInt32(limit * yScale));
+					gr.DrawLine(blackPen, x, 0, x, y);
+				}
+			}
 
+			void Scales()
+			{
+				input_array[0] = 0.0001f;
+				yScale = 1080 / Math.Max(input_array.Max(), minimalY);
+				ampYScale = 1080 / theirSizes.Max();
+				xScale = 1920.0 / input_array.Length;
+			}
 
-			gr.DrawLine(redPen, Convert.ToInt32(1.05 * greenLine / 2 * xScale), 0, Convert.ToInt32(1.05 * greenLine / 2 * xScale), 1080);
-			gr.DrawLine(redPen, Convert.ToInt32(0.95 * greenLine / 2 * xScale), 0, Convert.ToInt32(0.95 * greenLine / 2 * xScale), 1080);
+			void Pens()
+			{
+				blackPen = new Pen(Color.Black, Convert.ToInt32(xScale) + 1);
+				redPen = new Pen(Color.FromArgb(255, 0, 0), 4);
+				greenPen = new Pen(Color.Green, 7);
+				bluePen = new Pen(Color.FromArgb(0, 0, 255), 7);
+			}
 
-			gr.DrawLine(redPen, Convert.ToInt32(1.05 * greenLine / 3 * xScale), 0, Convert.ToInt32(1.05 * greenLine / 3 * xScale), 1080);
-			gr.DrawLine(redPen, Convert.ToInt32(0.95 * greenLine / 3 * xScale), 0, Convert.ToInt32(0.95 * greenLine / 3 * xScale), 1080);
+			void BaseStart()
+			{
+				bmp = new Bitmap(1920, 1080);
+				gr = Graphics.FromImage(bmp);
+				gr.Clear(Color.White);
+			}
 
-			gr.DrawLine(redPen, Convert.ToInt32(1.05 * greenLine / 4 * xScale), 0, Convert.ToInt32(1.05 * greenLine / 4 * xScale), 1080);
-			gr.DrawLine(redPen, Convert.ToInt32(0.95 * greenLine / 4 * xScale), 0, Convert.ToInt32(0.95 * greenLine / 4 * xScale), 1080);
-
-			Disk2.SaveImage(bmp, Disk2._programFiles + "Grafics\\g\\g_" + name + ".bmp");
-			bmp.Dispose(); //
+			void Ending()
+			{
+				Disk2.SaveImage(bmp, Disk2._programFiles + "Grafics\\g\\g_" + name + ".bmp");
+				bmp.Dispose(); //
+			}
 		}
 	}
 }

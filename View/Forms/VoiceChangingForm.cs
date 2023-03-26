@@ -70,19 +70,37 @@ namespace MusGen.Forms
 
 			void Tr()
 			{
-				//EffectsCreator.Effect7(openFileDialog1.FileName, exportFileName.Text, 10000);
-				Nad nad = new Nad();
-				Wav wav = new Wav();
-				wav.Read(openFileDialog1.FileName);
-				nad.MakeNad(wav, 5);
+				EffectsCreator.Effect7(openFileDialog1.FileName, exportFileName.Text, 150);
+
+				//Nad nad = new Nad();
+				//Wav wav = new Wav();
+				//wav.Read(openFileDialog1.FileName);
+
+				//nad.MakeNad(wav, 5);
+				//var a = nad.MakeMidi();
+				//a.Write($"{Disk2._programFiles}\\Export\\{exportFileName.Text}.midi");
 
 				//Wav wavOut = new Wav();
 				//wavOut.Read(openFileDialog1.FileName);
 				//wavOut = nad.MakeWav(wavOut);
 				//wavOut.Export(exportFileName.Text);
 
-				var a = nad.MakeMidi();
-				a.Write($"{Disk2._programFiles}\\Export\\{exportFileName.Text}.midi");
+
+				//float[] periods = new float[5];
+				//float[] amplitudes = new float[5];
+				//PeriodFinder.FP_DFT_MULTI_2(ref periods, ref amplitudes, wav, 0, 200, 1, 20, "q");
+
+				/*				for (float L = 200; L < 4000; L *= 1.1f)
+								{
+									int step = (int)Math.Max(1, Math.Floor(L / 200));
+									PeriodFinder.FP_DFT_MULTI_2(ref periods, ref amplitudes, wav, 0, (int)L, step, 20, $"1 {L}");
+								}
+
+								for (float steps = 1000; steps > 10; steps *= 0.9f)
+								{
+									int step = (int)Math.Floor(4000 / steps);
+									PeriodFinder.FP_DFT_MULTI_2(ref periods, ref amplitudes, wav, 0, 4000, step, 20, $"2 {step}");
+								}*/
 			}
 		}
 	}
