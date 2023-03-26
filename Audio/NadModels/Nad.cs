@@ -93,32 +93,34 @@ namespace MusGen
 			var tempoMap = TempoMap.Create(Tempo.FromBeatsPerMinute(110));
 			midiFile.ReplaceTempoMap(tempoMap);
 
-			// Add first track chunk to the file
-
 			var trackChunk1 = Build(tempoMap);
 			midiFile.Chunks.Add(trackChunk1);
-
-			// Add second track chunk to the file
 
 			var trackChunk2 = Build(tempoMap);
 			midiFile.Chunks.Add(trackChunk2);
 
             // Write MIDI data to file. See https://github.com/melanchall/drywetmidi/wiki/Writing-a-MIDI-file
-            // to learn more
 
             return midiFile;
 		}
 
-        private static TrackChunk Build(TempoMap tempoMap)
+        private TrackChunk Build(TempoMap tempoMap)
         {
-            // We can create a track chunk and put events in it via its constructor
+            ProgramChangeEvent pce = new ProgramChangeEvent((SevenBitNumber)1);
+            TrackChunk trackChunk = new TrackChunk(pce);
 
-            var trackChunk = new TrackChunk(
-                new ProgramChangeEvent((SevenBitNumber)1)); // 'Acoustic Grand Piano' in GM
+            using (var chordsManager = trackChunk.ManageChords())
+            {
+                for (int s = 0; s < 117; s++)
+                {
+                    var chords = chordsManager.Objects;
 
-            // Insert notes via NotesManager class. See https://github.com/melanchall/drywetmidi/wiki/Notes
-            // to learn more about managing notes
+                    Note[] notes = samples[s].GetMidiNotes((byte)s);
 
+                    chords.Add(new Chord(notes, s * 50));////
+                }
+            }
+/*
             using (var notesManager = trackChunk.ManageNotes())
             {
                 var notes = notesManager.Objects;
@@ -160,17 +162,17 @@ namespace MusGen
 
                 var notes = new[]
                 {
-            new Note(noteName: mt.NoteName.C,
+                     new Note(noteName: mt.NoteName.C,
                      octave: 2,
                      length: LengthConverter.ConvertFrom(new MetricTimeSpan(0, 0, 30, 600),
                                                          time: 0,
                                                          tempoMap: tempoMap)),
-            new Note(noteName: mt.NoteName.CSharp,
+                     new Note(noteName: mt.NoteName.CSharp,
                      octave: 3,
                      length: LengthConverter.ConvertFrom(new MetricTimeSpan(0, 0, 0, 300),
                                                          time: 0,
                                                          tempoMap: tempoMap))
-        };
+                };
 
                 // Insert the chord at different times:
                 // - at the start of a file
@@ -185,7 +187,7 @@ namespace MusGen
                            new Chord(notes,
                                      time: TimeConverter.ConvertFrom(new MetricTimeSpan(10, 0, 0),
                                                                      tempoMap)));
-            }
+            }*/
 
             return trackChunk;
         }

@@ -74,7 +74,7 @@ namespace MusGen.Forms
 				Nad nad = new Nad();
 				Wav wav = new Wav();
 				wav.Read(openFileDialog1.FileName);
-				nad.MakeNad(wav, 1);
+				nad.MakeNad(wav, 5);
 
 				//Wav wavOut = new Wav();
 				//wavOut.Read(openFileDialog1.FileName);
