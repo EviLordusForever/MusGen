@@ -216,7 +216,7 @@ namespace MusGen
 
 		public static bool CheckWav(string path)
 		{
-			if (TextMethods.StringAfterLast(path, ".").ToLower() != "wav")
+			if (Text2.StringAfterLast(path, ".").ToLower() != "wav")
 				return false;
 
 			Wav localWav = new Wav();

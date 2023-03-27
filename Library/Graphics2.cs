@@ -8,6 +8,16 @@ namespace Library
 {
 	public static class Graphics2
 	{
+		public static Color Rainbow(float x)
+		{
+			// red yellow green cyan blue magenta red
+			float pi2 = 2 * MathF.PI;
+			byte r = (byte)(255 * (1 + MathF.Cos(pi2 * (0 / 3f + x))) / 2f);
+			byte g = (byte)(255 * (1 + MathF.Cos(pi2 * (1 / 3f + x))) / 2f);
+			byte b = (byte)(255 * (1 + MathF.Cos(pi2 * (2 / 3f + x))) / 2f);
+			return Color.FromArgb(255, r, g, b);
+		}
+
 		public static Bitmap RescaleBitmap(Bitmap bmp0, int width, int height)
 		{
 			Bitmap bmp = new Bitmap(width, height);

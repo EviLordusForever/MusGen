@@ -37,7 +37,7 @@ namespace MusGen.Forms
 
 			if (isGood)
 			{
-				selectAudioFileButton.Text = TextMethods.StringAfterLast(openFileDialog1.FileName, "\\");
+				selectAudioFileButton.Text = Text2.StringAfterLast(openFileDialog1.FileName, "\\");
 				selectAudioFileButton.ForeColor = Color.Green;
 			}
 			else

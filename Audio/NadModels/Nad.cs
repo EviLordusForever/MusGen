@@ -38,7 +38,7 @@ namespace MusGen
 				float[] periods = new float[channelsCount];
 				float[] amplitudes = new float[channelsCount];
 
-				PeriodFinder.FP_DFT_MULTI_2(ref samples[s].periods, ref samples[s].amplitudes, wav, (int)(sps * s), 4000, 20, 15, "");
+				PeriodFinder.FP_DFT_MULTI(ref samples[s].periods, ref samples[s].amplitudes, wav, (int)(sps * s), 4000, 20, 15, "");
 				ProgressShower.SetProgress(1.0 * s / nadSamplesCount);
 			}
 

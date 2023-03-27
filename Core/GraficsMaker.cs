@@ -22,7 +22,7 @@ namespace MusGen.Core
 			Disk2.SaveImage(bmp, Disk2._programFiles + "Grafics\\grafic.bmp");
 		}
 
-		public static void MakeGraficPlus(string name, float[] input_array, int[] verticalRedLines, float[] theirSizes, float minimalY)
+		public static void MakeGraficPlus(string name, float[] input_array, int[] verticalLines, float[] theirSizes, float minimalY)
 		{
 			Bitmap bmp;
 			Graphics gr;
@@ -38,16 +38,20 @@ namespace MusGen.Core
 			Scales();
 			Pens();
 			DrawArray();
-			DrawVerticalRedLines();
+			DrawVerticalLines();
 			Ending();
 
-			void DrawVerticalRedLines()
+			void DrawVerticalLines()
 			{
-				for (int i = 0; i < verticalRedLines.Length; i++)
+				for (int i = 0; i < verticalLines.Length; i++)
 				{
-					int x = Convert.ToInt32(verticalRedLines[i] * xScale);
+					int x = Convert.ToInt32(verticalLines[i] * xScale);
 					int y = Convert.ToInt32(theirSizes[i] * ampYScale);
-					gr.DrawLine(redPen, x, 0, x, y);
+
+					Color clr = Graphics2.Rainbow(i / verticalLines.Length);
+					Pen pen = new Pen(clr, 5);
+
+					gr.DrawLine(pen, x, 0, x, y);
 				}
 			}
 

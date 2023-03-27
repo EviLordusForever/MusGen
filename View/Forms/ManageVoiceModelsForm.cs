@@ -157,7 +157,7 @@ namespace MusGen.Forms
 			if (patterns.Count() > 0)
 			{
 				foreach (string pattern in patterns)
-					letterPatternsBox.Items.Add(TextMethods.StringBeforeLast(TextMethods.StringAfterLast(pattern, "\\"), "."));
+					letterPatternsBox.Items.Add(Text2.StringBeforeLast(Text2.StringAfterLast(pattern, "\\"), "."));
 
 				letterPatternsBox.SelectedIndex = 0;
 

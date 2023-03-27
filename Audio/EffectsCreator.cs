@@ -391,7 +391,7 @@ namespace MusGen
 					if (i % 250 == 0)
 						if (i < wavIn.L.Length)
 						{
-							PeriodFinder.FP_DFT_MULTI_2(ref periods1, ref amps1, wavIn, i, 4000, 20, 15, $"");
+							PeriodFinder.FP_DFT_MULTI(ref periods1, ref amps1, wavIn, i, 4000, 20, 15, $"");
 							Sort();
 							ProgressShower.SetProgress(1.0 * i / limit);
 						}

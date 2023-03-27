@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using MusGen.Voice;
 using MusGen.Core;
+using Library;
 
 namespace MusGen.Forms
 {
@@ -40,10 +41,10 @@ namespace MusGen.Forms
 
 			if (isGood)
 			{
-				button3.Text = TextMethods.StringAfterLast(openFileDialog1.FileName, "\\");
+				button3.Text = Text2.StringAfterLast(openFileDialog1.FileName, "\\");
 				button3.ForeColor = Color.Green;
 				if (textBox1.Text.Length <= 0)
-					textBox1.Text = TextMethods.StringBeforeLast(TextMethods.StringAfterLast(openFileDialog1.FileName, "\\"), ".");
+					textBox1.Text = Text2.StringBeforeLast(Text2.StringAfterLast(openFileDialog1.FileName, "\\"), ".");
 			}
 			else
 			{

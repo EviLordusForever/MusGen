@@ -77,7 +77,7 @@ namespace MusGen.Voice
 			voiceModelsNames = new List<string>();
 			string[] strs = Directory.GetDirectories(Disk2._programFiles + "VoiceModels");
 			foreach (string str in strs)
-				voiceModelsNames.Add(TextMethods.StringAfterLast(str, "\\"));
+				voiceModelsNames.Add(Text2.StringAfterLast(str, "\\"));
 		}
 	}
 }
