@@ -47,7 +47,7 @@ namespace MusGen
 			wavOut.Export(name);
 		}
 
-		public static void Effect1(string originPath, string outName)
+		public static void EffectPanWaving(string originPath, string outName)
 		{
 			Startup(originPath);
 
@@ -68,7 +68,7 @@ namespace MusGen
 			Export(outName);
 		}
 
-		public static void Effect2(string originPath, string outName)
+		public static void EffectSqrt(string originPath, string outName)
 		{
 			Startup(originPath);
 
@@ -249,22 +249,21 @@ namespace MusGen
 				for (int i = 0; i < limit; i++)
 				{
 					if (i % 500 == 0)
-						if (i < wavIn.L.Length)
+					{
+						if (i > i2)
 						{
-							if (i > i2)
-							{
-								i2 += (wavIn.sampleRate / 60.0);
+							i2 += (wavIn.sampleRate / 60.0);
 
-								period = PeriodFinder.FP_DFT_ANI(wavIn, i, 2000, 10, out mismatch, mismatchLimit, period, i) / 2;
-							}
-							else
-								period = PeriodFinder.FP_DFT(wavIn, i, 2000, 10, out mismatch) / 2;
-
-							if (i < limit - 500)
-								A = FindA(i, i + 500);
-
-							ProgressShower.SetProgress(1.0 * i / limit);
+							period = PeriodFinder.FP_DFT_ANI(wavIn, i, 2000, 10, out mismatch, mismatchLimit, period, i) / 2;
 						}
+						else
+							period = PeriodFinder.FP_DFT(wavIn, i, 2000, 10, out mismatch) / 2;
+
+						if (i < limit - 500)
+							A = FindA(i, i + 500);
+
+						ProgressShower.SetProgress(1.0 * i / limit);
+					}
 
 					AA = AA * 0.98 + A * 0.02;
 
@@ -291,7 +290,7 @@ namespace MusGen
 			}
 		}
 
-		public static void Effect6(string originPath, string outName, int limitSec)
+		public static void EffectDftSingle(string originPath, string outName, int limitSec)
 		{
 			Thread tr = new Thread(Tr);
 			tr.Start();
@@ -307,11 +306,8 @@ namespace MusGen
 
 				double a_smooth = 0;
 
-				double i2 = 0;
-
 				double a_new = 0;
 				double a_actual = 0;
-				double mismatchLimit = 1;
 
 				double period_new = period_actual;
 
@@ -355,7 +351,7 @@ namespace MusGen
 			}
 		}
 
-		public static void Effect7(string originPath, string outName, int limitSec)
+		public static void EffectDftMulti(string originPath, string outName, int limitSec)
 		{
 			Thread tr = new Thread(Tr);
 			tr.Start();
@@ -389,12 +385,11 @@ namespace MusGen
 				for (int i = 0; i < limit; i++)
 				{
 					if (i % 250 == 0)
-						if (i < wavIn.L.Length)
-						{
-							PeriodFinder.FP_DFT_MULTI(ref periods1, ref amps1, wavIn, i, 4000, 20, 15, $"");
-							Sort();
-							ProgressShower.SetProgress(1.0 * i / limit);
-						}
+					{
+						PeriodFinder.FP_DFT_MULTI(ref periods1, ref amps1, wavIn, i, 4000, 20, 15, $"");
+						//SortByFrequency();
+						ProgressShower.SetProgress(1.0 * i / limit);
+					}
 
 					signal = 0;
 
@@ -417,7 +412,7 @@ namespace MusGen
 
 				ProgressShower.CloseProgressForm();
 
-				void Sort()
+				void SortByFrequency()
 				{
 					float[] periodsSorted = new float[periods1.Length];
 					float[] ampsSorted = new float[amps1.Length];

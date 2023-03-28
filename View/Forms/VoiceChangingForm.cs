@@ -70,7 +70,7 @@ namespace MusGen.Forms
 
 			void Tr()
 			{
-				EffectsCreator.Effect7(openFileDialog1.FileName, exportFileName.Text, 150);
+				EffectsCreator.EffectDftMulti(openFileDialog1.FileName, exportFileName.Text, 150);
 
 				//Nad nad = new Nad();
 				//Wav wav = new Wav();
