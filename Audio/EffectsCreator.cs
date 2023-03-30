@@ -15,6 +15,8 @@ namespace MusGen
 	{
 		public static Wav wavIn;
 		public static Wav wavOut;
+		public static string waveType = "sin";
+		public static float adaptiveCeiling = 0;
 
 		public static void Startup(string originPath)
 		{
@@ -379,16 +381,30 @@ namespace MusGen
 				float[] amps2 = new float[channels];
 				float[] t = new float[channels];
 
+				uint graphStep = wavIn.sampleRate / 60;
+
+
 
 				ProgressShower.ShowProgress("Effect7 making");
 				long limit = Math.Min(wavIn.L.Length, wavIn.sampleRate * limitSec);
+
+				UserAsker.Ask($"Name: {outName}\nWave type: {waveType}\nRecreation hannels: {channels}\nSamples: {limit}\nSample rate: {wavOut.sampleRate}\nSeconds: {(int)(limit / wavOut.sampleRate)}");
+				
 				for (int i = 0; i < limit; i++)
 				{
 					if (i % 250 == 0)
 					{
-						PeriodFinder.FP_DFT_MULTI(ref periods1, ref amps1, wavIn, i, 4000, 20, 15, $"");
+						PeriodFinder.FP_DFT_MULTI(ref periods1, ref amps1, wavIn, i, 4000, 20, 15, $"", adaptiveCeiling);
+						adaptiveCeiling *= 0.99f;
 						//SortByFrequency();
 						ProgressShower.SetProgress(1.0 * i / limit);
+					}
+
+					if (i % graphStep == 0)
+					{
+						GraphDrawer.DrawGraphPlus($"{i}", PeriodFinder.dft, PeriodFinder.leadIndexes, amps1, adaptiveCeiling);
+						PeriodFinder.FP_DFT_MULTI(ref periods1, ref amps1, wavIn, i, 4000, 20, 15, $"", adaptiveCeiling);
+						adaptiveCeiling *= 0.99f;						
 					}
 
 					signal = 0;
@@ -436,8 +452,12 @@ namespace MusGen
 
 		public static float F(float t)
 		{
-			//return MathF.Sin(t);
-			return Math.Sign(Math.Sin(t));
+			if (waveType == "sin")
+				return MathF.Sin(t);
+			else if (waveType == "sqaure")
+				return Math.Sign(Math.Sin(t));
+			else
+				return MathF.Sin(t);
 		}
 	}
 }

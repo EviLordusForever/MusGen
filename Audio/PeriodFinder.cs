@@ -9,15 +9,16 @@ namespace MusGen
 {
 	public static class PeriodFinder
 	{
-		public static int minPeriod = 40;    //80
-		public static int maxPeriod = 1200;   //600
 		public static float[] dft;
+		public static int[] leadIndexes;
 
 		public static double FindPeriod(Wav wav, int start, int length, out double minMismatch)
 		{
-			//length MORE then maxPeriod + 50;
-
+			int minPeriod = 40;    //80
+			int maxPeriod = 1200;   //600
 			int points = 120;
+
+			//length MORE then maxPeriod + 50;
 
 			float[] mismatches = new float[maxPeriod];
 
@@ -169,7 +170,7 @@ namespace MusGen
 			return 1000 / frequency;
 		}
 
-		public static void FP_DFT_MULTI(ref float[] periods, ref float[] amplitudes, Wav wav, int start, int L, int step, float frqSize, string graficName)
+		public static void FP_DFT_MULTI(ref float[] periods, ref float[] amplitudes, Wav wav, int start, int L, int step, float trashSize, string graficName, float adaptiveCeiling)
 		{
 			if (start + L >= wav.L.Length - 1)
 				return;
@@ -179,7 +180,7 @@ namespace MusGen
 			float leadAmplitude = 0;
 			int leadIndex = 0;
 
-			int[] leadIndexes = new int[periods.Length];
+			leadIndexes = new int[periods.Length];
 
 			dft = new float[300];
 			float[] dftClone = new float[300];
@@ -191,11 +192,15 @@ namespace MusGen
 				float re = 0;
 				float im = 0;
 
-				for (int s = start; s < start + L; s += step)
+				float fakePoint = 0;
+				float fakeStep = step * frequency;
+
+				for (int sample = start; sample < start + L; sample += step)
 				{
-					float v = pi2 * frequency * s / L;
-					re += wav.L[s] * MathF.Cos(v);
-					im += wav.L[s] * MathF.Sin(v);
+					re += wav.L[sample] * MathF.Cos(fakePoint);
+					im += wav.L[sample] * MathF.Sin(fakePoint);
+
+					fakePoint += fakeStep;
 				}
 
 				dft[index] = 0.5f * MathF.Sqrt(re * re + im * im);
@@ -204,27 +209,25 @@ namespace MusGen
 				index++;
 			}
 
-			FindFrequency();
+			FindLeadFrequency();
 			float amplitudeMax = leadAmplitude; //why abs?
 			float amplitudeOverflow = MathF.Max(leadAmplitude, 1);
+			float ceiling = Math.Max(adaptiveCeiling, amplitudeMax / amplitudeOverflow);
 
 			for (int i = 0; i < periods.Count(); i++)
 			{
-				FindFrequency();
+				FindLeadFrequency();
 
-				periods[i] = (float)(1 / leadFrequency);
-				amplitudes[i] = (float)(leadAmplitude / amplitudeOverflow);
+				periods[i] = 1 / leadFrequency;
+				amplitudes[i] = leadAmplitude / amplitudeOverflow;
 				leadIndexes[i] = leadIndex;
 
 				//GraficsMaker.MakeGraficPlus($"A {i}", dftClone, leadIndexes, amplitudes, amplitudeMax);
 
-				RemoveTrash(leadIndex, frqSize);
+				RemoveTrash(leadIndex, trashSize);
 			}
 
-			if (graficName != "")
-				GraficsMaker.MakeGraficPlus(graficName, dft, leadIndexes, amplitudes, amplitudeMax);
-
-			void FindFrequency()
+			void FindLeadFrequency()
 			{
 				leadFrequency = 0;
 				leadAmplitude = 0;
@@ -244,7 +247,7 @@ namespace MusGen
 				}
 
 				//leadAmplitude = dft[leadIndex];
-				//is think this will be disabled
+				//is think this should be disabled
 			}
 
 			void RemoveTrash(int point, float size)
