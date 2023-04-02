@@ -10,17 +10,6 @@ namespace MusGen.Core
 {
 	public static class Tests
 	{
-		public static void Test1()
-		{
-			Wav wav = new Wav();
-			wav.Read(Disk2._programFiles + "test.wav", 0);
-			UserAsker.Ask(wav.L.Length.ToString());
-
-			double delme;
-
-			PeriodFinder.FindPeriod(wav, 30000, 33000, out delme);
-		}
-
 		public static void Test2()
 		{
 			Wav wav = new Wav();
