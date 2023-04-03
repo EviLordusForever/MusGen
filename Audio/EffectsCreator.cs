@@ -15,8 +15,8 @@ namespace MusGen
 	{
 		public static Wav wavIn;
 		public static Wav wavOut;
-		public static string waveType = "sin";
-		public static float adaptiveCeiling = 0;
+		public static string waveForm = "sin";
+		public static float adaptiveCeiling = 3;
 
 		public static void Startup(string originPath)
 		{
@@ -101,15 +101,11 @@ namespace MusGen
 				float pi2 = MathF.PI * 2;
 
 				float signal = 0;
-				float A = 1;
-				double AA = 1;
-
-				double i2 = 0;
-
-				double mismatch = 1;
-				double mismatchLimit = 1;
 
 				int channels = 5;
+
+				float smooth = 0.8f;
+				float antismooth = 1 - smooth;
 
 				float[] periods1 = new float[channels];
 				float[] periods2 = new float[channels];
@@ -119,18 +115,16 @@ namespace MusGen
 
 				uint graphStep = wavIn.sampleRate / 60;
 
-
-
 				ProgressShower.ShowProgress("Effect7 making");
 				long limit = Math.Min(wavIn.L.Length, wavIn.sampleRate * limitSec);
 
-				UserAsker.Ask($"Name: {outName}\nWave type: {waveType}\nRecreation hannels: {channels}\nSamples: {limit}\nSample rate: {wavOut.sampleRate}\nSeconds: {(int)(limit / wavOut.sampleRate)}");
+				UserAsker.Ask($"Name: {outName}\nWave type: {waveForm}\nRecreation hannels: {channels}\nSmooth: {smooth}\nSamples: {limit}\nSample rate: {wavOut.sampleRate}\nSeconds: {(int)(limit / wavOut.sampleRate)}");
 				
 				for (int i = 0; i < limit; i++)
 				{
 					if (i % 250 == 0)
 					{
-						PeriodFinder.FP_DFT_MULTI(ref periods1, ref amps1, wavIn, i, 4000, 20, 15, $"", adaptiveCeiling);
+						PeriodFinder.DFT_MULTI(ref periods1, ref amps1, wavIn, i, 4000, 20, 15, $"", ref adaptiveCeiling);
 						adaptiveCeiling *= 0.99f;
 						//SortByFrequency();
 						ProgressShower.SetProgress(1.0 * i / limit);
@@ -138,19 +132,18 @@ namespace MusGen
 
 					if (i % graphStep == 0)
 					{
-						GraphDrawer.DrawGraphPlus($"{i}", PeriodFinder.dft, PeriodFinder.leadIndexes, amps1, adaptiveCeiling);
-						PeriodFinder.FP_DFT_MULTI(ref periods1, ref amps1, wavIn, i, 4000, 20, 15, $"", adaptiveCeiling);
-						adaptiveCeiling *= 0.99f;						
+						//GraphDrawer.Draw($"{i}", PeriodFinder.dft, PeriodFinder.leadIndexes, amps1, adaptiveCeiling);
+						//adaptiveCeiling *= 0.99f;
 					}
 
 					signal = 0;
 
 					for (int c = 0; c < channels; c++)
 					{
-						amps2[c] = amps2[c] * 0.8f + amps1[c] * 0.2f;
-						periods2[c] = periods2[c] * 0.8f + periods1[c] * 0.2f;
+						amps2[c] = amps2[c] * smooth + amps1[c] * antismooth;
+						periods2[c] = periods2[c] * smooth + periods1[c] * antismooth;
 
-						t[c] += pi2 * 0.001f / periods2[c];
+						t[c] += pi2 * 0.00001f / periods2[c];
 
 						signal += (float)(F(t[c]) * amps2[c]);
 					}
@@ -188,9 +181,9 @@ namespace MusGen
 
 		public static float F(float t)
 		{
-			if (waveType == "sin")
+			if (waveForm == "sin")
 				return MathF.Sin(t);
-			else if (waveType == "sqaure")
+			else if (waveForm == "sqaure")
 				return Math.Sign(Math.Sin(t));
 			else
 				return MathF.Sin(t);

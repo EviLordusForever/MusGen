@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MusGen.Core;
+using System;
+using System.Collections;
+using System.Data;
 
 namespace MusGen
 {
@@ -14,7 +17,7 @@ namespace MusGen
 		public static float[] frequencies;
 		public static int[] leadIndexes;
 
-		public static void FP_DFT_MULTI(ref float[] periods, ref float[] amplitudes, Wav wav, int start, int L, int step, float trashSize, string graficName, float adaptiveCeiling)
+		public static void DFT_MULTI(ref float[] periods, ref float[] amplitudes, Wav wav, int start, int L, int step, float trashSize, string graficName, ref float adaptiveCeiling)
 		{
 			if (start + L >= wav.L.Length - 1)
 				return;
@@ -32,7 +35,7 @@ namespace MusGen
 
 			int index = 0;
 
-			for (float frequency = 20f; index < dft.Length; frequency *= 1.05f)
+			for (float frequency = 20f; index < dft.Length; frequency *= 1.023f)
 			{
 				float re = 0;
 				float im = 0;
@@ -58,7 +61,7 @@ namespace MusGen
 			FindLeadFrequency();
 			float amplitudeMax = leadAmplitude; //why abs?
 			float amplitudeOverflow = MathF.Max(leadAmplitude, 1);
-			float ceiling = Math.Max(adaptiveCeiling, amplitudeMax / amplitudeOverflow);
+			adaptiveCeiling = Math.Max(adaptiveCeiling, amplitudeMax / amplitudeOverflow);
 
 			for (int i = 0; i < periods.Count(); i++)
 			{
@@ -121,6 +124,97 @@ namespace MusGen
 				dft[frequancy] = Math.Sqrt(real[frequancy] * real[frequancy] + imag[frequancy] * imag[frequancy]) / length;
 			}
 			return dft;
+		}
+
+		public static float[] DFT_EX(ref float[] fft, Wav wav, int start, int L, int power)
+		{
+			fft = new float[L];
+			float[] fft2 = new float[L];
+			for (int i = 0; i < L; i++)
+			{
+				fft[i] = wav.L[i + start];
+				fft2[i] = fft[i];
+			}
+
+			FFT1D(1, power, ref fft, ref fft2);
+			float[] fft0 = new float[L / 2];
+
+			for (int i = 0; i < L / 2; i++)
+				fft0[i] = fft[i] + fft[L - i - 1];
+
+			return fft0;
+		}
+
+		public static void FFT1D(int dir, int m, ref float[] x, ref float[] y)
+		{
+			long nn, i, i1, j, k, i2, l, l1, l2;
+			float c1, c2, tx, ty, t1, t2, u1, u2, z;
+			/* Calculate the number of points */
+			nn = 1;
+			for (i = 0; i < m; i++)
+				nn *= 2;
+			/* Do the bit reversal */
+			i2 = nn >> 1;
+			j = 0;
+			for (i = 0; i < nn - 1; i++)
+			{
+				if (i < j)
+				{
+					tx = x[i];
+					ty = y[i];
+					x[i] = x[j];
+					y[i] = y[j];
+					x[j] = tx;
+					y[j] = ty;
+				}
+				k = i2;
+				while (k <= j)
+				{
+					j -= k;
+					k >>= 1;
+				}
+				j += k;
+			}
+			/* Compute the FFT */
+			c1 = -1f;
+			c2 = 0f;
+			l2 = 1;
+			for (l = 0; l < m; l++)
+			{
+				l1 = l2;
+				l2 <<= 1;
+				u1 = 1f;
+				u2 = 0f;
+				for (j = 0; j < l1; j++)
+				{
+					for (i = j; i < nn; i += l2)
+					{
+						i1 = i + l1;
+						t1 = u1 * x[i1] - u2 * y[i1];
+						t2 = u1 * y[i1] + u2 * x[i1];
+						x[i1] = x[i] - t1;
+						y[i1] = y[i] - t2;
+						x[i] += t1;
+						y[i] += t2;
+					}
+					z = u1 * c1 - u2 * c2;
+					u2 = u1 * c2 + u2 * c1;
+					u1 = z;
+				}
+				c2 = MathF.Sqrt((1f - c1) / 2f);
+				if (dir == 1)
+					c2 = -c2;
+				c1 = MathF.Sqrt((1f + c1) / 2f);
+			}
+			/* Scaling for forward transform */
+			if (dir == 1)
+			{
+				for (i = 0; i < nn; i++)
+				{
+					x[i] /= (float)nn;
+					y[i] /= (float)nn;
+				}
+			}
 		}
 
 		public static double goertzel(double[] signal, long N, float freq, int samplerate)

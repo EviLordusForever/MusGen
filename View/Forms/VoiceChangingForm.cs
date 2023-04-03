@@ -70,7 +70,25 @@ namespace MusGen.Forms
 
 			void Tr()
 			{
-				EffectsCreator.EffectDftMulti(openFileDialog1.FileName, exportFileName.Text, 150);
+				//EffectsCreator.EffectDftMulti(openFileDialog1.FileName, exportFileName.Text, 150);
+
+				Wav wav = new Wav();
+				wav.Read(openFileDialog1.FileName);
+
+				int L = 2048;
+				int p = 11;
+
+				for (int j = 500500; j < 500500 + L * 50; j++)
+				{
+					wav.L[j] = MathF.Sin(j / 250f) + MathF.Sin(j / 17f) + MathF.Sin(j / 7f);
+				}
+
+				for (int i = 0; i < 50; i++)
+				{
+					float[] fft = new float[L];
+					fft = PeriodFinder.DFT_EX(ref fft, wav, 500500 + L * i, L, p);
+					GraphDrawer.Draw($"{i}", fft, new int[0], new float[0], fft.Max());
+				}
 
 				//Nad nad = new Nad();
 				//Wav wav = new Wav();
