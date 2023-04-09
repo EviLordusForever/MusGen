@@ -65,8 +65,8 @@ namespace MusGen.Core
 			void Scales()
 			{
 				input_array[0] = 0.0001f;
-				yScale = 1080 / Math.Max(input_array.Max(), ceiling);
-				xScale = 1920.0 / input_array.Length;
+				yScale = resY / Math.Max(input_array.Max(), ceiling);
+				xScale = resX / input_array.Length;
 			}
 
 			void Pens()
@@ -76,14 +76,14 @@ namespace MusGen.Core
 
 			void BaseStart()
 			{
-				bmp = new Bitmap(1920, 1080);
+				bmp = new Bitmap(resX, resY);
 				gr = Graphics.FromImage(bmp);
 				gr.Clear(Color.White);
 			}
 
 			void Ending()
 			{
-				string path = $"{Disk2._programFiles}Grafics\\g\\g_{name}.bmp";
+				string path = $"{Disk2._programFiles}Grafics\\g\\g_{name}.jpg";
 				//Disk2.SaveImage(bmp, path);
 				Graphics2.SaveJPG100(bmp, path); 
 				bmp.Dispose(); //

@@ -37,8 +37,10 @@ namespace MusGen.Forms
 
 			if (isGood)
 			{
-				selectAudioFileButton.Text = Text2.StringAfterLast(openFileDialog1.FileName, "\\");
+				string name = Text2.StringAfterLast(openFileDialog1.FileName, "\\");
+				selectAudioFileButton.Text = name;
 				selectAudioFileButton.ForeColor = Color.Green;
+				exportFileName.Text = Text2.StringBeforeLast(name, ".wav");
 			}
 			else
 			{
@@ -70,7 +72,7 @@ namespace MusGen.Forms
 
 			void Tr()
 			{
-				EffectsCreator.EffectFFTMulti(openFileDialog1.FileName, exportFileName.Text, 25);
+				EffectsCreator.EffectFFTMulti(openFileDialog1.FileName, exportFileName.Text);
 
 				//Wav wav = new Wav();
 				//wav.Read(openFileDialog1.FileName);

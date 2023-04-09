@@ -89,7 +89,7 @@ namespace MusGen
 			Export(outName);
 		}
 
-		public static void EffectFFTMulti(string originPath, string outName, int limitSec)
+		public static void EffectFFTMulti(string originPath, string outName)
 		{
 			Thread tr = new Thread(Tr);
 			tr.Start();
@@ -98,9 +98,10 @@ namespace MusGen
 			{
 				//PARAMS:
 
+				int limitSec = 25;
 				int channels = 5;
 				float smooth = 0.98f;
-				bool drawGraph = false;
+				bool drawGraph = true;
 				int FFTsize = 512;
 				float trashSize = 15;
 
@@ -118,7 +119,7 @@ namespace MusGen
 				float[] amps2 = new float[channels];
 				float[] t = new float[channels];
 
-				outName += $" FFT {FFTsize} ch {channels} tr {trashSize}";
+				outName += $" (FFT {FFTsize} ch {channels} tr {trashSize})";
 
 				uint graphStep = wavIn.sampleRate / 60;
 
