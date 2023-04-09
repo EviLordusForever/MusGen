@@ -99,12 +99,13 @@ namespace MusGen
 				Startup(originPath);
 
 				float pi2 = MathF.PI * 2;
+				float buf = pi2 / wavIn.sampleRate;
 
 				float signal = 0;
 
 				int channels = 5;
 
-				float smooth = 0.8f;
+				float smooth = 0.98f;
 				float antismooth = 1 - smooth;
 
 				float[] periods1 = new float[channels];
@@ -124,16 +125,20 @@ namespace MusGen
 				{
 					if (i % 250 == 0)
 					{
-						PeriodFinder.DFT_MULTI(ref periods1, ref amps1, wavIn, i, 4000, 20, 15, $"", ref adaptiveCeiling);
-						adaptiveCeiling *= 0.99f;
+						PeriodFinder.FFT_MULTI(ref periods1, ref amps1, wavIn, i, 8192, 15, ref adaptiveCeiling);
 						//SortByFrequency();
-						ProgressShower.SetProgress(1.0 * i / limit);
 					}
 
 					if (i % graphStep == 0)
 					{
-						//GraphDrawer.Draw($"{i}", PeriodFinder.dft, PeriodFinder.leadIndexes, amps1, adaptiveCeiling);
-						//adaptiveCeiling *= 0.99f;
+						float[] amps0 = new float[channels];
+						for (int c = 0; c < channels; c++)
+							amps0[c] = amps1[c] * PeriodFinder.amplitudeOverflow;
+
+						GraphDrawer.Draw($"{i}", PeriodFinder.dft, PeriodFinder.leadIndexes, amps0, adaptiveCeiling);
+						adaptiveCeiling *= 0.99f;
+
+						ProgressShower.SetProgress(1.0 * i / limit);
 					}
 
 					signal = 0;
@@ -141,9 +146,10 @@ namespace MusGen
 					for (int c = 0; c < channels; c++)
 					{
 						amps2[c] = amps2[c] * smooth + amps1[c] * antismooth;
-						periods2[c] = periods2[c] * smooth + periods1[c] * antismooth;
+						if (periods1[c] < 0.05f)
+							periods2[c] = periods2[c] * smooth + periods1[c] * antismooth;
 
-						t[c] += pi2 * 0.00001f / periods2[c];
+						t[c] += buf / periods2[c];
 
 						signal += (float)(F(t[c]) * amps2[c]);
 					}

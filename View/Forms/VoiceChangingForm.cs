@@ -70,25 +70,42 @@ namespace MusGen.Forms
 
 			void Tr()
 			{
-				//EffectsCreator.EffectDftMulti(openFileDialog1.FileName, exportFileName.Text, 150);
+				EffectsCreator.EffectDftMulti(openFileDialog1.FileName, exportFileName.Text, 25);
 
-				Wav wav = new Wav();
-				wav.Read(openFileDialog1.FileName);
+				//Wav wav = new Wav();
+				//wav.Read(openFileDialog1.FileName);
 
-				int L = 2048;
+
+
+				/*int fftsize = (int)Math.Pow(2, 16);
+				int start = 500500;
+				uint R = wav.sampleRate;
 				int p = 11;
 
-				for (int j = 500500; j < 500500 + L * 50; j++)
+				for (int j = start; j < start + fftsize * 50; j++)
 				{
-					wav.L[j] = MathF.Sin(j / 250f) + MathF.Sin(j / 17f) + MathF.Sin(j / 7f);
+					//wav.L[j] = 0;
+					//AddFrequency(j, 15000f);
+					//AddFrequency(j, 10000f);
+					//AddFrequency(j, 5000f);
+					//AddFrequency(j, 20000f);
 				}
 
 				for (int i = 0; i < 50; i++)
 				{
-					float[] fft = new float[L];
-					fft = PeriodFinder.DFT_EX(ref fft, wav, 500500 + L * i, L, p);
-					GraphDrawer.Draw($"{i}", fft, new int[0], new float[0], fft.Max());
+					float[] fft = new float[fftsize];
+					fft = PeriodFinder.DFT_EX_2(fft, wav, start + fftsize * i, fftsize);
+					GraphDrawer.Draw($"{i}", fft);
 				}
+
+				void AddFrequency(int j, float f)
+				{
+					float perSample = 2 * MathF.PI * j;
+					float perFFT = perSample / fftsize;
+					wav.L[j] += MathF.Sin(f * perFFT);
+				}*/
+
+
 
 				//Nad nad = new Nad();
 				//Wav wav = new Wav();

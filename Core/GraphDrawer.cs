@@ -9,6 +9,11 @@ namespace MusGen.Core
 {
 	public static class GraphDrawer
 	{
+		public static void Draw(string name, float[] input_array)
+		{
+			Draw(name, input_array, new int[0], new float[0], input_array.Max());
+		}
+
 		public static void Draw(string name, float[] input_array, int[] verticalLines, float[] theirSizes, float ceiling)
 		{
 			Bitmap bmp;
@@ -28,6 +33,9 @@ namespace MusGen.Core
 			{
 				for (int i = 0; i < verticalLines.Length; i++)
 				{
+					if (theirSizes[i] > Int32.MaxValue)
+						continue;
+
 					int x = Convert.ToInt32(verticalLines[i] * xScale);
 					int y = Convert.ToInt32(theirSizes[i] * yScale);
 
