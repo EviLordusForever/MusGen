@@ -99,11 +99,12 @@ namespace MusGen
 				//PARAMS:
 
 				int limitSec = 25;
-				int channels = 5;
-				float smooth = 0.98f;
-				bool drawGraph = true;
+				int channels = 20;
+				float smooth = 0.99f;
+				bool drawGraph = false;
 				int FFTsize = 512;
-				float trashSize = 15;
+				float trashSize = 10;
+				float amplitudeThreshold = 0;
 
 				Startup(originPath);
 
@@ -126,14 +127,15 @@ namespace MusGen
 				ProgressShower.ShowProgress("Effect FFT multi audio recreation...");
 				long limit = Math.Min(wavIn.L.Length, wavIn.sampleRate * limitSec);
 
-				UserAsker.Ask($"Name: {outName}\nWave type: {waveForm}\nRecreation channels: {channels}\nSmooth: {smooth}\nFFT size: {FFTsize}\nTrash size: {trashSize}\nDraw graph: {drawGraph}\nSamples: {limit}\nSample rate: {wavOut.sampleRate}\nSeconds: {(int)(limit / wavOut.sampleRate)}");
+				UserAsker.Ask($"Name: {outName}\nWave type: {waveForm}\nRecreation channels: {channels}\nSmooth: {smooth}\nFFT size: {FFTsize}\nTrash size: {trashSize}\nAmplitude threshold: {amplitudeThreshold}\nDraw graph: {drawGraph}\nSamples: {limit}\nSample rate: {wavOut.sampleRate}\nSeconds: {(int)(limit / wavOut.sampleRate)}");
 				
 				for (int i = 0; i < limit; i++)
 				{
-					if (i % 250 == 0)
+					if (i % 441 == 0)
 					{
 						PeriodFinder.FFT_MULTI(ref periods1, ref amps1, wavIn, i, FFTsize, trashSize, ref adaptiveCeiling);
 						//SortByFrequency();
+						DeleteSmallAmplitudes();
 					}
 
 					if (i % graphStep == 0)
@@ -156,8 +158,11 @@ namespace MusGen
 					for (int c = 0; c < channels; c++)
 					{
 						amps2[c] = amps2[c] * smooth + amps1[c] * antismooth;
-						if (periods1[c] < 0.05f)
-							periods2[c] = periods2[c] * smooth + periods1[c] * antismooth;
+
+						if (periods1[c] > 0.05f)
+							periods1[c] = 0.05f;
+
+						periods2[c] = periods2[c] * smooth + periods1[c] * antismooth;
 
 						t[c] += buf / periods2[c];
 
@@ -190,6 +195,14 @@ namespace MusGen
 
 					periods1 = periodsSorted;
 					amps1 = ampsSorted;
+				}
+
+				void DeleteSmallAmplitudes()
+				{
+					if (amplitudeThreshold > 0)
+						for (int i = 1; i < channels; i++)
+							if (amps1[i] < amps1[0] * amplitudeThreshold)
+								amps1[i] = 0;
 				}
 			}
 		}

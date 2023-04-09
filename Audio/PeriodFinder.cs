@@ -98,9 +98,9 @@ namespace MusGen
 			}
 		}
 
-		public static void FFT_MULTI(ref float[] periods, ref float[] amplitudes, Wav wav, int start, int L, float trashSize, ref float adaptiveCeiling)
+		public static void FFT_MULTI(ref float[] periods, ref float[] amplitudes, Wav wav, int start, int FFTsize, float trashSize, ref float adaptiveCeiling)
 		{
-			if (start + L >= wav.L.Length - 1)
+			if (start + FFTsize >= wav.L.Length - 1)
 				return;
 
 			float pi2 = 2 * MathF.PI;
@@ -111,18 +111,16 @@ namespace MusGen
 
 			leadIndexes = new int[periods.Length];
 
-			dft = new float[L / 2];
-			float[] dftClone = new float[L / 2];
-
-			int index = 0;
-
-			Complex[] complex = new Complex[L];
-			for (int i = 0; i < L; i++)
+			Complex[] complex = new Complex[FFTsize];
+			for (int i = 0; i < FFTsize; i++)
 				complex[i] = new Complex(wav.L[start + i], 0);
 
 			complex = FFT.Forward(complex);
 
-			for (int i = 0; i < L / 2; i++)
+			dft = new float[FFTsize / 2];
+			float[] dftClone = new float[FFTsize / 2]; //////////
+
+			for (int i = 0; i < FFTsize / 2; i++)
 			{
 				dft[i] = (float)(Math.Sqrt(Math.Pow(complex[i].Real, 2) + Math.Pow(complex[i].Imaginary, 2)));
 				dftClone[i] = dft[i];
@@ -161,7 +159,10 @@ namespace MusGen
 						leadIndex = i;
 					}
 
-				leadFrequency = (1f * leadIndex / L) * wav.sampleRate;
+				leadAmplitude = dft[leadIndex]; //test me
+
+				leadFrequency = (1f * leadIndex / FFTsize) * wav.sampleRate;
+				//From frequency formula
 			}
 
 			void RemoveTrash(int point, float size)

@@ -18,11 +18,12 @@ namespace MusGen.Core
 		{
 			Bitmap bmp;
 			Graphics gr;
-			double yScale;
-			double xScale;
+			float yScale;
+			float xScale;
 			Pen blackPen;
 			int resX = 1920 / 4;
 			int resY = 1080 / 4;
+			int yHalf = resY / 2;
 
 			BaseStart();
 			Scales();
@@ -42,9 +43,10 @@ namespace MusGen.Core
 					int y = Convert.ToInt32(theirSizes[i] * yScale);
 
 					Color clr = Graphics2.Rainbow(i * 1f / verticalLines.Length);
-					Pen pen = new Pen(clr, 6);
+					int w = (int)((16f / 1920f) * resX);
+					Pen pen = new Pen(clr, w);
 
-					gr.DrawLine(pen, x, 0, x, y);
+					gr.DrawLine(pen, x, yHalf - y, x, yHalf + y);
 				}
 			}
 
@@ -58,15 +60,16 @@ namespace MusGen.Core
 
 					int x = Convert.ToInt32(i * xScale);
 
-					gr.DrawLine(blackPen, x, 0, x, y);
+					gr.DrawLine(blackPen, x, yHalf - y, x, yHalf + y);
 				}
 			}
 
 			void Scales()
 			{
 				input_array[0] = 0.0001f;
-				yScale = resY / Math.Max(input_array.Max(), ceiling);
-				xScale = resX / input_array.Length;
+				yScale = 1f * resY / Math.Max(input_array.Max(), ceiling);
+				yScale /= 2;
+				xScale = 1f * resX / input_array.Length;
 			}
 
 			void Pens()
