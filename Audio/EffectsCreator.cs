@@ -98,59 +98,55 @@ namespace MusGen
 			{
 				//PARAMS:
 
-				int limitSec = 25;
+				int limitSec = 2500;
 				int channels = 20;
-				float smooth = 0.99f;
-				bool drawGraph = false;
+				float smooth = 0.8f;
+				bool drawGraph = true;
 				int FFTsize = 512;
-				float trashSize = 10;
+				float trashSize = 5;
 				float amplitudeThreshold = 0;
 
 				Startup(originPath);
+				GraphDrawer.Init(256 * 2, 16 * 9 * 2);
 
+				float max = 0;
 				float signal = 0;
 				float antismooth = 1 - smooth;
 
 				float pi2 = MathF.PI * 2;
 				float buf = pi2 / wavIn.sampleRate;
 
-				float[] periods1 = new float[channels];
-				float[] periods2 = new float[channels];
+				float[] frqs1 = new float[channels];
+				float[] frqs2 = new float[channels];
 				float[] amps1 = new float[channels];
 				float[] amps2 = new float[channels];
-				float[] t = new float[channels];
+				double[] t = new double[channels];
 
 				outName += $" (FFT {FFTsize} ch {channels} tr {trashSize})";
 
 				uint graphStep = wavIn.sampleRate / 60;
 
-				ProgressShower.ShowProgress("Effect FFT multi audio recreation...");
 				long limit = Math.Min(wavIn.L.Length, wavIn.sampleRate * limitSec);
 
-				UserAsker.Ask($"Name: {outName}\nWave type: {waveForm}\nRecreation channels: {channels}\nSmooth: {smooth}\nFFT size: {FFTsize}\nTrash size: {trashSize}\nAmplitude threshold: {amplitudeThreshold}\nDraw graph: {drawGraph}\nSamples: {limit}\nSample rate: {wavOut.sampleRate}\nSeconds: {(int)(limit / wavOut.sampleRate)}");
-				
-				for (int i = 0; i < limit; i++)
+				bool ok = UserAsker.Ask($"Name: {outName}\nWave type: {waveForm}\nRecreation channels: {channels}\nSmooth: {smooth}\nFFT size: {FFTsize}\nTrash size: {trashSize}\nAmplitude threshold: {amplitudeThreshold}\nDraw graph: {drawGraph}\nSamples: {limit}\nSample rate: {wavOut.sampleRate}\nSeconds: {(int)(limit / wavOut.sampleRate)}");
+				if (!ok)
+					return;
+
+				FindAmplitudeMaxForWholeTrack();
+
+				ProgressShower.ShowProgress("Effect FFT multi audio recreation...");
+
+				float maxAmplitudeForNormalization = 0;
+
+				for (int s = 0; s < limit; s++)
 				{
-					if (i % 441 == 0)
+					if (s % 441 == 0)
 					{
-						PeriodFinder.FFT_MULTI(ref periods1, ref amps1, wavIn, i, FFTsize, trashSize, ref adaptiveCeiling);
-						//SortByFrequency();
+						FrequencyFinder.FFT_MULTI(ref frqs1, ref amps1, wavIn, s, FFTsize, trashSize);
+						adaptiveCeiling = Math.Max(adaptiveCeiling, FrequencyFinder.amplitudeMax);
+
+						ConnectNewPoints();
 						DeleteSmallAmplitudes();
-					}
-
-					if (i % graphStep == 0)
-					{
-						if (drawGraph)
-						{
-							float[] amps0 = new float[channels];
-							for (int c = 0; c < channels; c++)
-								amps0[c] = amps1[c] * PeriodFinder.amplitudeOverflow;
-
-							GraphDrawer.Draw($"{i}", PeriodFinder.dft, PeriodFinder.leadIndexes, amps0, adaptiveCeiling);
-							adaptiveCeiling *= 0.99f;
-						}
-
-						ProgressShower.SetProgress(1.0 * i / limit);
 					}
 
 					signal = 0;
@@ -159,42 +155,149 @@ namespace MusGen
 					{
 						amps2[c] = amps2[c] * smooth + amps1[c] * antismooth;
 
-						if (periods1[c] > 0.05f)
-							periods1[c] = 0.05f;
+						if (frqs1[c] < 20f)
+							frqs1[c] = 20f;
 
-						periods2[c] = periods2[c] * smooth + periods1[c] * antismooth;
+						frqs2[c] = frqs2[c] * smooth + frqs1[c] * antismooth;
 
-						t[c] += buf / periods2[c];
+						t[c] += (pi2 * frqs2[c] / wavIn.sampleRate); //check me
 
 						signal += (float)(F(t[c]) * amps2[c]);
 					}
 
-					wavOut.L[i] = signal / channels;
-					if (wavIn.channels == 2)
-						wavOut.R[i] = wavOut.L[i];
+					DrawGraph(s);
+
+					wavOut.L[s] = signal / channels;
+
+					if (MathF.Abs(wavOut.L[s]) > maxAmplitudeForNormalization)
+						maxAmplitudeForNormalization = MathF.Abs(wavOut.L[s]);
 				}
+
+				Normalize();
+
+				ProgressShower.ShowProgress("Saving...");
 
 				Export(outName);
 
 				ProgressShower.CloseProgressForm();
 
-				void SortByFrequency()
+				void DrawGraph(int sampleNumber)
 				{
-					float[] periodsSorted = new float[periods1.Length];
-					float[] ampsSorted = new float[amps1.Length];
-
-					for (int i = 0; i < periods1.Length; i++)
+					if (sampleNumber % graphStep == 0)
 					{
-						int id = Math2.IndexOfMax(periods1);
-							
-						periodsSorted[i] = periods1[id];
-						ampsSorted[i] = amps1[id];
+						if (drawGraph)
+						{
+							float[] amps0 = new float[channels];
+							for (int c = 0; c < channels; c++)
+								amps0[c] = amps1[c] * FrequencyFinder.amplitudeOvedrive;
 
-						periods1[id] = 0;
+							GraphDrawer.Draw($"{sampleNumber}", FrequencyFinder.dft, FrequencyFinder.leadIndexes, amps0, adaptiveCeiling);
+							adaptiveCeiling *= 0.99f;
+						}
+
+						ProgressShower.SetProgress(1.0 * sampleNumber / limit);
+					}
+				}
+
+				void Normalize()
+				{
+					ProgressShower.ShowProgress($"Normalization... ({maxAmplitudeForNormalization} to 1)");
+					ProgressShower.SetProgress(0.0);
+					maxAmplitudeForNormalization *= 1.01f;
+					for (int i = 0; i < limit; i++)
+					{
+						wavOut.L[i] /= maxAmplitudeForNormalization;
+						if (wavIn.channels == 2)
+							wavOut.R[i] = wavOut.L[i];
+
+						if (i % 500 == 0)
+							ProgressShower.SetProgress(1.0 * i / limit);
+					}
+				}
+
+				void FindAmplitudeMaxForWholeTrack()
+				{
+					ProgressShower.ShowProgress("Finding maximal FFT amplitude...");
+					int step = (int)(limit / 26);
+					max = 0;
+					for (int i = 3; i < 23; i++)
+					{
+						FrequencyFinder.FFT_MULTI(ref frqs1, ref amps1, wavIn, i * step, FFTsize, trashSize);
+						ProgressShower.SetProgress((i - 3) / 20.0);
+						if (FrequencyFinder.amplitudeMax > max)
+							max = FrequencyFinder.amplitudeMax;
 					}
 
-					periods1 = periodsSorted;
+					FrequencyFinder.amplitudeMaxForWholeTrack = max;
+					ProgressShower.SetProgress(0.0);
+				}
+
+				void SortByFrequency()
+				{
+					float[] frqsSorted = new float[frqs1.Length];
+					float[] ampsSorted = new float[amps1.Length];
+
+					for (int i = 0; i < frqs1.Length; i++)
+					{
+						int id = Math2.IndexOfMax(frqs1);
+							
+						frqsSorted[i] = frqs1[id];
+						ampsSorted[i] = amps1[id];
+
+						frqs1[id] = 0;
+					}
+
+					frqs1 = frqsSorted;
 					amps1 = ampsSorted;
+				}
+
+				void ConnectNewPoints()
+				{
+					float[] ampsSorted = new float[amps1.Length];
+					float[] frqsSorted = new float[frqs1.Length];
+					int[] leadIndexes = new int[FrequencyFinder.leadIndexes.Length];
+
+					bool[] taken = new bool[amps1.Length];
+
+					for (int id2 = 0; id2 < amps2.Length; id2++)
+					{
+						int id1 = FindNearestPoint(id2);
+
+						frqsSorted[id2] = frqs1[id1];
+						ampsSorted[id2] = amps1[id1];
+						leadIndexes[id2] = FrequencyFinder.leadIndexes[id1];
+					}
+
+					frqs1 = frqsSorted;
+					amps1 = ampsSorted;
+					FrequencyFinder.leadIndexes = leadIndexes;
+
+					int FindNearestPoint(int id2)
+					{
+						float minDistance = 1000000f;
+						int id_res = 0;
+
+						for (int id1 = 0; id1 < amps1.Length; id1++)
+						{
+							if (!taken[id1])
+							{
+								float x = frqs2[id2] - frqs1[id1];
+								x /= 20000; //Hz
+								x *= 4; //check
+								float y = amps2[id2] - amps1[id1];
+								float distance = MathF.Sqrt(x * x + y * y);
+
+								if (distance < minDistance)
+								{
+									minDistance = distance;
+									id_res = id1;
+								}
+							}
+						}
+
+						taken[id_res] = true;
+						return id_res;
+					}
 				}
 
 				void DeleteSmallAmplitudes()
@@ -208,14 +311,14 @@ namespace MusGen
 		}
 
 
-		public static float F(float t)
+		public static double F(double t)
 		{
 			if (waveForm == "sin")
-				return MathF.Sin(t);
+				return Math.Sin(t);
 			else if (waveForm == "sqaure")
 				return Math.Sign(Math.Sin(t));
 			else
-				return MathF.Sin(t);
+				return Math.Sin(t);
 		}
 	}
 }

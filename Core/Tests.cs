@@ -21,7 +21,7 @@ namespace MusGen.Core
 			for (int i = 1; i < 1000; i++)
 				a[i] = wav.L[i];
 
-			UserAsker.Ask(PeriodFinder.goertzel(a, 100, 44800, (int)wav.sampleRate).ToString());
+			UserAsker.Ask(FrequencyFinder.goertzel(a, 100, 44800, (int)wav.sampleRate).ToString());
 		}
 
 		public static void Test3()
