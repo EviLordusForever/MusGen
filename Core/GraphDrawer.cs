@@ -21,6 +21,8 @@ namespace MusGen.Core
 			double yScale;
 			double xScale;
 			Pen blackPen;
+			int resX = 1920 / 4;
+			int resY = 1080 / 4;
 
 			BaseStart();
 			Scales();
@@ -81,7 +83,9 @@ namespace MusGen.Core
 
 			void Ending()
 			{
-				Disk2.SaveImage(bmp, Disk2._programFiles + "Grafics\\g\\g_" + name + ".bmp");
+				string path = $"{Disk2._programFiles}Grafics\\g\\g_{name}.bmp";
+				//Disk2.SaveImage(bmp, path);
+				Graphics2.SaveJPG100(bmp, path); 
 				bmp.Dispose(); //
 			}
 		}

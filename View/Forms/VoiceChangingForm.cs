@@ -70,7 +70,7 @@ namespace MusGen.Forms
 
 			void Tr()
 			{
-				EffectsCreator.EffectDftMulti(openFileDialog1.FileName, exportFileName.Text, 25);
+				EffectsCreator.EffectFFTMulti(openFileDialog1.FileName, exportFileName.Text, 25);
 
 				//Wav wav = new Wav();
 				//wav.Read(openFileDialog1.FileName);

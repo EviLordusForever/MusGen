@@ -89,24 +89,28 @@ namespace MusGen
 			Export(outName);
 		}
 
-		public static void EffectDftMulti(string originPath, string outName, int limitSec)
+		public static void EffectFFTMulti(string originPath, string outName, int limitSec)
 		{
 			Thread tr = new Thread(Tr);
 			tr.Start();
 
 			void Tr()
 			{
+				//PARAMS:
+
+				int channels = 5;
+				float smooth = 0.98f;
+				bool drawGraph = false;
+				int FFTsize = 512;
+				float trashSize = 15;
+
 				Startup(originPath);
+
+				float signal = 0;
+				float antismooth = 1 - smooth;
 
 				float pi2 = MathF.PI * 2;
 				float buf = pi2 / wavIn.sampleRate;
-
-				float signal = 0;
-
-				int channels = 5;
-
-				float smooth = 0.98f;
-				float antismooth = 1 - smooth;
 
 				float[] periods1 = new float[channels];
 				float[] periods2 = new float[channels];
@@ -114,29 +118,34 @@ namespace MusGen
 				float[] amps2 = new float[channels];
 				float[] t = new float[channels];
 
+				outName += $" FFT {FFTsize} ch {channels} tr {trashSize}";
+
 				uint graphStep = wavIn.sampleRate / 60;
 
-				ProgressShower.ShowProgress("Effect7 making");
+				ProgressShower.ShowProgress("Effect FFT multi audio recreation...");
 				long limit = Math.Min(wavIn.L.Length, wavIn.sampleRate * limitSec);
 
-				UserAsker.Ask($"Name: {outName}\nWave type: {waveForm}\nRecreation hannels: {channels}\nSmooth: {smooth}\nSamples: {limit}\nSample rate: {wavOut.sampleRate}\nSeconds: {(int)(limit / wavOut.sampleRate)}");
+				UserAsker.Ask($"Name: {outName}\nWave type: {waveForm}\nRecreation channels: {channels}\nSmooth: {smooth}\nFFT size: {FFTsize}\nTrash size: {trashSize}\nDraw graph: {drawGraph}\nSamples: {limit}\nSample rate: {wavOut.sampleRate}\nSeconds: {(int)(limit / wavOut.sampleRate)}");
 				
 				for (int i = 0; i < limit; i++)
 				{
 					if (i % 250 == 0)
 					{
-						PeriodFinder.FFT_MULTI(ref periods1, ref amps1, wavIn, i, 8192, 15, ref adaptiveCeiling);
+						PeriodFinder.FFT_MULTI(ref periods1, ref amps1, wavIn, i, FFTsize, trashSize, ref adaptiveCeiling);
 						//SortByFrequency();
 					}
 
 					if (i % graphStep == 0)
 					{
-						float[] amps0 = new float[channels];
-						for (int c = 0; c < channels; c++)
-							amps0[c] = amps1[c] * PeriodFinder.amplitudeOverflow;
+						if (drawGraph)
+						{
+							float[] amps0 = new float[channels];
+							for (int c = 0; c < channels; c++)
+								amps0[c] = amps1[c] * PeriodFinder.amplitudeOverflow;
 
-						GraphDrawer.Draw($"{i}", PeriodFinder.dft, PeriodFinder.leadIndexes, amps0, adaptiveCeiling);
-						adaptiveCeiling *= 0.99f;
+							GraphDrawer.Draw($"{i}", PeriodFinder.dft, PeriodFinder.leadIndexes, amps0, adaptiveCeiling);
+							adaptiveCeiling *= 0.99f;
+						}
 
 						ProgressShower.SetProgress(1.0 * i / limit);
 					}
