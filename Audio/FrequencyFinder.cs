@@ -100,7 +100,7 @@ namespace MusGen
 			}
 		}
 
-		public static void FFT_MULTI(ref float[] frequencies, ref float[] amplitudes, Wav wav, int start, int FFTsize, float trashSize)
+		public static void FFT_MULTI(ref float[] frequencies, ref float[] amplitudes, Wav wav, int start, int FFTsize, float trashSize, float[] smoothMask)
 		{
 			if (start + FFTsize >= wav.L.Length - 1)
 				return;
@@ -119,12 +119,15 @@ namespace MusGen
 
 			complex = FFT.Forward(complex);
 
+			float[] oldDft = dft;
+
 			dft = new float[FFTsize / 2];
 			float[] dftClone = new float[FFTsize / 2]; //////////
 
 			for (int i = 0; i < FFTsize / 2; i++)
 			{
-				dft[i] = (float)(Math.Sqrt(Math.Pow(complex[i].Real, 2) + Math.Pow(complex[i].Imaginary, 2)));
+				float newValue = (float)(Math.Sqrt(Math.Pow(complex[i].Real, 2) + Math.Pow(complex[i].Imaginary, 2)));
+				dft[i] = oldDft[i] * smoothMask[i] + newValue * (1 - smoothMask[i]);
 				dftClone[i] = dft[i];
 			}
 
@@ -144,6 +147,10 @@ namespace MusGen
 
 				frequencies[i] = leadFrequency;
 				amplitudes[i] = leadAmplitude / amplitudeOvedrive;
+
+				if (float.IsNaN(amplitudes[i]))
+				{
+				}
 				leadIndexes[i] = leadIndex;
 			}
 

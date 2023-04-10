@@ -99,12 +99,14 @@ namespace MusGen
 				//PARAMS:
 
 				int limitSec = 2500;
-				int channels = 20;
+				int channels = 10;
 				float smooth = 0.8f;
 				bool drawGraph = true;
 				int FFTsize = 512;
 				float trashSize = 5;
 				float amplitudeThreshold = 0;
+				float lfsY = 0.95f;
+				float lfsX = 2000f;
 
 				Startup(originPath);
 				GraphDrawer.Init(256 * 2, 16 * 9 * 2);
@@ -121,6 +123,7 @@ namespace MusGen
 				float[] amps1 = new float[channels];
 				float[] amps2 = new float[channels];
 				double[] t = new double[channels];
+				float[] lowFrequenciesSmoothing = new float[FFTsize];
 
 				outName += $" (FFT {FFTsize} ch {channels} tr {trashSize})";
 
@@ -130,9 +133,10 @@ namespace MusGen
 
 				bool ok = UserAsker.Ask($"Name: {outName}\nWave type: {waveForm}\nRecreation channels: {channels}\nSmooth: {smooth}\nFFT size: {FFTsize}\nTrash size: {trashSize}\nAmplitude threshold: {amplitudeThreshold}\nDraw graph: {drawGraph}\nSamples: {limit}\nSample rate: {wavOut.sampleRate}\nSeconds: {(int)(limit / wavOut.sampleRate)}");
 				if (!ok)
-					return;
+					return;	
 
 				FindAmplitudeMaxForWholeTrack();
+				CalculateLowFrequencySmoothing();
 
 				ProgressShower.ShowProgress("Effect FFT multi audio recreation...");
 
@@ -142,11 +146,25 @@ namespace MusGen
 				{
 					if (s % 441 == 0)
 					{
-						FrequencyFinder.FFT_MULTI(ref frqs1, ref amps1, wavIn, s, FFTsize, trashSize);
+						if (s == 4410)
+						{
+						}
+
+						FrequencyFinder.FFT_MULTI(ref frqs1, ref amps1, wavIn, s, FFTsize, trashSize, lowFrequenciesSmoothing);
 						adaptiveCeiling = Math.Max(adaptiveCeiling, FrequencyFinder.amplitudeMax);
+
+						for (int c = 0; c < channels; c++)
+							if (float.IsNaN(amps1[c]))
+							{
+							}
 
 						ConnectNewPoints();
 						DeleteSmallAmplitudes();
+
+/*						for (int c = 0; c < channels; c++)
+							if (float.IsNaN(amps1[c]))
+							{
+							}*/
 					}
 
 					signal = 0;
@@ -154,6 +172,10 @@ namespace MusGen
 					for (int c = 0; c < channels; c++)
 					{
 						amps2[c] = amps2[c] * smooth + amps1[c] * antismooth;
+
+						if (float.IsNaN(amps1[c]))
+						{
+						}
 
 						if (frqs1[c] < 20f)
 							frqs1[c] = 20f;
@@ -181,6 +203,12 @@ namespace MusGen
 
 				ProgressShower.CloseProgressForm();
 
+				void CalculateLowFrequencySmoothing()
+				{
+					for (int x = 0; x < FFTsize; x++)
+						lowFrequenciesSmoothing[x] = lfsY / MathF.Pow(MathF.E, x * wavOut.sampleRate / (FFTsize * lfsX));
+				}
+
 				void DrawGraph(int sampleNumber)
 				{
 					if (sampleNumber % graphStep == 0)
@@ -191,7 +219,10 @@ namespace MusGen
 							for (int c = 0; c < channels; c++)
 								amps0[c] = amps1[c] * FrequencyFinder.amplitudeOvedrive;
 
-							GraphDrawer.Draw($"{sampleNumber}", FrequencyFinder.dft, FrequencyFinder.leadIndexes, amps0, adaptiveCeiling);
+							float[] f = Math2.RescaleArrayToLog2(FrequencyFinder.dft);
+							int[] indexes = Math2.RescaleIndexesToLog2(FrequencyFinder.leadIndexes, f.Length);
+
+							GraphDrawer.Draw($"{sampleNumber}", f, indexes, amps0, adaptiveCeiling, FrequencyFinder.amplitudeMaxForWholeTrack);
 							adaptiveCeiling *= 0.99f;
 						}
 
@@ -220,9 +251,13 @@ namespace MusGen
 					ProgressShower.ShowProgress("Finding maximal FFT amplitude...");
 					int step = (int)(limit / 26);
 					max = 0;
+
+					float[] empty = new float[FFTsize];
+					FrequencyFinder.dft = new float[FFTsize];
+
 					for (int i = 3; i < 23; i++)
 					{
-						FrequencyFinder.FFT_MULTI(ref frqs1, ref amps1, wavIn, i * step, FFTsize, trashSize);
+						FrequencyFinder.FFT_MULTI(ref frqs1, ref amps1, wavIn, i * step, FFTsize, trashSize, empty);
 						ProgressShower.SetProgress((i - 3) / 20.0);
 						if (FrequencyFinder.amplitudeMax > max)
 							max = FrequencyFinder.amplitudeMax;

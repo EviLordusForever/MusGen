@@ -17,19 +17,20 @@ namespace MusGen.Core
 
 		public static void Draw(string name, float[] input_array)
 		{
-			Draw(name, input_array, new int[0], new float[0], input_array.Max());
+			Draw(name, input_array, new int[0], new float[0], input_array.Max(), input_array.Max());
 		}
 
-		public static void Draw(string name, float[] input_array, int[] verticalLines, float[] theirSizes, float ceiling)
+		public static void Draw(string name, float[] input_array, int[] verticalLines, float[] theirSizes, float adaptiveCeiling, float maxCeiling)
 		{
 			float yScale;
 			float xScale;
 			float powerScale;
-			Pen blackPen;
+			Pen whitePen;
 
 			int yHalf = resY / 2;
 
 			MoveDown();
+			gr.FillRectangle(Brushes.Black, 0, 0, resX, yHalf + 1);
 			Scales();
 			DrawPro();
 			Pens();
@@ -65,7 +66,7 @@ namespace MusGen.Core
 
 					int x = Convert.ToInt32(i * xScale);
 
-					gr.DrawLine(blackPen, x, yHalf - y, x, yHalf);
+					gr.DrawLine(whitePen, x, yHalf - y, x, yHalf);
 				}
 			}
 
@@ -88,15 +89,15 @@ namespace MusGen.Core
 			void Scales()
 			{
 				input_array[0] = 0.0001f;
-				yScale = 1f * resY / Math.Max(input_array.Max(), ceiling);
+				yScale = 1f * resY / Math.Max(input_array.Max(), adaptiveCeiling);
 				yScale /= 2;
-				powerScale = 1f / theirSizes.Max();
+				powerScale = 1f / maxCeiling;
 				xScale = 1f * resX / input_array.Length;
 			}
 
 			void Pens()
 			{
-				blackPen = new Pen(Color.Black, Convert.ToInt32(xScale) + 1);
+				whitePen = new Pen(Color.FromArgb(255, 14, 14, 14), Convert.ToInt32(xScale) + 1);
 			}
 
 			void MoveDown()
@@ -106,7 +107,6 @@ namespace MusGen.Core
 				Bitmap buffer = new Bitmap(resX, yHalf - 1);
 				buffer = bmp.Clone(from, bmp.PixelFormat);
 				gr.DrawImage(buffer, dest);
-				gr.FillRectangle(Brushes.White, 0, 0, resX, yHalf);
 			}
 
 			void Ending()
@@ -126,34 +126,35 @@ namespace MusGen.Core
 			gr = Graphics.FromImage(bmp);
 			gr.Clear(Color.Black);
 
-			Color[] clrs = new Color[6];
+			Color[] clrs = new Color[7];
+			int[] sizes = new int[6];
 
 			clrs[0] = Color.FromArgb(255, 0, 0, 0);
-			clrs[1] = Color.FromArgb(255, 75, 0, 255);
+			clrs[1] = Color.FromArgb(255, 25, 0, 255);
 			clrs[2] = Color.FromArgb(255, 255, 0, 255);
-			clrs[3] = Color.FromArgb(255, 255, 30, 0);
-			clrs[4] = Color.FromArgb(255, 255, 195, 0);
-			clrs[5] = Color.FromArgb(255, 255, 255, 255);
+			clrs[3] = Color.FromArgb(255, 255, 20, 0);
+			clrs[4] = Color.FromArgb(255, 255, 100, 0);
+			clrs[5] = Color.FromArgb(255, 255, 255, 0);
+			clrs[6] = Color.FromArgb(255, 255, 255, 255);
 
-			int[] sizes = new int[5];
-
-			sizes[0] = 25;
-			sizes[1] = 34; //59
-			sizes[2] = 61; //120
-			sizes[3] = 65; //185
-			sizes[4] = 71; //256
+			sizes[0] = 8; //to blue
+			sizes[1] = 12; //to purple 20
+			sizes[2] = 15; //to red 35
+			sizes[3] = 40; //to orange 75
+			sizes[4] = 70; //to yellow 145
+			sizes[5] = 111; //to white 256
 
 			gradient = new List<Color>();
 
-			for (int i = 0; i < 5; i++)
+			for (int i = 0; i < sizes.Length; i++)
 				gradient.AddRange(Graphics2.GetColorGradient(clrs[i], clrs[i + 1], sizes[i]));
 
-			/*Bitmap testBmp = new Bitmap(255, 255);
+			Bitmap testBmp = new Bitmap(255, 255);
 			Graphics tgr = Graphics.FromImage(testBmp);
 			for (int i = 0; i < 255; i++)
 				tgr.DrawLine(new Pen(gradient[i]), i, 0, i, 255);
 
-			testBmp.Save($"{Disk2._programFiles}\\Grafics\\graident.bmp");*/
+			testBmp.Save($"{Disk2._programFiles}\\Grafics\\graident.bmp");
 		}
 	}
 }

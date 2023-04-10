@@ -122,11 +122,16 @@ namespace MusGen
 						int nSamps = nValues / 2;
 						L = new float[nSamps];
 						R = new float[nSamps];
+						ProgressShower.ShowProgress("Reading wav...");
 						for (int s = 0, v = 0; s < nSamps; s++)
 						{
 							L[s] = asFloat[v++];
 							R[s] = asFloat[v++];
+
+							if (s % 10000 == 0) //
+								ProgressShower.SetProgress(1.0 * s / nSamps);
 						}
+						ProgressShower.CloseProgressForm();
 						return true;
 					default:
 						return false;
