@@ -345,7 +345,6 @@ namespace MusGen
 			}
 		}
 
-
 		public static double F(double t)
 		{
 			if (waveForm == "sin")

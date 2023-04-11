@@ -16,10 +16,7 @@ namespace MusGen.Forms
 		{
 			pictureBox1.ImageLocation = Disk2._programFiles + "Images\\img.png";
 			pictureBox1.Load();
-
-			//Wav wav = new Wav();
-			//wav.ReadWav(Disk.programFiles + "Amongus.wav");
-			//wav.SaveWav(Disk.programFiles + "Amongus2.wav");
+			Start.OnStart();			
 		}
 
 		private void button1_Click(object sender, EventArgs e)
@@ -35,6 +32,11 @@ namespace MusGen.Forms
 		private void button3_Click(object sender, EventArgs e)
 		{
 			FormsManager.OpenEffectsForm();
+		}
+
+		private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+		{
+			Logger.Quit();
 		}
 	}
 }

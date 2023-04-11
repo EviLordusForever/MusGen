@@ -1,4 +1,5 @@
 ﻿using MusGen.Forms;
+using Library;
 
 namespace MusGen
 {
@@ -229,7 +230,7 @@ namespace MusGen
 		static Logger()
 		{
 			_logText = "";
-			_writer = new StreamWriter(Library.Disk2._programFiles + "Logs\\log.log", true);
+			_writer = new StreamWriter($"{Disk2._programFiles}Logs\\log.log", true);
 			StartFlusher();
 			StartVisualiser();
 		}
