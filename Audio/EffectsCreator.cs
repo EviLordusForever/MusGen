@@ -122,7 +122,6 @@ namespace MusGen
 				float[] ampsNew = new float[channels];
 				float[] ampsRes = new float[channels];
 				double[] t = new double[channels];
-				float[] lowFrequenciesSmoothing = new float[FFTsize];
 
 				outName += $" (FFT {FFTsize} ch {channels} tr {trashSize})";
 
@@ -135,7 +134,7 @@ namespace MusGen
 					return;	
 
 				FindAmplitudeMaxForWholeTrack();
-				CalculateLowFrequencySmoothing();
+				FrequencyFinder.CalculateSmoothMask(lfsX, lfsY, FFTsize, wavOut.sampleRate);
 
 				ProgressShower.ShowProgress("Effect FFT multi audio recreation...");
 
@@ -145,7 +144,7 @@ namespace MusGen
 				{
 					if (s % 441 == 0)
 					{
-						FrequencyFinder.ByFFT(ref frqsNew, ref ampsNew, wavIn, s, FFTsize, trashSize, lowFrequenciesSmoothing);
+						FrequencyFinder.ByFFT(ref frqsNew, ref ampsNew, wavIn, s, FFTsize, trashSize);
 						adaptiveCeiling = Math.Max(adaptiveCeiling, FrequencyFinder.amplitudeMax);
 
 						ConnectNewPoints();
@@ -183,12 +182,6 @@ namespace MusGen
 
 				ProgressShower.CloseProgressForm();
 
-				void CalculateLowFrequencySmoothing()
-				{
-					for (int x = 0; x < FFTsize; x++)
-						lowFrequenciesSmoothing[x] = lfsY / MathF.Pow(MathF.E, x * wavOut.sampleRate / (FFTsize * lfsX));
-				}
-
 				void DrawGraph(int sampleNumber)
 				{
 					if (sampleNumber % graphStep == 0)
@@ -197,12 +190,12 @@ namespace MusGen
 						{
 							float[] ampsLg = new float[channels];
 							for (int c = 0; c < channels; c++)
-								ampsLg[c] = ampsNew[c] * FrequencyFinder.amplitudeOverdrive;
+								ampsLg[c] = ampsNew[c] * FrequencyFinder.amplitudeMaxWholeTrack;
 
 							float[] frqsLg = Array2.RescaleArrayToLog2(FrequencyFinder.spectrum);
 							int[] idxsLg = Array2.RescaleIndexesToLog2(FrequencyFinder.leadIndexes, frqsLg.Length);
 
-							GraphDrawer.Draw($"{sampleNumber}", frqsLg, idxsLg, ampsLg, adaptiveCeiling, FrequencyFinder.amplitudeMaxForWholeTrack);
+							GraphDrawer.Draw($"{sampleNumber}", frqsLg, idxsLg, ampsLg, adaptiveCeiling, FrequencyFinder.amplitudeMaxWholeTrack);
 							adaptiveCeiling *= 0.99f;
 						}
 
@@ -237,13 +230,13 @@ namespace MusGen
 
 					for (int i = 3; i < 23; i++)
 					{
-						FrequencyFinder.ByFFT(ref frqsNew, ref ampsNew, wavIn, i * step, FFTsize, trashSize, empty);
+						FrequencyFinder.ByFFT(ref frqsNew, ref ampsNew, wavIn, i * step, FFTsize, trashSize);
 						ProgressShower.SetProgress((i - 3) / 20.0);
 						if (FrequencyFinder.amplitudeMax > max)
 							max = FrequencyFinder.amplitudeMax;
 					}
 
-					FrequencyFinder.amplitudeMaxForWholeTrack = max;
+					FrequencyFinder.amplitudeMaxWholeTrack = max;
 					ProgressShower.SetProgress(0.0);
 				}
 
