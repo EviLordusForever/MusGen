@@ -1,4 +1,4 @@
-﻿using static Library.Math2;
+﻿using static Library.Array2;
 
 namespace Library
 {
@@ -73,6 +73,78 @@ namespace Library
 			}
 
 			return result;
+		}
+
+		public static void FFTv2(int dir, int m, ref float[] x, ref float[] y)
+		{
+			long nn, i, i1, j, k, i2, l, l1, l2;
+			float c1, c2, tx, ty, t1, t2, u1, u2, z;
+			/* Calculate the number of points */
+			nn = 1;
+			for (i = 0; i < m; i++)
+				nn *= 2;
+			/* Do the bit reversal */
+			i2 = nn >> 1;
+			j = 0;
+			for (i = 0; i < nn - 1; i++)
+			{
+				if (i < j)
+				{
+					tx = x[i];
+					ty = y[i];
+					x[i] = x[j];
+					y[i] = y[j];
+					x[j] = tx;
+					y[j] = ty;
+				}
+				k = i2;
+				while (k <= j)
+				{
+					j -= k;
+					k >>= 1;
+				}
+				j += k;
+			}
+			/* Compute the FFT */
+			c1 = -1f;
+			c2 = 0f;
+			l2 = 1;
+			for (l = 0; l < m; l++)
+			{
+				l1 = l2;
+				l2 <<= 1;
+				u1 = 1f;
+				u2 = 0f;
+				for (j = 0; j < l1; j++)
+				{
+					for (i = j; i < nn; i += l2)
+					{
+						i1 = i + l1;
+						t1 = u1 * x[i1] - u2 * y[i1];
+						t2 = u1 * y[i1] + u2 * x[i1];
+						x[i1] = x[i] - t1;
+						y[i1] = y[i] - t2;
+						x[i] += t1;
+						y[i] += t2;
+					}
+					z = u1 * c1 - u2 * c2;
+					u2 = u1 * c2 + u2 * c1;
+					u1 = z;
+				}
+				c2 = MathF.Sqrt((1f - c1) / 2f);
+				if (dir == 1)
+					c2 = -c2;
+				c1 = MathF.Sqrt((1f + c1) / 2f);
+			}
+			/* Scaling for forward transform */
+			if (dir == 1)
+			{
+				for (i = 0; i < nn; i++)
+				{
+					x[i] /= (float)nn;
+					y[i] /= (float)nn;
+				}
+			}
 		}
 	}
 }

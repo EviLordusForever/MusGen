@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Library;
 
-namespace MusGen.Core
+namespace MusGen
 {
 	public static class GraphDrawer
 	{
@@ -32,7 +32,7 @@ namespace MusGen.Core
 			MoveDown();
 			gr.FillRectangle(Brushes.Black, 0, 0, resX, yHalf + 1);
 			Scales();
-			DrawPro();
+			DrawSpectrum();
 			Pens();
 			DrawArray();
 			DrawVerticalLines();
@@ -70,13 +70,13 @@ namespace MusGen.Core
 				}
 			}
 
-			void DrawPro()
+			void DrawSpectrum()
 			{
 				int penWidth = Convert.ToInt32(xScale) + 1;
 
 				for (int i = 0; i < input_array.Length; i++)
 				{
-					Byte power = (byte)(255 * input_array[i] * powerScale);
+					int power = (byte)(2559 * input_array[i] * powerScale);
 
 					int x = Convert.ToInt32(i * xScale);
 
@@ -114,7 +114,6 @@ namespace MusGen.Core
 				string path = $"{Disk2._programFiles}Grafics\\g\\g_{name}.jpg";
 				//Disk2.SaveImage(bmp, path);
 				Graphics2.SaveJPG100(bmp, path); 
-				//bmp.Dispose(); //
 			}
 		}
 
@@ -137,24 +136,17 @@ namespace MusGen.Core
 			clrs[5] = Color.FromArgb(255, 255, 255, 0);
 			clrs[6] = Color.FromArgb(255, 255, 255, 255);
 
-			sizes[0] = 8; //to blue
-			sizes[1] = 12; //to purple 20
-			sizes[2] = 30; //to red 50
-			sizes[3] = 15; //to orange 65
-			sizes[4] = 80; //to yellow 145
-			sizes[5] = 111; //to white 256
+			sizes[0] = 80; //to blue
+			sizes[1] = 120; //to purple 200
+			sizes[2] = 300; //to red 500
+			sizes[3] = 150; //to orange 650
+			sizes[4] = 800; //to yellow 1450
+			sizes[5] = 1110; //to white 2560
 
 			gradient = new List<Color>();
 
 			for (int i = 0; i < sizes.Length; i++)
 				gradient.AddRange(Graphics2.GetColorGradient(clrs[i], clrs[i + 1], sizes[i]));
-
-			Bitmap testBmp = new Bitmap(255, 255);
-			Graphics tgr = Graphics.FromImage(testBmp);
-			for (int i = 0; i < 255; i++)
-				tgr.DrawLine(new Pen(gradient[i]), i, 0, i, 255);
-
-			testBmp.Save($"{Disk2._programFiles}\\Grafics\\graident.bmp");
 		}
 	}
 }

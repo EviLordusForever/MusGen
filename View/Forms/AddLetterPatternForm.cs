@@ -8,7 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using MusGen.Voice;
-using MusGen.Core;
 using Library;
 
 namespace MusGen.Forms

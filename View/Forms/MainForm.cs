@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using MusGen.Core;
 using Library;
 
 namespace MusGen.Forms

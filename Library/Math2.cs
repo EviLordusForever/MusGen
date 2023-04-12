@@ -6,49 +6,6 @@ namespace Library
 	{
 		public static Random rnd = new Random();
 
-		public static float[] RescaleArrayToLog2(float[] array)
-		{
-			int indexA = 0;
-			int indexB = 0;
-			int L = array.Length;
-
-			float[] newArray = new float[L];
-
-			for (int x = 0; x < L; x++)
-			{
-				float index = L * MathF.Pow(1f * x / L, 2);
-				indexB = (int)MathF.Floor(index);
-				if (indexB - indexA < 1)
-				{
-					float power = index - indexB;
-					newArray[x] = array[indexB] * (1 - power) + array[indexB + 1] * power;
-				}
-				else
-				{
-					indexA++;
-
-					for (int i = indexA; i <= indexB; i++)
-						newArray[x] += array[i];
-					newArray[x] /= indexB - indexA + 1;
-				}
-				indexA = indexB;
-			}
-
-			return newArray;
-		}
-
-		public static int[] RescaleIndexesToLog2(int[] indexes, int maximum)
-		{
-			//hard to explain.
-			//changes linear indexes to logarithmic indexes.
-			int L = maximum;
-
-			for (int x = 0; x < indexes.Length; x++)
-				indexes[x] = (int)(Math.Pow((indexes[x] + 0.0) / L, 0.5) * L);
-
-			return indexes;
-		}
-
 		public static byte[] StringToByteArray(string hex)
 		{
 			return Encoding.ASCII.GetBytes(hex);

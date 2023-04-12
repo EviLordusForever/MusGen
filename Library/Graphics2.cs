@@ -17,10 +17,17 @@ namespace Library
 				throw new ArgumentException("Gradient cannot have less than two colors.", nameof(totalNumberOfColors));
 			}
 
+			double fromR = from.R - 0.333;
+			double toR = to.R - 0.333;
+			double fromG = from.G;
+			double toG = to.G;
+			double fromB = from.B + 0.333;
+			double toB = to.B + 0.333;
+
 			double diffA = to.A - from.A;
-			double diffR = to.R - from.R;
-			double diffG = to.G - from.G;
-			double diffB = to.B - from.B;
+			double diffR = toR - fromR;
+			double diffG = toG - fromG;
+			double diffB = toB - fromB;
 
 			var steps = totalNumberOfColors - 1;
 
@@ -35,11 +42,11 @@ namespace Library
 			{
 				yield return Color.FromArgb(
 					c(from.A, stepA),
-					c(from.R, stepR),
-					c(from.G, stepG),
-					c(from.B, stepB));
+					c(fromR, stepR),
+					c(fromG, stepG),
+					c(fromB, stepB));
 
-				int c(int fromC, double stepC)
+				int c(double fromC, double stepC)
 				{
 					return (int)Math.Round(fromC + stepC * i);
 				}

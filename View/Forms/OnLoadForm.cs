@@ -1,5 +1,4 @@
 using MusGen.Forms;
-using MusGen.Core;
 
 namespace MusGen
 {

@@ -1,5 +1,4 @@
-﻿using MusGen.Core;
-using MusGen.Voice;
+﻿using MusGen.Voice;
 using System.ComponentModel;
 using Library;
 
