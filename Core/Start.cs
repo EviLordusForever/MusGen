@@ -11,6 +11,8 @@ namespace MusGen
 	{
 		public static void OnStart()
 		{
+			Logger.Log("App started. Good luck!");
+
 			int[,] costMatrix = new int[,] {
 			{  1,  2,  3,  4,  5 },
 			{  6,  7,  8,  9, 10 },
@@ -18,7 +20,6 @@ namespace MusGen
 			{ 16, 17, 18, 19, 20 },
 			{ 21, 22, 23, 24, 25 }};
 
-			Logger.Log("Hello");
 			int[] res = HungarianAlgorithm.Run(costMatrix);
 			Logger.Log(string.Join(' ', res));
 		}

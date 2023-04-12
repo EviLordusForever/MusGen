@@ -131,17 +131,17 @@ namespace MusGen.Core
 
 			clrs[0] = Color.FromArgb(255, 0, 0, 0);
 			clrs[1] = Color.FromArgb(255, 25, 0, 255);
-			clrs[2] = Color.FromArgb(255, 255, 0, 255);
-			clrs[3] = Color.FromArgb(255, 255, 20, 0);
+			clrs[2] = Color.FromArgb(255, 215, 0, 255);
+			clrs[3] = Color.FromArgb(255, 185, 25, 0);
 			clrs[4] = Color.FromArgb(255, 255, 100, 0);
 			clrs[5] = Color.FromArgb(255, 255, 255, 0);
 			clrs[6] = Color.FromArgb(255, 255, 255, 255);
 
 			sizes[0] = 8; //to blue
 			sizes[1] = 12; //to purple 20
-			sizes[2] = 15; //to red 35
-			sizes[3] = 40; //to orange 75
-			sizes[4] = 70; //to yellow 145
+			sizes[2] = 30; //to red 50
+			sizes[3] = 15; //to orange 65
+			sizes[4] = 80; //to yellow 145
 			sizes[5] = 111; //to white 256
 
 			gradient = new List<Color>();

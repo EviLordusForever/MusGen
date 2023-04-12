@@ -16,13 +16,21 @@ namespace Library
 
 			for (int x = 0; x < L; x++)
 			{
-				indexB = (int)Math.Floor(L * Math.Pow(1.0 * x / L, 2));
-				if (indexB > indexA)
+				float index = L * MathF.Pow(1f * x / L, 2);
+				indexB = (int)MathF.Floor(index);
+				if (indexB - indexA < 1)
+				{
+					float power = index - indexB;
+					newArray[x] = array[indexB] * (1 - power) + array[indexB + 1] * power;
+				}
+				else
+				{
 					indexA++;
-				for (int i = indexA; i <= indexB; i++)
-					newArray[x] += array[i];
-				newArray[x] /= indexB - indexA + 1;
 
+					for (int i = indexA; i <= indexB; i++)
+						newArray[x] += array[i];
+					newArray[x] /= indexB - indexA + 1;
+				}
 				indexA = indexB;
 			}
 
@@ -36,7 +44,7 @@ namespace Library
 			int L = maximum;
 
 			for (int x = 0; x < indexes.Length; x++)
-				indexes[x] = (int)(Math.Pow((indexes[x] + 0.5) / L, 0.5) * L);
+				indexes[x] = (int)(Math.Pow((indexes[x] + 0.0) / L, 0.5) * L);
 
 			return indexes;
 		}
@@ -228,83 +236,5 @@ namespace Library
 		}
 
 		public static bool CheckIfIsNumberic(string value) => int.TryParse(value, out int _);
-
-		public class Complex
-		{
-			public float Real { get; set; }
-
-			public float Imaginary { get; set; }
-
-			public Complex(float real, float imaginary)
-			{
-				Real = real;
-				Imaginary = imaginary;
-			}
-
-			public static float Modulus(Complex number)
-			{
-				return (float)Math.Sqrt(number.Real * number.Real + number.Imaginary * number.Imaginary);
-			}
-
-			public static Complex Polar(float r, float angle)
-			{
-				return new Complex((float)(r * Math.Cos(angle)), (float)(r * Math.Sin(angle)));
-			}
-
-			public static Complex operator +(Complex a, Complex b)
-			{
-				return new Complex(a.Real + b.Real, a.Imaginary + b.Imaginary);
-			}
-
-			public static Complex operator +(float a, Complex b)
-			{
-				return new Complex(b.Real + a, b.Imaginary);
-			}
-
-			public static Complex operator +(Complex a, float b)
-			{
-				return new Complex(a.Real + b, a.Imaginary);
-			}
-
-			public static Complex operator -(Complex a, Complex b)
-			{
-				return new Complex(a.Real - b.Real, a.Imaginary - b.Imaginary);
-			}
-
-			public static Complex operator *(float a, Complex b)
-			{
-				return new Complex(b.Real * a, b.Imaginary * a);
-			}
-
-			public static Complex operator *(Complex a, float b)
-			{
-				return new Complex(a.Real * b, a.Imaginary * b);
-			}
-
-			public static Complex operator /(Complex b, float a)
-			{
-				return new Complex(b.Real / a, b.Imaginary / a);
-			}
-
-			public static Complex operator *(Complex a, Complex b)
-			{
-				return new Complex(a.Real * b.Real - a.Imaginary * b.Imaginary, a.Real * b.Imaginary + a.Imaginary * b.Real);
-			}
-
-			public static Complex Conjugate(Complex a)
-			{
-				return new Complex(a.Real, -a.Imaginary);
-			}
-
-			public static Complex operator /(float a, Complex b)
-			{
-				return new Complex(a / b.Real, a / b.Imaginary);
-			}
-
-			public static bool IsNaN(Complex a)
-			{
-				return float.IsNaN(a.Imaginary) || float.IsNaN(a.Real);
-			}
-		}
 	}
 }
