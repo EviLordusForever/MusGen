@@ -83,14 +83,20 @@ namespace Library
 
 			return null;
 		}
+
 		public static Color Rainbow(float x)
+		{
+			return Rainbow(x, 255);
+		}
+
+		public static Color Rainbow(float x, byte alfa)
 		{
 			// red yellow green cyan blue magenta red
 			float pi2 = 2 * MathF.PI;
 			byte r = (byte)(255 * (1 + MathF.Cos(pi2 * (0 / 3f + x))) / 2f);
 			byte g = (byte)(255 * (1 + MathF.Cos(pi2 * (1 / 3f + x))) / 2f);
 			byte b = (byte)(255 * (1 + MathF.Cos(pi2 * (2 / 3f + x))) / 2f);
-			return Color.FromArgb(255, r, g, b);
+			return Color.FromArgb(alfa, r, g, b);
 		}
 
 		public static Bitmap RescaleBitmap(Bitmap bmp0, int width, int height)

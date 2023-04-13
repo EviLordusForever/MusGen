@@ -41,7 +41,7 @@ namespace MusGen
 
 		public static void GraphDrawerGradient()
 		{
-			GraphDrawer.Init(1, 1);
+			GraphDrawer.Init(1, 1, 10);
 			Bitmap testBmp = new Bitmap(GraphDrawer.gradient.Count(), 255);
 			Graphics tgr = Graphics.FromImage(testBmp);
 			for (int i = 0; i < GraphDrawer.gradient.Count(); i++)
