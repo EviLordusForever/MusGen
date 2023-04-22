@@ -90,7 +90,7 @@ namespace MusGen
 
 		public static void EffectFFTMulti(string originPath, string outName)
 		{
-			Thread tr = new Thread(Tr);
+			Thread tr = new(Tr);
 			tr.Start();
 
 			void Tr()
@@ -101,43 +101,49 @@ namespace MusGen
 				int channels = 10;
 				int FFTPerSecond = 100;
 				float fadeTime = 0.99f;
-				bool drawGraph = false;
+				bool drawGraph = true;
 				int FFTsize = 1024;
 				float trashSize = 10;
 				float amplitudeThreshold = 0;
 				float lfsY = 0.95f;
 				float lfsX = 4000f;
+				string pointsConnectingX = "logarithmic";
+				string pointsConnectingY = "logarithmic";
 
 				Startup(originPath);
 				GraphDrawer.Init(256 * 2, 16 * 9 * 2, channels);
 
 				int fadeSamplesLeft = 0;
-				float max = 0;
 				float signal = 0;
 				int FFTstep = (int)(wavIn.sampleRate / FFTPerSecond);
 				int samplesForFade = (int)(FFTstep * fadeTime);
+				float maxAmplitudeForNormalization = 0;
 
 				float pi2 = MathF.PI * 2;
 				float buf = pi2 / wavIn.sampleRate;
 
+
 				float[] frqsNew = new float[channels];
-				float[] frqsOld = new float[channels];
 				float[] ampsNew = new float[channels];
+
+				float[] frqsOld = new float[channels];
 				float[] ampsOld = new float[channels];
+
 				float[] ampsLg = new float[channels];
 				int[] idxsLg = new int[channels];
+
 				float[] ampsLgOld = new float[channels];
 				int[] idxsLgOld = new int[channels];
-				double[] tOld = new double[channels];
+
 				double[] t = new double[channels];
+				double[] tOld = new double[channels];
+
 
 				outName += $" (FFT {FFTsize} ch {channels} tr {trashSize})";
-
 				uint graphStep = wavIn.sampleRate / 60;
-
 				long limit = Math.Min(wavIn.L.Length, wavIn.sampleRate * limitSec);
 
-				bool ok = UserAsker.Ask($"Name: {outName}\nWave type: {waveForm}\nRecreation channels: {channels}\nFade time: {fadeTime}\nFFT size: {FFTsize}\nFFT per second: {FFTPerSecond}\nTrash size: {trashSize}\nLow frq smoothing size X: {lfsX}\nLow frq smoothing size Y: {lfsY}\nAmplitude threshold: {amplitudeThreshold}\nDraw graph: {drawGraph}\nSamples: {limit}\nSample rate: {wavOut.sampleRate}\nSeconds: {(int)(limit / wavOut.sampleRate)}");
+				bool ok = UserAsker.Ask($"Name: {outName}\nWave type: {waveForm}\nRecreation channels: {channels}\nFade time: {fadeTime}\nFFT size: {FFTsize}\nFFT per second: {FFTPerSecond}\nTrash size: {trashSize}\nLow frq smoothing size X: {lfsX}\nLow frq smoothing size Y: {lfsY}\nAmplitude threshold: {amplitudeThreshold}\nPoints connecting X: {pointsConnectingX}\nPoints connecting Y: {pointsConnectingY}\nDraw graph: {drawGraph}\nSamples: {limit}\nSample rate: {wavOut.sampleRate}\nSeconds: {(int)(limit / wavOut.sampleRate)}");
 				if (!ok)
 					return;
 
@@ -145,8 +151,6 @@ namespace MusGen
 				FindAmplitudeMaxForWholeTrack();
 
 				ProgressShower.ShowProgress("Effect FFT multi audio recreation...");
-
-				float maxAmplitudeForNormalization = 0;
 
 				for (int s = 0; s < limit; s++)
 				{
@@ -156,25 +160,41 @@ namespace MusGen
 						ampsOld = ampsNew;
 						ampsNew = new float[channels];
 						frqsNew = new float[channels];
-						fadeSamplesLeft = samplesForFade;
 
 						FrequencyFinder.ByFFT(ref frqsNew, ref ampsNew, wavIn, s, FFTsize, trashSize);
-						adaptiveCeiling = Math.Max(adaptiveCeiling, FrequencyFinder.amplitudeMax);
+						adaptiveCeiling = Math.Max(adaptiveCeiling, FrequencyFinder.amplitudeMax / FrequencyFinder.amplitudeMaxWholeTrack);
 
 						FindLg();
-						ConnectNewPoints();
+						ConnectNewPoints(pointsConnectingX, pointsConnectingY);
 						DeleteSmallAmplitudes();
+						SetTimeOld();
 
-						for (int c = 0; c < channels; c++)
-						{
-							tOld[c] = t[c];
-/*							if (frqsNew[c] == frqsOld[c])
-								t[c] = Math2.rnd.Next(10000);*/
-						}
+						fadeSamplesLeft = samplesForFade;
 					}
 					else
 						fadeSamplesLeft--;
 
+					WriteSample(s);
+					DrawGraph(s);
+					CheckMaxAmplitude(s);
+				}
+
+				Normalize();
+
+				ProgressShower.ShowProgress("Saving...");
+
+				Export(outName);
+
+				ProgressShower.CloseProgressForm();
+
+				void SetTimeOld()
+				{
+					for (int c = 0; c < channels; c++)
+						tOld[c] = t[c];
+				}
+
+				void WriteSample(int s)
+				{
 					signal = 0;
 
 					for (int c = 0; c < channels; c++)
@@ -203,28 +223,16 @@ namespace MusGen
 						}
 					}
 
-					DrawGraph(s);
-
 					wavOut.L[s] = signal / channels;
-
-					if (MathF.Abs(wavOut.L[s]) > maxAmplitudeForNormalization)
-						maxAmplitudeForNormalization = MathF.Abs(wavOut.L[s]);
 				}
-
-				Normalize();
-
-				ProgressShower.ShowProgress("Saving...");
-
-				Export(outName);
-
-				ProgressShower.CloseProgressForm();
 
 				void FindLg()
 				{
 					for (int c = 0; c < channels; c++)
 					{
 						ampsLgOld[c] = ampsLg[c];
-						ampsLg[c] = ampsNew[c] * FrequencyFinder.amplitudeMaxWholeTrack;
+						ampsLg[c] = ampsNew[c];
+						ampsLg[c] = Math2.ToLogScale(ampsLg[c], 10);
 					}
 
 					idxsLgOld = idxsLg;
@@ -238,7 +246,8 @@ namespace MusGen
 						if (drawGraph)
 						{
 							//GraphDrawer.Draw($"{sampleNumber}", frqsLg, idxsLg, ampsLg, adaptiveCeiling, FrequencyFinder.amplitudeMaxWholeTrack);
-							GraphDrawer.DrawType3($"{sampleNumber}", idxsLg, ampsLg, adaptiveCeiling, FrequencyFinder.amplitudeMaxWholeTrack);
+							//GraphDrawer.DrawType3($"{sampleNumber}", idxsLg, ampsNew, adaptiveCeiling, FrequencyFinder.amplitudeMaxWholeTrack);
+							GraphDrawer.DrawType2($"{sampleNumber}", idxsLg, ampsNew, adaptiveCeiling, FrequencyFinder.amplitudeMaxWholeTrack);
 							adaptiveCeiling *= 0.99f;
 						}
 
@@ -266,39 +275,52 @@ namespace MusGen
 				{
 					ProgressShower.ShowProgress("Finding maximal FFT amplitude...");
 					int step = (int)(limit / 26);
-					max = 0;
 
 					float[] empty = new float[FFTsize];
 					FrequencyFinder.spectrum = new float[FFTsize];
+					FrequencyFinder.amplitudeMaxWholeTrack = 0;
+					FrequencyFinder.amplitudeMax = 0;
 
 					for (int i = 3; i < 23; i++)
 					{
 						FrequencyFinder.ByFFT(ref frqsNew, ref ampsNew, wavIn, i * step, FFTsize, trashSize);
 						ProgressShower.SetProgress((i - 3) / 20.0);
-						if (FrequencyFinder.amplitudeMax > max)
-							max = FrequencyFinder.amplitudeMax;
 					}
 
-					FrequencyFinder.amplitudeMaxWholeTrack = max;
 					ProgressShower.SetProgress(0.0);
 				}
 
-				void ConnectNewPoints()
+				void ConnectNewPoints(string typeX, string typeY)
 				{
 					int L = ampsNew.Length;
-
 					int[,] distances = new int[L, L];
+					float x = 0;
+					float y = 0;
 
-					for (int n = 0; n < L; n++)
-						for (int f = 0; f < L; f++)
+					for (int idNew = 0; idNew < L; idNew++)
+						for (int idOld = 0; idOld < L; idOld++)
 						{
-							float x = idxsLgOld[f] - idxsLg[n];
-							x /= FrequencyFinder.spectrum.Length;
-							x *= 4; //check
-							float y = ampsLgOld[f] - ampsLg[n];
-							y /= FrequencyFinder.amplitudeMaxWholeTrack;
+							if (typeX == "logarithmic")
+							{
+								x = idxsLgOld[idOld] - idxsLg[idNew];
+								x /= FrequencyFinder.spectrum.Length;
+								x *= 4; //check
+							}
+							else if (typeX == "linear")
+							{
+								x = frqsOld[idOld] - frqsNew[idNew];
+								x /= 20000; //Hz
+								x *= 4; //check
+							}
+							else
+								throw new ArgumentException("Smooth type incorrect");
 
-							distances[f, n] = (int)(1000 * Math.Sqrt(x * x + y * y));
+							if (typeY == "logarithmic")
+								y = ampsLgOld[idOld] - ampsLg[idNew];
+							else if (typeY == "linear")
+								y = ampsOld[idOld] - ampsNew[idNew];
+
+							distances[idOld, idNew] = (int)(1000 * Math.Sqrt(x * x + y * y));
 						}
 
 					int[] compares = HungarianAlgorithm.Run(distances);
@@ -333,6 +355,12 @@ namespace MusGen
 						for (int i = 1; i < channels; i++)
 							if (ampsNew[i] < ampsNew[0] * amplitudeThreshold)
 								ampsNew[i] = 0;
+				}
+
+				void CheckMaxAmplitude(int s)
+				{
+					if (MathF.Abs(wavOut.L[s]) > maxAmplitudeForNormalization)
+						maxAmplitudeForNormalization = MathF.Abs(wavOut.L[s]);
 				}
 			}
 		}		

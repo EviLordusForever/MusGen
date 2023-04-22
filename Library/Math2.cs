@@ -19,6 +19,11 @@ namespace Library
 			return s / 32768.0;
 		}
 
+		public static float ToLogScale(float x, float base_)
+		{
+			return MathF.Log(x * (base_ - 1) + 1, base_);
+		}
+
 		public static byte[] FloatToBytes(float d)
 		{
 			return BitConverter.GetBytes(d);

@@ -125,9 +125,9 @@ namespace MusGen
 
 		public static void DrawType2(string name, int[] verticalLines, float[] theirSizes, float adaptiveCeiling, float maxCeiling)
 		{
-			float yScale;
+			float yScaleUp;
 			float xScale;
-			float powerScale;
+			float yScaleDown;
 			Pen whitePen;
 
 			int yHalf = resY / 2;
@@ -135,12 +135,11 @@ namespace MusGen
 			MoveDown();
 			grL1.FillRectangle(Brushes.Black, 0, 0, resX, yHalf + 1);
 			Scales();
-			DrawSpectrum();
-			Pens();
-			DrawVerticalLines();
+			DrawPartUp();
+			DrawPartDown();
 			Ending();
 
-			void DrawVerticalLines()
+			void DrawPartDown()
 			{
 				int penWidth = Convert.ToInt32(xScale) + 1;
 
@@ -150,20 +149,20 @@ namespace MusGen
 						continue;
 
 					int x = Convert.ToInt32(verticalLines[i] * xScale);
-					int y = Convert.ToInt32(theirSizes[i] * yScale);
 
-					/*					int power = Math.Min((int)(2559 * theirSizes[i] * powerScale), 2559);
-										Pen pen = new Pen(gradient[power], penWidth);*/
-
-					int power = Math.Min((int)(255 * theirSizes[i] * powerScale), 255);
-					Color clr = Color.FromArgb(255, power, power, power);
+					float power0_1 = theirSizes[i];
+					//power0_1 = Math2.ToLogScale(power0_1, 10);
+					float power0_2559 = (2559 * power0_1);
+					int power = Math.Min((int)power0_2559, 2559);
+					Color clr = gradient[power];
+					//Color clr = Color.FromArgb(power0_255, 255, 255, 255);
 					Pen pen = new Pen(clr, penWidth);
 
 					grL1.DrawLine(pen, x, yHalf + 1, x, yHalf + 2);
 				}
 			}
-			
-			void DrawSpectrum()
+
+			void DrawPartUp()
 			{
 				int penWidth = Convert.ToInt32(xScale) + 1;
 
@@ -172,13 +171,11 @@ namespace MusGen
 					if (theirSizes[i] > Int32.MaxValue)
 						continue;
 
-					int power = Math.Min((int)(255 * theirSizes[i] * powerScale), 255);
+					float power0_1 = theirSizes[i];
+					//power0_1 = Math2.ToLogScale(power0_1, 10);
 
 					int x = Convert.ToInt32(verticalLines[i] * xScale);
-					int y = Convert.ToInt32(theirSizes[i] * yScale) / 2;
-
-/*					Color clr = Color.FromArgb(255, power, power, power);
-					Pen pen = new Pen(clr, penWidth);*/
+					int y = Convert.ToInt32(power0_1 * yScaleUp * 0.95);
 
 					Color clr = Graphics2.Rainbow(i * 1f / verticalLines.Length);
 					Pen pen = new Pen(clr, penWidth);
@@ -189,20 +186,14 @@ namespace MusGen
 
 			void Scales()
 			{
-				yScale = 1f * resY / Math.Max(theirSizes.Max(), adaptiveCeiling);
-				yScale /= 2;
-				powerScale = 1f / maxCeiling;
+				yScaleUp = 1f * resY / adaptiveCeiling;
+				yScaleUp /= 4;
 				xScale = 1f * resX / resX;
-			}
-
-			void Pens()
-			{
-				whitePen = new Pen(Color.FromArgb(255, 14, 14, 14), Convert.ToInt32(xScale) + 1);
 			}
 
 			void MoveDown()
 			{
-				int size = (int)(Math2.rnd.NextSingle() * (yHalf - 1) + 1);
+				int size = yHalf;
 				Rectangle dest = new Rectangle(0, yHalf + 1, resX, size);
 				Rectangle from = new Rectangle(0, yHalf + 0, resX, size);
 				Bitmap buffer = new Bitmap(resX, yHalf - 1);
@@ -219,24 +210,23 @@ namespace MusGen
 
 		public static void DrawType3(string name, int[] verticalLines, float[] theirSizes, float adaptiveCeiling, float maxCeiling)
 		{
-			float yScale;
+			float yScaleUp;
 			float xScale;
-			float powerScale;
-			Pen whitePen;
+			float yScaleDown;
 
 			int yHalf = resY / 2;
 
 			gr.Clear(Color.Black);
-			grL1.FillRectangle(new SolidBrush(Color.FromArgb(10, 0, 0, 0)), 0, 0, resX, yHalf + 1);
+			grL1.FillRectangle(new SolidBrush(Color.FromArgb(125, 0, 0, 0)), 0, 0, resX, yHalf + 1);
 			grL2.Clear(Color.Empty);
+
 			MoveDown();	
 			Scales();
-			DrawSpectrum();
-			InitPens();
-			DrawVerticalLines();
+			DrawPartUp();
+			DrawPartDown();
 			Ending();
 
-			void DrawVerticalLines()
+			void DrawPartDown()
 			{
 				int penWidth = Convert.ToInt32(xScale) + 1;
 
@@ -246,10 +236,11 @@ namespace MusGen
 						continue;
 
 					int x = Convert.ToInt32(verticalLines[i] * xScale);
-					int y = Convert.ToInt32(theirSizes[i] * yScale);
 
-					float gg = 255 * MathF.Sqrt(theirSizes[i] * powerScale);
-					int power = Math.Min((int)gg, 255);
+					float power0_1 = theirSizes[i];
+					power0_1 = Math2.ToLogScale(power0_1, 10);
+					float power0_255 = 255 * MathF.Sqrt(power0_1 * yScaleDown);
+					int power = Math.Min((int)power0_255, 255);
 					Color clr = Color.FromArgb(255, power, power, power);
 					Pen pen = new Pen(clr, penWidth);
 
@@ -257,7 +248,7 @@ namespace MusGen
 				}
 			}
 
-			void DrawSpectrum()
+			void DrawPartUp()
 			{
 				int penWidth = Convert.ToInt32(xScale) + 1;
 
@@ -266,19 +257,18 @@ namespace MusGen
 					if (theirSizes[i] > Int32.MaxValue)
 						continue;
 
-					float gg = 255 * MathF.Sqrt(theirSizes[i] * powerScale);
-					byte power = (byte)Math.Min((gg), 255);
+					float power0_1 = theirSizes[i];
+					power0_1 = Math2.ToLogScale(power0_1, 10);
+					float power0_255 = 255 * power0_1;
+					byte power = (byte)Math.Min(power0_255, 255);
 
 					int x = Convert.ToInt32(verticalLines[i] * xScale);
-					int y = yHalf - penWidth - Convert.ToInt32(theirSizes[i] * yScale * 0.95);
+					int y = yHalf - penWidth - Convert.ToInt32(power0_1 * yScaleUp * 0.95);
 
-					Color clr = Graphics2.Rainbow(i * 1f / verticalLines.Length, power);
+					Color clr = Graphics2.Rainbow(i * 1f / verticalLines.Length);
 					Pen pen = new Pen(clr, penWidth);
 
 					grL1.DrawLine(pen, oldXs[i], oldYs[i], x, y);
-
-					clr = Graphics2.Rainbow(i * 1f / verticalLines.Length);
-					pen = new Pen(clr, penWidth);
 
 					int R = 3;
 					grL2.DrawEllipse(pen, x - R, y + 1 - R, 2 * R, 2 * R);
@@ -290,15 +280,10 @@ namespace MusGen
 
 			void Scales()
 			{
-				yScale = 1f * resY / Math.Max(theirSizes.Max(), adaptiveCeiling);
-				yScale /= 2;
-				powerScale = 1f / maxCeiling;
+				yScaleUp = 1f * resY / 1;
+				yScaleUp /= 2;
+				yScaleDown = 1f / 1;
 				xScale = 1f * resX / resX;
-			}
-
-			void InitPens()
-			{
-				whitePen = new Pen(Color.FromArgb(255, 14, 14, 14), Convert.ToInt32(xScale) + 1);
 			}
 
 			void MoveDown()

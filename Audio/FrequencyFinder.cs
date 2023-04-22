@@ -69,7 +69,7 @@ namespace MusGen
 			FindLeadFrequency();
 			amplitudeMax = leadAmplitude;
 			amplitudeMaxWholeTrack = MathF.Max(leadAmplitude, amplitudeMaxWholeTrack);
-			adaptiveCeiling = Math.Max(adaptiveCeiling, amplitudeMax / amplitudeMaxWholeTrack);
+			adaptiveCeiling = Math.Max(adaptiveCeiling, leadAmplitude / amplitudeMaxWholeTrack); //???
 
 			for (int i = 0; i < periods.Count(); i++)
 			{
@@ -162,7 +162,6 @@ namespace MusGen
 			void FindLeader()
 			{
 				leadIndex = 0;
-				leadFrequency = 0;
 				leadAmplitude = 0;
 
 				for (int i = 0; i < spectrumClone.Length; i++)
