@@ -1,4 +1,9 @@
-﻿using Microsoft.VisualBasic;
+﻿using System;
+using System.Windows;
+using Microsoft.VisualBasic;
+using System.Runtime.InteropServices;
+using Microsoft.Win32;
+using WPFFolderBrowser;
 
 namespace Library
 {
@@ -6,22 +11,18 @@ namespace Library
 	{
 		public static bool Ask(string q)
 		{
-			return MessageBox.Show(q, "Hey", MessageBoxButtons.YesNo) == DialogResult.Yes;
+			return MessageBox.Show(q, "Hey", MessageBoxButton.YesNo) == MessageBoxResult.Yes;
 		}
 
 		public static string AskFolder(Environment.SpecialFolder rootFolder, string description)
 		{
-			string res = "";
-			Application.OpenForms[0].Invoke(new Action(() =>
-			{
-				FolderBrowserDialog fbd;
-				fbd = new FolderBrowserDialog();
-				fbd.RootFolder = rootFolder;
-				fbd.Description = description;
-				fbd.ShowDialog();
-				res = fbd.SelectedPath;
-			}));
-			return res;
+			var dialog = new WPFFolderBrowserDialog("Выберите папку:");
+			bool? result = dialog.ShowDialog();
+
+			if (result == true)
+				return dialog.FileName;
+			else
+				return dialog.InitialDirectory;
 		}
 
 		public static string AskValue(string prompt, string title, string defaultValue)

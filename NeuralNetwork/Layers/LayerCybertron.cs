@@ -1,4 +1,5 @@
-﻿using Library;
+﻿using System;
+using Library;
 
 namespace MusGen
 {
@@ -10,7 +11,7 @@ namespace MusGen
 
 		public override void FillWeightsRandomly()
 		{
-			for (int i = 0; i < _perceptrons.Count(); i++)
+			for (int i = 0; i < _perceptrons.Length; i++)
 				_perceptrons[i].FillWeightsRandomly();
 		}
 
@@ -22,19 +23,19 @@ namespace MusGen
 
 		public override void FindBPGradient(int test, float[] innerBPGradients, float[][] innerWeights)
 		{
-			for (int n = 0; n < _perceptrons.Count(); n++)
-				_perceptrons[n].FindBPGradient(test, innerBPGradients, Array2.SubArray(innerWeights, n * _perceptrons[0]._nodes.Count(), _perceptrons[0]._nodes.Count()));
+			for (int n = 0; n < _perceptrons.Length; n++)
+				_perceptrons[n].FindBPGradient(test, innerBPGradients, Array2.SubArray(innerWeights, n * _perceptrons[0]._nodes.Length, _perceptrons[0]._nodes.Length));
 		}
 
 		public override void Dropout()
 		{
-			for (int p = 0; p < _perceptrons.Count(); p++)
+			for (int p = 0; p < _perceptrons.Length; p++)
 				_perceptrons[p].Dropout();
 		}
 
 		public override void UseMomentumForGradient(int test)
 		{
-			for (int p = 0; p < _perceptrons.Count(); p++)
+			for (int p = 0; p < _perceptrons.Length; p++)
 				_perceptrons[p].UseMomentumForGradient(test);
 		}
 
@@ -47,7 +48,7 @@ namespace MusGen
 		public override float[][] GetValues(int test)
 		{
 			int node1 = 0;
-			for (int perceptron = 0; perceptron < _perceptrons.Count(); perceptron++)
+			for (int perceptron = 0; perceptron < _perceptrons.Length; perceptron++)
 			{
 				for (int node2 = 0; node2 < _perceptrons[perceptron]._nodes.Length;)
 				{
@@ -64,7 +65,7 @@ namespace MusGen
 		{
 			get
 			{
-				return _perceptrons.Count() * _perceptrons[0].WeightsCount;
+				return _perceptrons.Length * _perceptrons[0].WeightsCount;
 			}
 		}
 
@@ -102,7 +103,7 @@ namespace MusGen
 			int testsCount = ownerNN._testerT._testsCount;
 
 			_perceptrons = new LayerPerceptron[perceptronsCount];
-			for (int p = 0; p < _perceptrons.Count(); p++)
+			for (int p = 0; p < _perceptrons.Length; p++)
 				_perceptrons[p] = new LayerPerceptron(ownerNN, nodesPerPerceptronCount, weightsPerNodePerceptronCount, dropoutProbability, af);
 
 			InitValues(testsCount);
@@ -122,7 +123,7 @@ namespace MusGen
 				_values[test][0] = new float[_outNodesSummCount];
 			}
 
-			for (int p = 0; p < _perceptrons.Count(); p++)
+			for (int p = 0; p < _perceptrons.Length; p++)
 			{
 				_perceptrons[p].InitValues(testsCount);
 				_perceptrons[p]._af = _af = new TanH();
@@ -131,7 +132,7 @@ namespace MusGen
 
 		public override void InitLinksToOwnerNN(NN ownerNN)
 		{
-			for (int p = 0; p < _perceptrons.Count(); p++)
+			for (int p = 0; p < _perceptrons.Length; p++)
 				_perceptrons[p].InitLinksToOwnerNN(ownerNN);
 		}
 

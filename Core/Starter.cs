@@ -7,7 +7,7 @@ using Library;
 
 namespace MusGen
 {
-	public static class Start
+	public static class Starter
 	{
 		public static void OnStart()
 		{

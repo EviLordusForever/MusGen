@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 using Library;
 
 namespace MusGen
@@ -22,7 +23,7 @@ namespace MusGen
 
 		public override void FillWeightsRandomly()
 		{
-			for (int sub = 0; sub < _subs.Count(); sub++)
+			for (int sub = 0; sub < _subs.Length; sub++)
 				_subs[sub].FillRandomly();
 		}
 
@@ -54,8 +55,8 @@ namespace MusGen
 
 		public override void FindBPGradient(int test, float[] innerBPGradients, float[][] innerWeights)
 		{
-			int gradientsPerSubCount = innerBPGradients.Count() / _subs.Count();
-			for (int sub = 0; sub < _subs.Count(); sub++)
+			int gradientsPerSubCount = innerBPGradients.Length / _subs.Length;
+			for (int sub = 0; sub < _subs.Length; sub++)
 				FindBPGradientOneSub(test, sub, Array2.SubArray(innerBPGradients, sub * gradientsPerSubCount, gradientsPerSubCount), Array2.SubArray(innerWeights, sub * _outsPerSubCount, _outsPerSubCount));
 		}
 
@@ -74,7 +75,7 @@ namespace MusGen
 
 		public override void UseMomentumForGradient(int test)
 		{
-			for (int sub = 0; sub < _subs.Count(); sub++)
+			for (int sub = 0; sub < _subs.Length; sub++)
 				_subs[sub].UseInertionForGradient(test);
 		}
 
@@ -99,7 +100,7 @@ namespace MusGen
 		{
 			get
 			{
-				return _subs.Count() * _subs[0]._weights.Count();
+				return _subs.Length * _subs[0]._weights.Length;
 			}
 		}
 
@@ -116,7 +117,7 @@ namespace MusGen
 			int testsCount = ownerNN._testerT._testsCount;
 
 			_subs = new Node[subsCount];
-			for (int sub = 0; sub < _subs.Count(); sub++)
+			for (int sub = 0; sub < _subs.Length; sub++)
 				_subs[sub] = new Node(ownerNN, testsCount, weightsPerSubCount);
 
 			InitValues(testsCount);
@@ -132,20 +133,20 @@ namespace MusGen
 			_values = new float[testsCount][][];
 			for (int test = 0; test < testsCount; test++)
 			{
-				_values[test] = new float[_subs.Count()][];
-				for (int sub = 0; sub < _subs.Count(); sub++)
+				_values[test] = new float[_subs.Length][];
+				for (int sub = 0; sub < _subs.Length; sub++)
 					_values[test][sub] = new float[_outsPerSubCount];
 			}
 
 			_unnormalizedValues = new float[testsCount][][];
 			for (int test = 0; test < testsCount; test++)
 			{
-				_unnormalizedValues[test] = new float[_subs.Count()][];
-				for (int sub = 0; sub < _subs.Count(); sub++)
+				_unnormalizedValues[test] = new float[_subs.Length][];
+				for (int sub = 0; sub < _subs.Length; sub++)
 					_unnormalizedValues[test][sub] = new float[_outsPerSubCount];
 			}
 
-			for (int s = 0; s < _subs.Count(); s++)
+			for (int s = 0; s < _subs.Length; s++)
 				_subs[s].InitValues(testsCount); //does we need you? // ??? //
 
 			_dropoutLayer = new bool[_weightsPerSubCount];
@@ -159,7 +160,7 @@ namespace MusGen
 		{
 			_ownerNN = ownerNN;
 
-			for (int sub = 0; sub < _subs.Count(); sub++)
+			for (int sub = 0; sub < _subs.Length; sub++)
 				_subs[sub].SetOwnerNN(ownerNN);
 		}
 

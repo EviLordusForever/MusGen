@@ -5,6 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using MusGen.Voice;
 using Library;
+using Clr = System.Windows.Media.Color;
+using Clr0 = System.Drawing.Color;
+using System.Windows.Media.Imaging;
+using System.Windows.Media;
 
 namespace MusGen
 {
@@ -27,27 +31,27 @@ namespace MusGen
 		{
 			int size = 1000;
 
-			List<Color> gradient = new List<Color>();
+			List<Clr> gradient = new List<Clr>();
 
-			gradient.AddRange(Graphics2.GetColorGradient(Color.Black, Color.White, size));
+			gradient.AddRange(Graphics2.GetColorGradientM(Colors.Black, Colors.White, size));
 
-			Bitmap testBmp = new Bitmap(size, 255);
-			Graphics tgr = Graphics.FromImage(testBmp);
+			WriteableBitmap testBmp = BMP.Create(size, 255);
+
 			for (int i = 0; i < size; i++)
-				tgr.DrawLine(new Pen(gradient[i]), i, 0, i, 255);
+				testBmp.DrawLine(i, 0, i, 255, gradient[i]);
 
-			testBmp.Save($"{Disk2._programFiles}\\Grafics\\GraidentDitheting.bmp");
+			Disk2.SaveImagePng(testBmp, $"{Disk2._programFiles}\\Grafics\\GraidentDitheting.bmp");
 		}
 
 		public static void GraphDrawerGradient()
 		{
 			GraphDrawer.Init(1, 1, 10);
-			Bitmap testBmp = new Bitmap(GraphDrawer.gradient.Count(), 255);
-			Graphics tgr = Graphics.FromImage(testBmp);
-			for (int i = 0; i < GraphDrawer.gradient.Count(); i++)
-				tgr.DrawLine(new Pen(GraphDrawer.gradient[i]), i, 0, i, 255);
+			WriteableBitmap testBmp = BMP.Create(GraphDrawer.gradient.Count(), 255);
 
-			testBmp.Save($"{Disk2._programFiles}\\Grafics\\SpectrumGraident.bmp");
+			for (int i = 0; i < GraphDrawer.gradient.Count(); i++)
+				testBmp.DrawLine(i, 0, i, 255, GraphDrawer.gradient[i]);
+
+			Disk2.SaveImagePng(testBmp, $"{Disk2._programFiles}\\Grafics\\SpectrumGraident.bmp");
 		}
 	}
 }

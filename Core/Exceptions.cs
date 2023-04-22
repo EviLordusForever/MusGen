@@ -1,4 +1,6 @@
-﻿namespace MusGen
+﻿using System;
+
+namespace MusGen
 {
 	public class VanishedGradientException : Exception
 	{

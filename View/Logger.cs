@@ -1,4 +1,8 @@
-﻿using MusGen.Forms;
+﻿using System;
+using System.Windows;
+using System.Threading;
+using System.IO;
+using MusGen.Forms;
 using Library;
 
 namespace MusGen
@@ -15,7 +19,7 @@ namespace MusGen
 
 		public static void Log(string text)
 		{
-			FormsManager.OpenLogForm();
+			FormsManager.OpenLogWindow();
 
 			string msg = CreateMessageToShout(text);
 			string date = GetDateToShow(System.DateTime.Now);
@@ -26,10 +30,10 @@ namespace MusGen
 
 			void LogToFile(string text)
 			{
-				FormsManager._mainForm.Invoke(new Action(() =>
+				Application.Current.Dispatcher.Invoke(() =>
 				{
 					_writer.Write($"{text}\r\n");
-				}));
+				});
 			}
 
 			void LogToWindow(string text)
@@ -141,12 +145,12 @@ namespace MusGen
 				{
 					while (true)
 					{
-						if (_updated && FormsManager._logForm.WindowState != FormWindowState.Minimized)
+						//if (_updated && FormsManager._logForm.WindowState != FormWindowState.Minimized) FIX
 						{
-							FormsManager._mainForm.Invoke(new Action(() =>
+							Application.Current.Dispatcher.Invoke(() =>
 							{
-								FormsManager._logForm.rtb.Text = _logText;
-							}));
+								//FormsManager._logForm.rtb.Text = _logText; FIX
+							});
 							_updated = false;
 						}
 						Thread.Sleep(250);

@@ -1,4 +1,8 @@
-﻿using System.Text;
+﻿using System;
+using System.IO;
+using System.Text;
+using System.Threading;
+using System.Windows.Media.Imaging;
 
 namespace Library
 {
@@ -42,14 +46,24 @@ namespace Library
 			File.WriteAllText($"{_currentDirectory}\\ProgramFilesPath.txt", _programFiles);
 		}
 
-		public static void SaveImage(Bitmap image, string path)
+		public static void SaveImagePng(BitmapImage image, string path)
 		{
-			image.Save(path);
+			using (var stream = new FileStream(path, FileMode.Create))
+			{
+				PngBitmapEncoder encoder = new PngBitmapEncoder();
+				encoder.Frames.Add(BitmapFrame.Create(image));
+				encoder.Save(stream);
+			}
 		}
 
-		public static void SaveImageToProgramFiles(Bitmap image, string path)
+		public static void SaveImagePng(WriteableBitmap bitmap, string path)
 		{
-			image.Save(_programFiles + path);
+			using (FileStream stream = new FileStream(path, FileMode.Create))
+			{
+				PngBitmapEncoder encoder = new PngBitmapEncoder();
+				encoder.Frames.Add(BitmapFrame.Create(bitmap));
+				encoder.Save(stream);
+			}
 		}
 
 		public static void CreateDirectory(string path)

@@ -1,4 +1,5 @@
-﻿using static Library.Array2;
+﻿using System;
+using static Library.Array2;
 
 namespace Library
 {

@@ -1,3 +1,6 @@
+using System;
+using System.IO;
+using System.Collections.Generic;
 using static MusGen.Logger;
 using Newtonsoft.Json;
 using Library;
@@ -115,7 +118,7 @@ namespace MusGen
 
 		private void FillTestsFromDerivativeGraph()
 		{
-			int maximalDelta = _availableGraphPoints.Count();
+			int maximalDelta = _availableGraphPoints.Count;
 			double deltaOfDelta = 0.990 * maximalDelta / _testsCount;
 
 			int test = 0;
@@ -140,7 +143,7 @@ namespace MusGen
 
 		private void FillTestsFromOriginalGraph()
 		{
-			int maximalDelta = _availableGraphPoints.Count();
+			int maximalDelta = _availableGraphPoints.Count;
 			double deltaOfDelta = 0.990 * maximalDelta / _testsCount;
 
 			_tests = new float[_testsCount][];
@@ -153,7 +156,7 @@ namespace MusGen
 
 				_tests[test] = Array2.SubArray(_originalGraph, offset, _ownerNN._inputWindow);
 
-				float final = _tests[test].Last();
+				float final = _tests[test][_tests.Length - 1]; //check me
 
 				for (int i = 0; i < _tests[test].Length; i++)
 					_tests[test][i] = _tests[test][i] - final;
@@ -174,7 +177,7 @@ namespace MusGen
 
 		private void FillTestsFromHorizonGraph()
 		{
-			int maximalDelta = _availableGraphPointsForHorizonGraph.Count();
+			int maximalDelta = _availableGraphPointsForHorizonGraph.Count;
 			double DeltaOfDelta = 0.990 * maximalDelta / _testsCount;
 
 			_tests = new float[_testsCount][];

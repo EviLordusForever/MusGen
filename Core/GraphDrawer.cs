@@ -1,23 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
+using System.Drawing;
 using Library;
+using Clr = System.Windows.Media.Color;
+using static MusGen.HardwareParams;
 
 namespace MusGen
 {
 	public static class GraphDrawer
 	{
-		public static int resX = 1920 / 4;
-		public static int resY = 1080 / 4;
-		public static Bitmap bmpL1;
-		public static Graphics grL1;
-		public static Bitmap bmpL2;
-		public static Graphics grL2;
-		public static Bitmap bmp;
-		public static Graphics gr;
-		public static List<Color> gradient;
+		public static int resX;
+		public static int resY;
+		public static int yHalf;
+		public static WriteableBitmap bmpL1;
+		public static WriteableBitmap bmpL2;
+		public static WriteableBitmap bmp;
+		public static List<Clr> gradient;
 		public static int[] oldXs;
 		public static int[] oldYs;
 
@@ -31,18 +31,19 @@ namespace MusGen
 			float yScale;
 			float xScale;
 			float powerScale;
-			Pen whitePen;
-
-			int yHalf = resY / 2;
 
 			MoveDown();
-			grL1.FillRectangle(Brushes.Black, 0, 0, resX, yHalf + 1);
+			FillBlack();
 			Scales();
 			DrawSpectrum();
-			Pens();
 			DrawArray();
 			DrawVerticalLines();
 			Ending();
+
+			void FillBlack()
+			{
+				Graphics2.FillRectangle(bmpL1, Clr.FromRgb(0, 0, 0), new System.Windows.Int32Rect(0, 0, resX, yHalf + 1));
+			}
 
 			void DrawVerticalLines()
 			{
@@ -54,11 +55,10 @@ namespace MusGen
 					int x = Convert.ToInt32(verticalLines[i] * xScale);
 					int y = Convert.ToInt32(theirSizes[i] * yScale);
 
-					Color clr = Graphics2.Rainbow(i * 1f / verticalLines.Length);
+					Clr clr = Graphics2.RainbowM(i * 1f / verticalLines.Length);
 					int w = (int)((10f / 1920f) * resX);
-					Pen pen = new Pen(clr, w);
 
-					grL1.DrawLine(pen, x, yHalf - y, x, yHalf);
+					bmpL1.DrawLineAa(x, yHalf - y, x, yHalf, clr, w);
 				}
 			}
 
@@ -72,7 +72,7 @@ namespace MusGen
 
 					int x = Convert.ToInt32(i * xScale);
 
-					grL1.DrawLine(whitePen, x, yHalf - y, x, yHalf);
+					bmpL1.DrawLineAa(x, yHalf - y, x, yHalf, Clr.FromRgb(255, 255, 255), 1); //
 				}
 			}
 
@@ -86,9 +86,7 @@ namespace MusGen
 
 					int x = Convert.ToInt32(i * xScale);
 
-					Pen pen = new Pen(gradient[power], penWidth);
-
-					grL1.DrawLine(pen, x, yHalf + 1, x, yHalf + 2);
+					bmpL1.DrawLineAa(x, yHalf + 1, x, yHalf + 2, gradient[power], penWidth);
 				}
 			}
 
@@ -101,19 +99,7 @@ namespace MusGen
 				xScale = 1f * resX / input_array.Length;
 			}
 
-			void Pens()
-			{
-				whitePen = new Pen(Color.FromArgb(255, 14, 14, 14), Convert.ToInt32(xScale) + 1);
-			}
-
-			void MoveDown()
-			{
-				Rectangle dest = new Rectangle(0, yHalf + 1, resX, yHalf - 1);
-				Rectangle from = new Rectangle(0, yHalf + 0, resX, yHalf - 1);
-				Bitmap buffer = new Bitmap(resX, yHalf - 1);
-				buffer = bmpL1.Clone(from, bmpL1.PixelFormat);
-				grL1.DrawImage(buffer, dest);
-			}
+			
 
 			void Ending()
 			{
@@ -128,16 +114,18 @@ namespace MusGen
 			float yScaleUp;
 			float xScale;
 			float yScaleDown;
-			Pen whitePen;
-
-			int yHalf = resY / 2;
 
 			MoveDown();
-			grL1.FillRectangle(Brushes.Black, 0, 0, resX, yHalf + 1);
+			FillBlack();
 			Scales();
 			DrawPartUp();
 			DrawPartDown();
 			Ending();
+
+			void FillBlack()
+			{
+				Graphics2.FillRectangle(bmpL1, Clr.FromRgb(0, 0, 0), new System.Windows.Int32Rect(0, 0, resX, yHalf + 1));
+			}
 
 			void DrawPartDown()
 			{
@@ -154,11 +142,9 @@ namespace MusGen
 					//power0_1 = Math2.ToLogScale(power0_1, 10);
 					float power0_2559 = (2559 * power0_1);
 					int power = Math.Min((int)power0_2559, 2559);
-					Color clr = gradient[power];
-					//Color clr = Color.FromArgb(power0_255, 255, 255, 255);
-					Pen pen = new Pen(clr, penWidth);
+					Clr clr = gradient[power];
 
-					grL1.DrawLine(pen, x, yHalf + 1, x, yHalf + 2);
+					bmpL1.DrawLineAa(x, yHalf + 1, x, yHalf + 2, clr, penWidth);
 				}
 			}
 
@@ -177,10 +163,9 @@ namespace MusGen
 					int x = Convert.ToInt32(verticalLines[i] * xScale);
 					int y = Convert.ToInt32(power0_1 * yScaleUp * 0.95);
 
-					Color clr = Graphics2.Rainbow(i * 1f / verticalLines.Length);
-					Pen pen = new Pen(clr, penWidth);
+					Clr clr = Graphics2.RainbowM(i * 1f / verticalLines.Length);
 
-					grL1.DrawLine(pen, x, yHalf / 2 - y, x, yHalf / 2 + y);
+					bmpL1.DrawLineAa(x, yHalf / 2 - y, x, yHalf / 2 + y, clr, penWidth);
 				}
 			}
 
@@ -189,16 +174,6 @@ namespace MusGen
 				yScaleUp = 1f * resY / adaptiveCeiling;
 				yScaleUp /= 4;
 				xScale = 1f * resX / resX;
-			}
-
-			void MoveDown()
-			{
-				int size = yHalf;
-				Rectangle dest = new Rectangle(0, yHalf + 1, resX, size);
-				Rectangle from = new Rectangle(0, yHalf + 0, resX, size);
-				Bitmap buffer = new Bitmap(resX, yHalf - 1);
-				buffer = bmpL1.Clone(from, bmpL1.PixelFormat);
-				grL1.DrawImage(buffer, dest);
 			}
 
 			void Ending()
@@ -214,11 +189,9 @@ namespace MusGen
 			float xScale;
 			float yScaleDown;
 
-			int yHalf = resY / 2;
-
-			gr.Clear(Color.Black);
-			grL1.FillRectangle(new SolidBrush(Color.FromArgb(125, 0, 0, 0)), 0, 0, resX, yHalf + 1);
-			grL2.Clear(Color.Empty);
+			bmp.Clear(Clr.FromRgb(0, 0, 0));
+			bmpL1.FillRectangle(0, 0, resX, yHalf + 1, Clr.FromArgb(125, 0, 0, 0));
+			bmp.Clear(Clr.FromArgb(0, 255, 0, 255));
 
 			MoveDown();	
 			Scales();
@@ -240,11 +213,10 @@ namespace MusGen
 					float power0_1 = theirSizes[i];
 					power0_1 = Math2.ToLogScale(power0_1, 10);
 					float power0_255 = 255 * MathF.Sqrt(power0_1 * yScaleDown);
-					int power = Math.Min((int)power0_255, 255);
-					Color clr = Color.FromArgb(255, power, power, power);
-					Pen pen = new Pen(clr, penWidth);
+					byte power = Math.Min((byte)power0_255, (byte)255);
+					Clr clr = Clr.FromArgb(255, power, power, power);
 
-					grL1.DrawLine(pen, x, yHalf + 1, x, yHalf + 2);
+					bmpL1.DrawLineAa(x, yHalf + 1, x, yHalf + 2, clr, penWidth);
 				}
 			}
 
@@ -265,13 +237,12 @@ namespace MusGen
 					int x = Convert.ToInt32(verticalLines[i] * xScale);
 					int y = yHalf - penWidth - Convert.ToInt32(power0_1 * yScaleUp * 0.95);
 
-					Color clr = Graphics2.Rainbow(i * 1f / verticalLines.Length);
-					Pen pen = new Pen(clr, penWidth);
+					Clr clr = Graphics2.RainbowM(i * 1f / verticalLines.Length);
 
-					grL1.DrawLine(pen, oldXs[i], oldYs[i], x, y);
+					bmpL1.DrawLineAa(oldXs[i], oldYs[i], x, y, clr, penWidth);
 
 					int R = 3;
-					grL2.DrawEllipse(pen, x - R, y + 1 - R, 2 * R, 2 * R);
+					bmpL2.DrawEllipse(x - R, y + 1 - R, 2 * R, 2 * R, clr);
 
 					oldXs[i] = x;
 					oldYs[i] = y;
@@ -286,50 +257,52 @@ namespace MusGen
 				xScale = 1f * resX / resX;
 			}
 
-			void MoveDown()
-			{
-				int size = (int)(Math2.rnd.NextSingle() * (yHalf - 1) + 1);
-				Rectangle dest = new Rectangle(0, yHalf + 1, resX, size);
-				Rectangle from = new Rectangle(0, yHalf, resX, size);
-				Bitmap buffer = bmpL1.Clone(from, bmpL1.PixelFormat);
-				buffer = (Bitmap)buffer.GetThumbnailImage(resX, yHalf - 1, null, IntPtr.Zero);
-				grL1.DrawImage(buffer, dest);
-			}
-
 			void Ending()
 			{
-				gr.DrawImage(bmpL1, 0, 0);
-				gr.DrawImage(bmpL2, 0, 0);
+				bmp = bmpL1;
+				BMP.CopyPixelsWithTransparency(bmpL2, bmp, 0, 0, 0, 0, resX, resY, 1);
 				string path = $"{Disk2._programFiles}Grafics\\g\\g_{name}.jpg";
 				Graphics2.SaveJPG100(bmp, path);
 			}
+		}
+
+		public static void MoveDown()
+		{
+			Rectangle dest = new Rectangle(0, yHalf + 1, resX, yHalf - 1);
+			Rectangle from = new Rectangle(0, yHalf + 0, resX, yHalf - 1);
+
+			WriteableBitmap buffer = BMP.Create(resX, yHalf - 1);
+			BMP.CopyPixels(bmpL1, buffer, 0, yHalf, 0, 0, resX, yHalf - 1);
+			BMP.CopyPixels(buffer, bmpL1, 0, 0, 0, yHalf + 1, resX, yHalf - 1);
+			//IMPROVE ME !!!
 		}
 
 		public static void Init(int resX, int resY, int channels)
 		{
 			GraphDrawer.resX = resX;
 			GraphDrawer.resY = resY;
+			yHalf = resY / 2;
 			oldXs = new int[channels];
 			oldYs = new int[channels];
 			for (int i = 0; i < channels; i++)
 				oldYs[i] = resY / 2 - 5;
-			bmp = new Bitmap(resX, resY);
-			gr = Graphics.FromImage(bmp);
-			bmpL1 = new Bitmap(resX, resY);
-			grL1 = Graphics.FromImage(bmpL1);
-			bmpL2 = new Bitmap(resX, resY);
-			grL2 = Graphics.FromImage(bmpL2);
+			bmp = BMP.Create(resX, resY);
 
-			Color[] clrs = new Color[7];
+			bmpL1 = BMP.Create(resX, resY);
+
+			bmpL2 = BMP.Create(resX, resY);
+
+
+			Clr[] clrs = new Clr[7];
 			int[] sizes = new int[6];
 
-			clrs[0] = Color.FromArgb(255, 0, 0, 0);
-			clrs[1] = Color.FromArgb(255, 25, 0, 255);
-			clrs[2] = Color.FromArgb(255, 215, 0, 255);
-			clrs[3] = Color.FromArgb(255, 185, 25, 0);
-			clrs[4] = Color.FromArgb(255, 255, 100, 0);
-			clrs[5] = Color.FromArgb(255, 255, 255, 0);
-			clrs[6] = Color.FromArgb(255, 255, 255, 255);
+			clrs[0] = Clr.FromArgb(255, 0, 0, 0);
+			clrs[1] = Clr.FromArgb(255, 25, 0, 255);
+			clrs[2] = Clr.FromArgb(255, 215, 0, 255);
+			clrs[3] = Clr.FromArgb(255, 185, 25, 0);
+			clrs[4] = Clr.FromArgb(255, 255, 100, 0);
+			clrs[5] = Clr.FromArgb(255, 255, 255, 0);
+			clrs[6] = Clr.FromArgb(255, 255, 255, 255);
 
 			sizes[0] = 80; //to blue
 			sizes[1] = 120; //to purple 200
@@ -338,10 +311,10 @@ namespace MusGen
 			sizes[4] = 800; //to yellow 1450
 			sizes[5] = 1110; //to white 2560
 
-			gradient = new List<Color>();
+			gradient = new List<Clr>();
 
 			for (int i = 0; i < sizes.Length; i++)
-				gradient.AddRange(Graphics2.GetColorGradient(clrs[i], clrs[i + 1], sizes[i]));
+				gradient.AddRange(Graphics2.GetColorGradientM(clrs[i], clrs[i + 1], sizes[i]));
 		}
 	}
 }

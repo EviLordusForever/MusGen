@@ -1,9 +1,35 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Drawing;
+using System.Threading;
+using System.Runtime.InteropServices;
+using System.Windows.Input;
 
 namespace Library
 {
 	public class Mouse2
 	{
+		[DllImport("user32.dll")]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		internal static extern bool GetCursorPos(ref Win32Point pt);
+
+		[StructLayout(LayoutKind.Sequential)]
+		internal struct Win32Point
+		{
+			public Int32 X;
+			public Int32 Y;
+		};
+		public static Point GetMousePosition()
+		{
+			var w32Mouse = new Win32Point();
+			GetCursorPos(ref w32Mouse);
+
+			return new Point(w32Mouse.X, w32Mouse.Y);
+		}
+
+		[DllImport("User32.dll")]
+		private static extern bool SetCursorPos(int X, int Y);
+
+
 		[DllImport("user32.dll")]
 		private static extern void mouse_event(uint dwFlags, int dx, int dy, int dwData, IntPtr dwExtraInfo);
 
@@ -102,17 +128,16 @@ namespace Library
 			mouse_event(MOUSEEVENTF_LEFTUP, posX, posY, 0, new IntPtr());
 		}
 
-		public static void Wheel(UInt32 amount)
+		public static void Wheel(int amount)
 		{
-			uint posX = Convert.ToUInt32(Cursor.Position.X);
-			uint posY = Convert.ToUInt32(Cursor.Position.Y);
+			var p = GetMousePosition();
 
-			mouse_event(MOUSEEVENTF_WHEEL, posX, posY, amount, new IntPtr());
+			mouse_event(MOUSEEVENTF_WHEEL, p.X, p.Y, amount, new IntPtr());
 		}
 
 		public static void Click(int x, int y, int timeDown)
 		{
-			Cursor.Position = new Point(x, y);
+			SetCursorPos(x, y);
 			LeftDown();
 			Thread.Sleep(timeDown);
 			LeftUp();
@@ -138,18 +163,16 @@ namespace Library
 
 		public static void LeftDown()
 		{
-			int posX = Cursor.Position.X;
-			int posY = Cursor.Position.Y;
+			var p = GetMousePosition();
 
-			mouse_event(MOUSEEVENTF_LEFTDOWN, posX, posY, 0, new IntPtr());
+			mouse_event(MOUSEEVENTF_LEFTDOWN, p.X, p.Y, 0, new IntPtr());
 		}
 
 		public static void LeftUp()
 		{
-			int posX = Cursor.Position.X;
-			int posY = Cursor.Position.Y;
+			var p = GetMousePosition();
 
-			mouse_event(MOUSEEVENTF_LEFTUP, posX, posY, 0, new IntPtr());
+			mouse_event(MOUSEEVENTF_LEFTUP, p.X, p.Y, 0, new IntPtr());
 		}
 	}
 }

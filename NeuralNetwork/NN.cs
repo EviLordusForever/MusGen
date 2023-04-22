@@ -1,6 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading;
+using Newtonsoft.Json;
 using static MusGen.Logger;
-using static MusGen.Params;
+using static MusGen.HardwareParams;
 using Library;
 
 namespace MusGen

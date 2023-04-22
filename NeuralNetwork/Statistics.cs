@@ -1,5 +1,8 @@
-﻿using static MusGen.Logger;
-using static MusGen.Params;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using static MusGen.Logger;
+using static MusGen.HardwareParams;
 using Library;
 
 namespace MusGen
@@ -253,7 +256,7 @@ namespace MusGen
 
 		public bool IsInSection(float number)
 		{
-			for (int s = 0; s < _subSections.Count(); s++)
+			for (int s = 0; s < _subSections.Count; s++)
 				if (number >= _subSections[s][0] && number <= _subSections[s][1])
 					return true;
 
@@ -263,7 +266,7 @@ namespace MusGen
 		public override string ToString()
 		{
 			string str = "";
-			for (int s = 0; s < _subSections.Count(); s++)
+			for (int s = 0; s < _subSections.Count; s++)
 				str += $"({_subSections[s][0]}, {_subSections[s][1]}), ";
 			return str.Remove(str.Length - 2);
 		}

@@ -1,4 +1,5 @@
-﻿using Library;
+﻿using System;
+using Library;
 using static Library.Array2;
 
 namespace MusGen
@@ -71,7 +72,7 @@ namespace MusGen
 			amplitudeMaxWholeTrack = MathF.Max(leadAmplitude, amplitudeMaxWholeTrack);
 			adaptiveCeiling = Math.Max(adaptiveCeiling, leadAmplitude / amplitudeMaxWholeTrack); //???
 
-			for (int i = 0; i < periods.Count(); i++)
+			for (int i = 0; i < periods.Length; i++)
 			{
 				FindLeadFrequency();
 
@@ -147,7 +148,7 @@ namespace MusGen
 			amplitudes[0] = leadAmplitude / amplitudeMaxWholeTrack;
 			leadIndexes[0] = leadIndex;
 
-			for (int i = 1; i < frequencies.Count(); i++)
+			for (int i = 1; i < frequencies.Length; i++)
 			{
 				RemoveLeader(leadIndex, trashSize);
 

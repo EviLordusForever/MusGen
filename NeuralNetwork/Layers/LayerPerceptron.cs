@@ -1,4 +1,5 @@
-﻿using Library;
+﻿using System;
+using Library;
 
 namespace MusGen
 {
@@ -40,13 +41,13 @@ namespace MusGen
 		public override void Dropout()
 		{
 			if (_dropoutProbability > 0)
-				for (int n = 0; n < _nodes.Count(); n++)
+				for (int n = 0; n < _nodes.Length; n++)
 					_nodes[n].Dropout(_dropoutProbability);
 		}
 
 		public override void FindBPGradient(int test, float[] innerBPGradients, float[][] innerWeights)
 		{
-			for (int n = 0; n < _nodes.Count(); n++)
+			for (int n = 0; n < _nodes.Length; n++)
 				_nodes[n].FindBPGradient(test, _af, innerBPGradients, innerWeights[n]);
 		}
 
@@ -57,7 +58,7 @@ namespace MusGen
 
 		public override void UseMomentumForGradient(int test)
 		{
-			for (int n = 0; n < _nodes.Count(); n++)
+			for (int n = 0; n < _nodes.Length; n++)
 				_nodes[n].UseInertionForGradient(test);
 		}
 
@@ -87,7 +88,7 @@ namespace MusGen
 		{
 			get
 			{
-				return _nodes.Count() * _nodes[0]._weights.Count();
+				return _nodes.Length * _nodes[0]._weights.Length;
 			}
 		}
 
@@ -124,7 +125,7 @@ namespace MusGen
 			int testsCount = ownerNN._testerT._testsCount;
 
 			_nodes = new Node[nodesCount];
-			for (int i = 0; i < _nodes.Count(); i++)
+			for (int i = 0; i < _nodes.Length; i++)
 				_nodes[i] = new Node(ownerNN, testsCount, weightsCount);
 
 			InitValues(testsCount);
@@ -141,10 +142,10 @@ namespace MusGen
 			for (int test = 0; test < testsCount; test++)
 			{
 				_values[test] = new float[1][];
-				_values[test][0] = new float[_nodes.Count()];
+				_values[test][0] = new float[_nodes.Length];
 			}
 
-			for (int n = 0; n < _nodes.Count(); n++)
+			for (int n = 0; n < _nodes.Length; n++)
 				_nodes[n].InitValues(testsCount);
 		}
 
@@ -152,7 +153,7 @@ namespace MusGen
 		{
 			_ownerNN = ownerNN;
 
-			for (int i = 0; i < _nodes.Count(); i++)
+			for (int i = 0; i < _nodes.Length; i++)
 				_nodes[i].SetOwnerNN(ownerNN);
 		}
 	}

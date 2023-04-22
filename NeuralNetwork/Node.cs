@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 using Library;
 
 namespace MusGen
@@ -33,7 +34,7 @@ namespace MusGen
 		{
 			float scale = MathF.Abs(_ownerNN._weightsInitMax - _ownerNN._weightsInitMin);
 
-			for (int i = 0; i < _weights.Count(); i++)
+			for (int i = 0; i < _weights.Length; i++)
 				_weights[i] = Math2.rnd.NextSingle() * scale + _ownerNN._weightsInitMin;
 			_bias = 0;
 		}
@@ -43,7 +44,7 @@ namespace MusGen
 			_biasvalues[test] = _bias * _ownerNN._biasInput;
 			_summ[test] = _biasvalues[test];
 
-			for (int w = 0; w < _weights.Count(); w++)
+			for (int w = 0; w < _weights.Length; w++)
 			{
 				_subvalues[test][w] = _weights[w] * input[start + w];
 				_summ[test] += _subvalues[test][w];
@@ -57,7 +58,7 @@ namespace MusGen
 			_biasvalues[test] = _bias * _ownerNN._biasInput;
 			_summ[test] = _biasvalues[test];
 
-			for (int w = 0; w < _weights.Count(); w++)
+			for (int w = 0; w < _weights.Length; w++)
 				if (!dropoutLayer[w])
 				{
 					_subvalues[test][w] = _weights[w] * input[start + w];
@@ -134,7 +135,7 @@ namespace MusGen
 		{
 			float gwsumm = 0;
 
-			for (int gw = 0; gw < gradients.Count(); gw++)
+			for (int gw = 0; gw < gradients.Length; gw++)
 				gwsumm += gradients[gw] * weights[gw];
 
 			return gwsumm;
@@ -144,7 +145,7 @@ namespace MusGen
 		{
 			if (!_droppedOut)
 			{
-				for (int w = 0; w < _weights.Count(); w++)
+				for (int w = 0; w < _weights.Length; w++)
 					_weights[w] -= _ownerNN._LEARNING_RATE * _BPgradient[test] * input[start + w];
 				_bias -= _ownerNN._LEARNING_RATE * _BPgradient[test] * _ownerNN._biasInput;
 			}
@@ -166,7 +167,7 @@ namespace MusGen
 			_subvalues = new float[testsCount][];
 
 			for (int test = 0; test < testsCount; test++)
-				_subvalues[test] = new float[_weights.Count()];
+				_subvalues[test] = new float[_weights.Length];
 
 			_biasvalues = new float[testsCount];
 

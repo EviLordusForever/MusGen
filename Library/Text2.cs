@@ -1,4 +1,7 @@
-﻿namespace Library
+﻿using System;
+using System.Collections.Generic;
+
+namespace Library
 {
 	public static class Text2
 	{
