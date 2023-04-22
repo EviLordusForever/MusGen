@@ -10,22 +10,18 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Library;
 
-namespace MusGen
+namespace MusGen.View.Windows
 {
 	/// <summary>
-	/// Interaction logic for MainWindow.xaml
+	/// Interaction logic for LoggerWindow.xaml
 	/// </summary>
-	public partial class MainWindow : Window
+	public partial class LoggerWindow : Window
 	{
-		public MainWindow()
+		public LoggerWindow()
 		{
 			InitializeComponent();
-			BitmapImage ii = new BitmapImage(new Uri($"{Disk2._programFiles}//Images//img.png"));
-			image.Source = ii;
 		}
 	}
 }

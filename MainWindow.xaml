@@ -7,8 +7,21 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
 	<Grid>
-		<TextBlock Text="Hello World!" FontSize="75" HorizontalAlignment="Center" VerticalAlignment="Top"></TextBlock>
-		<Button Width="200" Height="100" Content="BTN" FontSize="50"></Button>
-		<Image Width="200" Height="200" HorizontalAlignment="Left"></Image>
-    </Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="2*"/>
+			<RowDefinition Height="2*"/>
+		</Grid.RowDefinitions>
+		
+		<Image Name ="image" HorizontalAlignment="Center"></Image>
+		
+		<Grid Grid.Row="1">
+			<Grid.RowDefinitions>
+				<RowDefinition/>
+				<RowDefinition/>
+			</Grid.RowDefinitions>
+			
+			<Button Width="400" Margin ="0,15,0,15" Content="Audio Recreation" FontSize="35" Grid.Row="0"></Button>
+			<Button Width="400" Margin ="0,15,0,15" Content="Realtime FFT" FontSize="35" Grid.Row="1"></Button>
+		</Grid>	
+	</Grid>
 </Window>

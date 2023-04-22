@@ -4,6 +4,7 @@ using System.Threading;
 using System.IO;
 using MusGen.Forms;
 using Library;
+using System.Linq;
 
 namespace MusGen
 {
@@ -145,16 +146,20 @@ namespace MusGen
 				{
 					while (true)
 					{
-						//if (_updated && FormsManager._logForm.WindowState != FormWindowState.Minimized) FIX
+						Application.Current.Dispatcher.Invoke(() =>
 						{
-							Application.Current.Dispatcher.Invoke(() =>
-							{
-								//FormsManager._logForm.rtb.Text = _logText; FIX
-							});
-							_updated = false;
-						}
+							if (_updated && FormsManager.logWindow.WindowState != WindowState.Minimized)
+								if (FormsManager.logWindow.IsVisible)
+								{
+									FormsManager.logWindow.RTB.Document.Blocks.Clear();
+									FormsManager.logWindow.RTB.AppendText(_logText); 
+
+									_updated = false;
+								}
+						});
+
 						Thread.Sleep(250);
-					}
+					}				
 				}
 				catch (ThreadInterruptedException ex)
 				{
@@ -172,10 +177,13 @@ namespace MusGen
 			{
 				try
 				{
+					Thread.Sleep(3000);
+
 					while (true)
-					{
+					{							
+						_writer.Flush(); //Checked.
+
 						Thread.Sleep(20000);
-						_writer.Flush();
 					}
 				}
 				catch (ThreadInterruptedException ex)
