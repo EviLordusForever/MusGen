@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MusGen.View.Windows"
         mc:Ignorable="d"
-        Title="ProgressWindow" Height="50" Width="800">
+        Title="ProgressWindow" Height="80" Width="800">
     <Grid>
-		<ProgressBar HorizontalAlignment="Center" Height="50" VerticalAlignment="Center" Width="800" Margin="5,5,5,5"/>
+		<ProgressBar Name="PB" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="800" Margin="5,5,5,5"/>
 	</Grid>
 </Window>

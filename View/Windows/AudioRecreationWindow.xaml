@@ -4,17 +4,19 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MusGen.View.Windows"
-        mc:Ignorable="d"
-        Title="AudioRecreationWindow" Height="450" Width="400">
+		xmlns:tbPro="clr-namespace:MusGen.View.Controls" d:DataContext="{d:DesignInstance Type=tbPro:TextBoxPro}"
+		mc:Ignorable="d"
+        Title="AudioRecreationWindow" Height="256" Width="400">
     <Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition/>
-			<RowDefinition Height="5*" />
+			<RowDefinition Height="1*" />
 			<RowDefinition/>
 		</Grid.RowDefinitions>
 
-		<Button Width="350" Height="50" Content="Select .wav file" FontSize="25"></Button>
+		<Button Name ="SelBtn" Width="350" Height="50" Content="Select .wav file" FontSize="25" Click="SelBtn_Click"></Button>
 		<Label Content="GG" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1"></Label>
-		<Button Width="350" Height="50" Content="Process" FontSize="25" Grid.Row="2"></Button>
+		<Button Name ="ProcessBtn" Width="350" Height="50" Content="Process" FontSize="25" Grid.Row="2" Click="ProcessBtn_Click"></Button>
+		<tbPro:TextBoxPro x:Name ="outNameTb" Placeholder="Out file name" Width="350" Height="50" Grid.Row="1"></tbPro:TextBoxPro>
 	</Grid>	
 </Window>

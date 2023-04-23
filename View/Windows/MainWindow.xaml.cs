@@ -27,5 +27,10 @@ namespace MusGen
 			BitmapImage ii = new BitmapImage(new Uri($"{Disk2._programFiles}//Images//img.png"));
 			image.Source = ii;
 		}
+
+		private void Button_Click(object sender, RoutedEventArgs e)
+		{
+			WindowsManager.OpenAudioRecreationWindow();
+		}
 	}
 }

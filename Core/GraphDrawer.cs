@@ -260,7 +260,7 @@ namespace MusGen
 			void Ending()
 			{
 				bmp = bmpL1;
-				BMP.CopyPixelsWithTransparency(bmpL2, bmp, 0, 0, 0, 0, resX, resY, 1);
+				WBMP.CopyPixels(bmpL2, bmp, 0, 0, 0, 0, resX, resY);
 				string path = $"{Disk2._programFiles}Grafics\\g\\g_{name}.jpg";
 				Graphics2.SaveJPG100(bmp, path);
 			}
@@ -271,9 +271,9 @@ namespace MusGen
 			Rectangle dest = new Rectangle(0, yHalf + 1, resX, yHalf - 1);
 			Rectangle from = new Rectangle(0, yHalf + 0, resX, yHalf - 1);
 
-			WriteableBitmap buffer = BMP.Create(resX, yHalf - 1);
-			BMP.CopyPixels(bmpL1, buffer, 0, yHalf, 0, 0, resX, yHalf - 1);
-			BMP.CopyPixels(buffer, bmpL1, 0, 0, 0, yHalf + 1, resX, yHalf - 1);
+			WriteableBitmap buffer = WBMP.Create(resX, yHalf - 1);
+			WBMP.CopyPixels(bmpL1, buffer, 0, yHalf, 0, 0, resX, yHalf - 1);
+			WBMP.CopyPixels(buffer, bmpL1, 0, 0, 0, yHalf + 1, resX, yHalf - 1);
 			//IMPROVE ME !!!
 		}
 
@@ -286,11 +286,11 @@ namespace MusGen
 			oldYs = new int[channels];
 			for (int i = 0; i < channels; i++)
 				oldYs[i] = resY / 2 - 5;
-			bmp = BMP.Create(resX, resY);
+			bmp = WBMP.Create(resX, resY);
 
-			bmpL1 = BMP.Create(resX, resY);
+			bmpL1 = WBMP.Create(resX, resY);
 
-			bmpL2 = BMP.Create(resX, resY);
+			bmpL2 = WBMP.Create(resX, resY);
 
 
 			Clr[] clrs = new Clr[7];

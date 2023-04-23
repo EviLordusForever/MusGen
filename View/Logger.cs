@@ -2,7 +2,6 @@
 using System.Windows;
 using System.Threading;
 using System.IO;
-using MusGen.Forms;
 using Library;
 using System.Linq;
 
@@ -20,7 +19,7 @@ namespace MusGen
 
 		public static void Log(string text)
 		{
-			FormsManager.OpenLogWindow();
+			WindowsManager.OpenLogWindow();
 
 			string msg = CreateMessageToShout(text);
 			string date = GetDateToShow(System.DateTime.Now);
@@ -148,11 +147,11 @@ namespace MusGen
 					{
 						Application.Current.Dispatcher.Invoke(() =>
 						{
-							if (_updated && FormsManager.logWindow.WindowState != WindowState.Minimized)
-								if (FormsManager.logWindow.IsVisible)
+							if (_updated && WindowsManager._logWindow.WindowState != WindowState.Minimized)
+								if (WindowsManager._logWindow.IsVisible)
 								{
-									FormsManager.logWindow.RTB.Document.Blocks.Clear();
-									FormsManager.logWindow.RTB.AppendText(_logText); 
+									WindowsManager._logWindow.RTB.Document.Blocks.Clear();
+									WindowsManager._logWindow.RTB.AppendText(_logText); 
 
 									_updated = false;
 								}

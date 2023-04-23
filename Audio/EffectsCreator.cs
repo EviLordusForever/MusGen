@@ -149,7 +149,7 @@ namespace MusGen
 				FrequencyFinder.CalculateSmoothMask(lfsX, lfsY, FFTsize, wavOut.sampleRate);
 				FindAmplitudeMaxForWholeTrack();
 
-				ProgressShower.ShowProgress("Effect FFT multi audio recreation...");
+				ProgressShower.ShowProgress($"Effect FFT multi audio recreation... ({outName})");
 
 				for (int s = 0; s < limit; s++)
 				{

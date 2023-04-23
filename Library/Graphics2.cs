@@ -112,6 +112,7 @@ namespace Library
 			int stride = bitmap.BackBufferStride;
 			IntPtr buffer = bitmap.BackBuffer + rect.Y * stride + rect.X * bytesPerPixel;
 
+			bitmap.Lock();
 			for (int y = 0; y < rect.Height; y++)
 			{
 				Marshal.Copy(colorBytes, 0, buffer, colorBytes.Length);
@@ -119,6 +120,7 @@ namespace Library
 			}
 
 			bitmap.AddDirtyRect(rect);
+			bitmap.Unlock();
 		} //Check me
 
 		public static void SaveJPG100(this WriteableBitmap bitmap, string fileName)

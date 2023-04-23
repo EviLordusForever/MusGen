@@ -35,7 +35,7 @@ namespace MusGen
 
 			gradient.AddRange(Graphics2.GetColorGradientM(Colors.Black, Colors.White, size));
 
-			WriteableBitmap testBmp = BMP.Create(size, 255);
+			WriteableBitmap testBmp = WBMP.Create(size, 255);
 
 			for (int i = 0; i < size; i++)
 				testBmp.DrawLine(i, 0, i, 255, gradient[i]);
@@ -46,7 +46,7 @@ namespace MusGen
 		public static void GraphDrawerGradient()
 		{
 			GraphDrawer.Init(1, 1, 10);
-			WriteableBitmap testBmp = BMP.Create(GraphDrawer.gradient.Count(), 255);
+			WriteableBitmap testBmp = WBMP.Create(GraphDrawer.gradient.Count(), 255);
 
 			for (int i = 0; i < GraphDrawer.gradient.Count(); i++)
 				testBmp.DrawLine(i, 0, i, 255, GraphDrawer.gradient[i]);
