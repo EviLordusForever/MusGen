@@ -86,7 +86,7 @@ namespace MusGen
 		public static string _outName;
 
 		public static uint graphDuration;
-		public static long limit;
+		public static long lastSample;
 
 		public static WriteableBitmap wbmp;
 
@@ -124,7 +124,7 @@ namespace MusGen
 				_outName = outName3 + $" (FFT {FFTsize} ch {channels} tr {trashSize})";
 
 				graphDuration = sampleRate / 60;
-				limit = Math.Min(wavIn.L.Length, sampleRate * limitSec);
+				lastSample = Math.Min(wavIn.L.Length - FFTsize, sampleRate * limitSec);
 			}
 
 			adaptiveCeiling = 3;
@@ -163,14 +163,14 @@ namespace MusGen
 			{
 				Startup(originPath, outName2);
 
-				if (UserAsker.Ask($"Name: {_outName}\nWave type: {waveForm}\nRecreation channels: {channels}\nFade time: {fadeTime}\nFFT size: {FFTsize}\nFFT per second: {FFTPerSecond}\nTrash size: {trashSize}\nLow frq smoothing size X: {lfsX}\nLow frq smoothing size Y: {lfsY}\nAmplitude threshold: {amplitudeThreshold}\nPoints connecting X: {pointsConnectingX}\nPoints connecting Y: {pointsConnectingY}\nDraw graph: {drawGraph}\nSamples: {limit}\nSample rate: {sampleRate}\nSeconds: {(int)(limit / sampleRate)}"))
+				if (UserAsker.Ask($"Name: {_outName}\nWave type: {waveForm}\nRecreation channels: {channels}\nFade time: {fadeTime}\nFFT size: {FFTsize}\nFFT per second: {FFTPerSecond}\nTrash size: {trashSize}\nLow frq smoothing size X: {lfsX}\nLow frq smoothing size Y: {lfsY}\nAmplitude threshold: {amplitudeThreshold}\nPoints connecting X: {pointsConnectingX}\nPoints connecting Y: {pointsConnectingY}\nDraw graph: {drawGraph}\nSamples: {lastSample}\nSample rate: {sampleRate}\nSeconds: {(int)(lastSample / sampleRate)}"))
 					return;
 
 				FindAmplitudeMaxForWholeTrack();
 
 				ProgressShower.ShowProgress($"Effect FFT multi audio recreation... ({_outName})");
 
-				for (int s = 0; s < limit; s++)
+				for (int s = 0; s < lastSample; s++)
 				{
 					if (s % FFTstep == 0)
 					{
@@ -194,7 +194,7 @@ namespace MusGen
 					{
 						DrawSpectrum();
 						SaveGraph($"{s}");
-						ProgressShower.SetProgress(1.0 * s / limit);
+						ProgressShower.SetProgress(1.0 * s / lastSample);
 					}
 
 					CheckMaxAmplitude(s);
@@ -258,21 +258,21 @@ namespace MusGen
 					ProgressShower.ShowProgress($"Normalization... ({maxAmplitudeForNormalization} to 1)");
 					ProgressShower.SetProgress(0.0);
 					maxAmplitudeForNormalization *= 1.01f;
-					for (int i = 0; i < limit; i++)
+					for (int i = 0; i < lastSample; i++)
 					{
 						wavOut.L[i] /= maxAmplitudeForNormalization;
 						if (wavIn.channels == 2)
 							wavOut.R[i] = wavOut.L[i];
 
 						if (i % 500 == 0)
-							ProgressShower.SetProgress(1.0 * i / limit);
+							ProgressShower.SetProgress(1.0 * i / lastSample);
 					}
 				}
 
 				void FindAmplitudeMaxForWholeTrack()
 				{
 					ProgressShower.ShowProgress("Finding maximal FFT amplitude...");
-					int step = (int)(limit / 26);
+					int step = (int)(lastSample / 26);
 
 					float[] empty = new float[FFTsize];					
 

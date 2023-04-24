@@ -112,8 +112,6 @@ namespace MusGen
 
 		public static void ByFFT(ref float[] frequencies, ref float[] amplitudes, Wav wav, int start, int FFTsize, float trashSize)
 		{
-			if (start + FFTsize > wav.L.Length)
-				return;
 
 			float leadFrequency = 0;
 			float leadAmplitude = 0;
