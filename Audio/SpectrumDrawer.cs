@@ -14,19 +14,14 @@ namespace MusGen
 		public static int resX;
 		public static int resY;
 		public static int yHalf;
-		public static WriteableBitmap bmpL1;
-		public static WriteableBitmap bmpL2;
-		public static WriteableBitmap bmp;
+		public static WriteableBitmap wbmpL1;
+		public static WriteableBitmap wbmpL2;
+		public static WriteableBitmap wbmp;
 		public static List<Clr> gradient;
 		public static int[] oldXs;
 		public static int[] oldYs;
 
-		public static void Draw(string name, float[] input_array)
-		{
-			Draw(input_array, new int[0], new float[0], input_array.Max(), input_array.Max());
-		}
-
-		public static WriteableBitmap Draw(float[] input_array, int[] verticalLines, float[] theirSizes, float adaptiveCeiling, float maxCeiling)
+		public static WriteableBitmap DrawType1(float[] input_array, int[] verticalLines, float[] theirSizes, float adaptiveCeiling, float maxCeiling)
 		{
 			float yScale;
 			float xScale;
@@ -38,11 +33,11 @@ namespace MusGen
 			DrawSpectrum();
 			DrawArray();
 			DrawVerticalLines();
-			return bmpL1;
+			return wbmpL1;
 
 			void FillBlack()
 			{
-				Graphics2.FillRectangle(bmpL1, Clr.FromRgb(0, 0, 0), new System.Windows.Int32Rect(0, 0, resX, yHalf + 1));
+				Graphics2.FillRectangle(wbmpL1, Clr.FromRgb(0, 0, 0), new System.Windows.Int32Rect(0, 0, resX, yHalf + 1));
 			}
 
 			void DrawVerticalLines()
@@ -58,7 +53,7 @@ namespace MusGen
 					Clr clr = Graphics2.RainbowM(i * 1f / verticalLines.Length);
 					int w = (int)((10f / 1920f) * resX);
 
-					bmpL1.DrawLineAa(x, yHalf - y, x, yHalf, clr, w);
+					wbmpL1.DrawLineAa(x, yHalf - y, x, yHalf, clr, w);
 				}
 			}
 
@@ -72,7 +67,7 @@ namespace MusGen
 
 					int x = Convert.ToInt32(i * xScale);
 
-					bmpL1.DrawLineAa(x, yHalf - y, x, yHalf, Clr.FromRgb(255, 255, 255), 1); //
+					wbmpL1.DrawLineAa(x, yHalf - y, x, yHalf, Clr.FromRgb(255, 255, 255), 1); //
 				}
 			}
 
@@ -86,7 +81,7 @@ namespace MusGen
 
 					int x = Convert.ToInt32(i * xScale);
 
-					bmpL1.DrawLineAa(x, yHalf + 1, x, yHalf + 2, gradient[power], penWidth);
+					wbmpL1.DrawLineAa(x, yHalf + 1, x, yHalf + 2, gradient[power], penWidth);
 				}
 			}
 
@@ -111,11 +106,11 @@ namespace MusGen
 			Scales();
 			DrawPartUp();
 			DrawPartDown();
-			return bmpL1;
+			return wbmpL1;
 
 			void FillBlack()
 			{
-				Graphics2.FillRectangle(bmpL1, Clr.FromRgb(0, 0, 0), new System.Windows.Int32Rect(0, 0, resX, yHalf + 1));
+				Graphics2.FillRectangle(wbmpL1, Clr.FromRgb(0, 0, 0), new System.Windows.Int32Rect(0, 0, resX, yHalf + 1));
 			}
 
 			void DrawPartDown()
@@ -135,7 +130,7 @@ namespace MusGen
 					int power = Math.Min((int)power0_2559, 2559);
 					Clr clr = gradient[power];
 
-					bmpL1.DrawLineAa(x, yHalf + 1, x, yHalf + 2, clr, penWidth);
+					wbmpL1.DrawLineAa(x, yHalf + 1, x, yHalf + 2, clr, penWidth);
 				}
 			}
 
@@ -156,7 +151,7 @@ namespace MusGen
 
 					Clr clr = Graphics2.RainbowM(i * 1f / verticalLines.Length);
 
-					bmpL1.DrawLineAa(x, yHalf / 2 - y, x, yHalf / 2 + y, clr, penWidth);
+					wbmpL1.DrawLineAa(x, yHalf / 2 - y, x, yHalf / 2 + y, clr, penWidth);
 				}
 			}
 
@@ -174,9 +169,9 @@ namespace MusGen
 			float xScale;
 			float yScaleDown;
 
-			bmp.Clear(Clr.FromRgb(0, 0, 0));
-			bmpL1.FillRectangle(0, 0, resX, yHalf + 1, Clr.FromArgb(125, 0, 0, 0));
-			bmp.Clear(Clr.FromArgb(0, 255, 0, 255));
+			wbmp.Clear(Clr.FromRgb(0, 0, 0));
+			wbmpL1.FillRectangle(0, 0, resX, yHalf + 1, Clr.FromArgb(125, 0, 0, 0));
+			wbmp.Clear(Clr.FromArgb(0, 255, 0, 255));
 
 			MoveDown();	
 			Scales();
@@ -201,7 +196,7 @@ namespace MusGen
 					byte power = Math.Min((byte)power0_255, (byte)255);
 					Clr clr = Clr.FromArgb(255, power, power, power);
 
-					bmpL1.DrawLineAa(x, yHalf + 1, x, yHalf + 2, clr, penWidth);
+					wbmpL1.DrawLineAa(x, yHalf + 1, x, yHalf + 2, clr, penWidth);
 				}
 			}
 
@@ -224,10 +219,10 @@ namespace MusGen
 
 					Clr clr = Graphics2.RainbowM(i * 1f / verticalLines.Length);
 
-					bmpL1.DrawLineAa(oldXs[i], oldYs[i], x, y, clr, penWidth);
+					wbmpL1.DrawLineAa(oldXs[i], oldYs[i], x, y, clr, penWidth);
 
 					int R = 3;
-					bmpL2.DrawEllipse(x - R, y + 1 - R, 2 * R, 2 * R, clr);
+					wbmpL2.DrawEllipse(x - R, y + 1 - R, 2 * R, 2 * R, clr);
 
 					oldXs[i] = x;
 					oldYs[i] = y;
@@ -244,21 +239,15 @@ namespace MusGen
 
 			WriteableBitmap Ending()
 			{
-				bmp = bmpL1;
-				WBMP.CopyPixels(bmpL2, bmp, 0, 0, 0, 0, resX, resY);
-				return bmp;
+				wbmp = wbmpL1;
+				WBMP.CopyPixels(wbmpL2, wbmp, 0, 0, 0, 0, resX, resY);
+				return wbmp;
 			}
 		}
 
 		public static void MoveDown()
 		{
-			Rectangle dest = new Rectangle(0, yHalf + 1, resX, yHalf - 1);
-			Rectangle from = new Rectangle(0, yHalf + 0, resX, yHalf - 1);
-
-			WriteableBitmap buffer = WBMP.Create(resX, yHalf - 1);
-			WBMP.CopyPixels(bmpL1, buffer, 0, yHalf, 0, 0, resX, yHalf - 1);
-			WBMP.CopyPixels(buffer, bmpL1, 0, 0, 0, yHalf + 1, resX, yHalf - 1);
-			//IMPROVE ME !!!
+			WBMP.CopyPixels(wbmpL1, wbmpL1, 0, yHalf, 0, yHalf + 1, resX, yHalf - 1);
 		}
 
 		public static void Init(int resX, int resY, int channels)
@@ -270,11 +259,11 @@ namespace MusGen
 			oldYs = new int[channels];
 			for (int i = 0; i < channels; i++)
 				oldYs[i] = resY / 2 - 5;
-			bmp = WBMP.Create(resX, resY);
+			wbmp = WBMP.Create(resX, resY);
 
-			bmpL1 = WBMP.Create(resX, resY);
+			wbmpL1 = WBMP.Create(resX, resY);
 
-			bmpL2 = WBMP.Create(resX, resY);
+			wbmpL2 = WBMP.Create(resX, resY);
 
 
 			Clr[] clrs = new Clr[7];

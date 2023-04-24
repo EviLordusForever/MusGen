@@ -76,10 +76,7 @@ namespace MusGen
 				int r = Math2.rnd.Next(500);
 
 				for (int i = 0; i < r; i++)
-				{
-					int g = Math2.rnd.Next(10);
-					strs[s] += chars[g];
-				}
+					strs[s] += chars[Math2.rnd.Next(10)];
 			}
 
 			Logger.Log("Logger test started...");

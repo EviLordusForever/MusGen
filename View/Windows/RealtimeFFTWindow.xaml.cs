@@ -22,14 +22,12 @@ namespace MusGen.View.Windows
         private WindowStyle _windowStyle;
         private ResizeMode _resizeMode;
         private WindowState _windowState;
-        private bool _topmost;
         private bool _isFullScreen;
 
         public RealtimeFFTWindow()
 		{
 			InitializeComponent();
 
-            _topmost = false;
             _windowState = WindowState.Normal;
             _resizeMode = ResizeMode.CanResize;
             _windowStyle = WindowStyle.SingleBorderWindow;
@@ -51,12 +49,10 @@ namespace MusGen.View.Windows
             _windowStyle = WindowStyle;
             _resizeMode = ResizeMode;
             _windowState = WindowState;
-            _topmost = Topmost;
 
             WindowStyle = WindowStyle.None;
             ResizeMode = ResizeMode.NoResize;
             WindowState = WindowState.Maximized;
-            Topmost = true;
             _isFullScreen = true;
         }
 
@@ -65,7 +61,6 @@ namespace MusGen.View.Windows
             WindowStyle = _windowStyle;
             ResizeMode = _resizeMode;
             WindowState = _windowState;
-            Topmost = false;
             _isFullScreen = false;
         }
     }

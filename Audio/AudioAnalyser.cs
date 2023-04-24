@@ -16,6 +16,7 @@ using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using System.Windows;
 using System.Windows.Threading;
+using System.Diagnostics;
 
 namespace MusGen
 {
@@ -24,7 +25,7 @@ namespace MusGen
 		//PARAMS FFT:
 
 		public static int channels = 10;
-		public static int FFTsize = 1024;
+		public static int FFTsize = 2048;
 		public static float trashSize = 10;
 
 		public static string pointsConnectingX = "logarithmic";
@@ -45,7 +46,7 @@ namespace MusGen
 		//PARAMS graph
 
 		public static bool drawGraph = true;
-		public static int graphResX = 256 * 2;
+		public static int graphResX = 256 * 2 * 2;
 		public static int graphResY = 16 * 9 * 2;
 		public static int graphType = 2;
 
@@ -323,6 +324,11 @@ namespace MusGen
 				var format = wbmp.Format;
 				var backBufferStride = wbmp.BackBufferStride;
 
+				int frames = 0;
+				var fps = 0;
+				var stopwatch = new Stopwatch();
+				stopwatch.Start();
+
 				AudioCapture.Start(sampleRate, 16, 1);
 
 				Wav wav = new Wav();
@@ -331,6 +337,7 @@ namespace MusGen
 
 				while (true)
 				{
+					FPS();
 					Olds();
 
 					wav.L = AudioCapture.GetSamples(FFTsize);
@@ -360,6 +367,21 @@ namespace MusGen
 							backBufferStride);
 						WindowsManager._realtimeFFTWindow.img.Source = bitmapSource;
 						WindowsManager._realtimeFFTWindow.img.UpdateLayout();
+					});
+				}
+
+				void FPS()
+				{
+					if (frames >= 60)
+					{
+						fps = (int)(60 * 1000 / stopwatch.Elapsed.TotalMilliseconds);
+						stopwatch.Restart();
+						frames = 0;
+					}
+					frames++;
+					WindowsManager._realtimeFFTWindow.Dispatcher.Invoke(() =>
+					{
+						WindowsManager._realtimeFFTWindow.fps.Text = fps.ToString();
 					});
 				}
 			}
@@ -455,7 +477,7 @@ namespace MusGen
 				}
 
 				float[] frqsLg = Array2.RescaleArrayToLog(fix, FFTsize, graphResX);
-				wbmp = SpectrumDrawer.Draw(frqsLg, idxsLg, ampsNew, adaptiveCeiling, FrequencyFinder.amplitudeMaxWholeTrack);
+				wbmp = SpectrumDrawer.DrawType1(frqsLg, idxsLg, ampsNew, adaptiveCeiling, FrequencyFinder.amplitudeMaxWholeTrack);
 			}
 			else if (graphType == 2)
 				wbmp = SpectrumDrawer.DrawType2(idxsLg, ampsNew, adaptiveCeiling, FrequencyFinder.amplitudeMaxWholeTrack);

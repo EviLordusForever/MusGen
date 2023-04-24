@@ -150,7 +150,7 @@ namespace MusGen
 
 			for (int i = 1; i < frequencies.Length; i++)
 			{
-				RemoveLeader(leadIndex, trashSize);
+				RemoveLeader(leadIndex, trashSize * FFTsize / 1024);
 
 				FindLeader();
 
