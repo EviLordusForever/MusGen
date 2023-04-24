@@ -15,6 +15,7 @@ namespace MusGen
 		public static AudioRecreationWindow _audioRecreationWindow;
 		public static ProgressWindow _progressWindow;
 		public static RealtimeFFTWindow _realtimeFFTWindow;
+		public static MainWindow _mainWindow;
 
 		public static void OpenRealtimeFFTWindow()
 		{

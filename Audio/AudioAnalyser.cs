@@ -45,7 +45,7 @@ namespace MusGen
 
 		//PARAMS graph
 
-		public static bool drawGraph = true;
+		public static bool drawSpectrum = false;
 		public static int graphResX = 256 * 2 * 2;
 		public static int graphResY = 16 * 9 * 2;
 		public static int graphType = 2;
@@ -85,10 +85,12 @@ namespace MusGen
 
 		public static string _outName;
 
-		public static uint graphDuration;
+		public static uint drawSpectumStep;
 		public static long lastSample;
 
 		public static WriteableBitmap wbmp;
+
+		public static int progressStep;
 
 		//CODE
 
@@ -123,9 +125,11 @@ namespace MusGen
 
 				_outName = outName3 + $" (FFT {FFTsize} ch {channels} tr {trashSize})";
 
-				graphDuration = sampleRate / 60;
+				drawSpectumStep = sampleRate / 60;
 				lastSample = Math.Min(wavIn.L.Length - FFTsize, sampleRate * limitSec);
 			}
+
+			progressStep = (int)(lastSample / 2000);
 
 			adaptiveCeiling = 3;
 
@@ -163,7 +167,7 @@ namespace MusGen
 			{
 				Startup(originPath, outName2);
 
-				if (UserAsker.Ask($"Name: {_outName}\nWave type: {waveForm}\nRecreation channels: {channels}\nFade time: {fadeTime}\nFFT size: {FFTsize}\nFFT per second: {FFTPerSecond}\nTrash size: {trashSize}\nLow frq smoothing size X: {lfsX}\nLow frq smoothing size Y: {lfsY}\nAmplitude threshold: {amplitudeThreshold}\nPoints connecting X: {pointsConnectingX}\nPoints connecting Y: {pointsConnectingY}\nDraw graph: {drawGraph}\nSamples: {lastSample}\nSample rate: {sampleRate}\nSeconds: {(int)(lastSample / sampleRate)}"))
+				if (UserAsker.Ask($"Name: {_outName}\nWave type: {waveForm}\nRecreation channels: {channels}\nFade time: {fadeTime}\nFFT size: {FFTsize}\nFFT per second: {FFTPerSecond}\nTrash size: {trashSize}\nLow frq smoothing size X: {lfsX}\nLow frq smoothing size Y: {lfsY}\nAmplitude threshold: {amplitudeThreshold}\nPoints connecting X: {pointsConnectingX}\nPoints connecting Y: {pointsConnectingY}\nDraw graph: {drawSpectrum}\nSamples: {lastSample}\nSample rate: {sampleRate}\nSeconds: {(int)(lastSample / sampleRate)}"))
 					return;
 
 				FindAmplitudeMaxForWholeTrack();
@@ -190,11 +194,15 @@ namespace MusGen
 						fadeSamplesLeft--;
 
 					WriteSample(s);
-					if (drawGraph && s % graphDuration == 0)
+
+
+					if (s % progressStep == 0)
+						ProgressShower.SetProgress(1.0 * s / lastSample);
+
+					if (drawSpectrum && s % drawSpectumStep == 0)
 					{
 						DrawSpectrum();
 						SaveGraph($"{s}");
-						ProgressShower.SetProgress(1.0 * s / lastSample);
 					}
 
 					CheckMaxAmplitude(s);

@@ -1,4 +1,7 @@
 ﻿using System.Threading;
+using System;
+using System.Windows;
+using System.Runtime.InteropServices;
 
 namespace MusGen
 {
@@ -14,15 +17,30 @@ namespace MusGen
 
 			void Tr()
 			{
+				Application.Current.Dispatcher.Invoke(new Action(() =>
+				{
+					WindowsManager._mainWindow.WindowState = WindowState.Minimized;
+				}));
+
 				Logger.Log("Tests are started...");
 
 				Tests.HungarianAlgorithm();
 				Tests.GradientDithering();
 				Tests.GraphDrawerGradient();
-				Tests.SPL();
-				//Tests.Logging();
+				Tests.SPL();			
 
 				Logger.Log("Tests are completed.");
+
+				while (Logger._updated)
+					Thread.Sleep(100);
+
+				Application.Current.Dispatcher.Invoke(new Action(() =>
+				{
+					WindowsManager._mainWindow.WindowState = WindowState.Normal;
+					WindowsManager._mainWindow.Activate();
+					WindowsManager._mainWindow.Focus();
+					WindowsManager._mainWindow.BringIntoView();
+				}));
 			}
 		}
 	}

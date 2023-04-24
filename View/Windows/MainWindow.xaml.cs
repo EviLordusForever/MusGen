@@ -24,8 +24,9 @@ namespace MusGen
 		public MainWindow()
 		{
 			InitializeComponent();
-			BitmapImage ii = new BitmapImage(new Uri($"{Disk2._programFiles}//Images//img.png"));
+			BitmapImage ii = new BitmapImage(new Uri($"{Disk2._programFiles}//Images//img2.png"));
 			image.Source = ii;
+			WindowsManager._mainWindow = this;
 		}
 
 		private void Button_Click(object sender, RoutedEventArgs e)
