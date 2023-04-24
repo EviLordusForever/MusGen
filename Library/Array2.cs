@@ -8,63 +8,17 @@ namespace Library
 {
 	public static class Array2
 	{
-		public static float[] RescaleArrayToLog2Fake(float[] array)
-		{
-			//changes array to logarithmic scale with intepolation
-			//scale of array will remain exactly the same
-			int indexA = 0;
-			int indexB = 0;
-			int L = array.Length;
-
-			float[] newArray = new float[L];
-
-			for (int x = 0; x < L; x++)
-			{
-				float index = L * MathF.Pow(1f * x / L, 2);
-				indexB = (int)MathF.Floor(index);
-				if (indexB - indexA < 1)
-				{
-					float power = index - indexB;
-					newArray[x] = array[indexB] * (1 - power) + array[indexB + 1] * power;
-				}
-				else
-				{
-					indexA++;
-
-					for (int i = indexA; i <= indexB; i++)
-						newArray[x] += array[i];
-					newArray[x] /= indexB - indexA + 1;
-				}
-				indexA = indexB;
-			}
-
-			return newArray;
-		}
-
-		public static int[] RescaleIndexesToLog2Fake(int[] indexes, int arraySize)
-		{
-			//changes indexes of linear array
-			//to indexes of array rescaled to logarithic scale by base 2
-			//all are stay in the range from 0 to maximum
-			int L = arraySize;
-
-			for (int x = 0; x < indexes.Length; x++)
-				indexes[x] = (int)(Math.Pow((indexes[x] + 0.0) / L, 0.5) * L);
-
-			return indexes;
-		}
-
-		public static float[] RescaleArrayToLog(float[] array, float base_)
+		public static float[] RescaleArrayToLog(float[] array, float base_, int new_size)
 		{
 			int indexA = 0;
 			int indexB = 0;
-			float size = array.Count();
+			int size = array.Count();
 
-			float[] newArray = new float[(int)size];
+			float[] newArray = new float[(int)new_size];
 
-			for (int x = 0; x < size; x++)
+			for (int x = 0; x < new_size; x++)
 			{
-				float index = MathF.Pow(base_, x / size - 1) * size;
+				float index = MathF.Pow(base_, 1f * x / new_size - 1) * size;
 
 				indexB = (int)MathF.Floor(index);
 				if (indexB + 1 >= size)

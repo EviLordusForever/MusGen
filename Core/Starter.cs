@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Library;
+﻿using System.Threading;
 
 namespace MusGen
 {
@@ -11,12 +6,24 @@ namespace MusGen
 	{
 		public static void OnStart()
 		{
-			Logger.Log("App started. Good luck!");
+			Logger.Log("Hello. App started. Good luck!");
 
-			Tests.TestHungarianAlgorithm();
-			Tests.GradientDithering();
-			Tests.GraphDrawerGradient();
-			Tests.SPL();
+			Thread tr = new(Tr);
+			tr.Name = "Starter";
+			tr.Start();
+
+			void Tr()
+			{
+				Logger.Log("Tests are started...");
+
+				Tests.HungarianAlgorithm();
+				Tests.GradientDithering();
+				Tests.GraphDrawerGradient();
+				Tests.SPL();
+				//Tests.Logging();
+
+				Logger.Log("Tests are completed.");
+			}
 		}
 	}
 }

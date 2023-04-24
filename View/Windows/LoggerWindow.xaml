@@ -7,9 +7,9 @@
         mc:Ignorable="d"
         Title="LoggerWindow" Height="450" Width="800">
     <Grid>
-		<RichTextBox Name="RTB" FontFamily="Consolas" Background="Black" Foreground="Lime">
+		<RichTextBox Name="RTB" IsReadOnly="true" FontFamily="Consolas" Background="Black" Foreground="Lime">
 			<FlowDocument>
-				<Paragraph>Hello</Paragraph>
+				<Paragraph></Paragraph>
 			</FlowDocument>
 		</RichTextBox>
     </Grid>

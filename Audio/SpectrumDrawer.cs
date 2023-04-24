@@ -9,7 +9,7 @@ using static MusGen.HardwareParams;
 
 namespace MusGen
 {
-	public static class GraphDrawer
+	public static class SpectrumDrawer
 	{
 		public static int resX;
 		public static int resY;
@@ -168,7 +168,7 @@ namespace MusGen
 			}
 		}
 
-		public static void DrawType3(string name, int[] verticalLines, float[] theirSizes, float adaptiveCeiling, float maxCeiling)
+		public static WriteableBitmap DrawType3(int[] verticalLines, float[] theirSizes, float adaptiveCeiling, float maxCeiling)
 		{
 			float yScaleUp;
 			float xScale;
@@ -182,7 +182,7 @@ namespace MusGen
 			Scales();
 			DrawPartUp();
 			DrawPartDown();
-			Ending();
+			return Ending();
 
 			void DrawPartDown()
 			{
@@ -242,12 +242,11 @@ namespace MusGen
 				xScale = 1f * resX / resX;
 			}
 
-			void Ending()
+			WriteableBitmap Ending()
 			{
 				bmp = bmpL1;
 				WBMP.CopyPixels(bmpL2, bmp, 0, 0, 0, 0, resX, resY);
-				string path = $"{Disk2._programFiles}Grafics\\g\\g_{name}.jpg";
-				Graphics2.SaveJPG100(bmp, path);
+				return bmp;
 			}
 		}
 
@@ -264,8 +263,8 @@ namespace MusGen
 
 		public static void Init(int resX, int resY, int channels)
 		{
-			GraphDrawer.resX = resX;
-			GraphDrawer.resY = resY;
+			SpectrumDrawer.resX = resX;
+			SpectrumDrawer.resY = resY;
 			yHalf = resY / 2;
 			oldXs = new int[channels];
 			oldYs = new int[channels];

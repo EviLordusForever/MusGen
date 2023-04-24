@@ -16,17 +16,14 @@ namespace MusGen
 	{
 		public static void SPL()
 		{
-			List<float> values = new List<float>();
-			for (int f = 20; f < 20000; f += 50)
-			{
-				values.Add(EffectsCreator2.GetSoundPressureLevel(f));
-			}
+			string str = "";
+			for (float f = 20; f < 20000; f *= 1.2f)
+				str += $"{f};{SoundPressureModel.GetSoundPressureLevel(f)}\n";
 
-			string str = String.Join('\n', values);
 			Disk2.WriteToProgramFiles("SPL", "csv", str, false);
 		}
 
-		public static void TestHungarianAlgorithm()
+		public static void HungarianAlgorithm()
 		{
 			int[,] costMatrix = new int[,] {
 			{  1,  2,  3,  4,  5 },
@@ -35,7 +32,7 @@ namespace MusGen
 			{ 16, 17, 18, 19, 20 },
 			{ 21, 22, 23, 24, 25 }};
 
-			int[] res = HungarianAlgorithm.Run(costMatrix);
+			int[] res = Library.HungarianAlgorithm.Run(costMatrix);
 			Logger.Log(string.Join(' ', res));
 		}
 
@@ -57,13 +54,40 @@ namespace MusGen
 
 		public static void GraphDrawerGradient()
 		{
-			GraphDrawer.Init(1, 1, 10);
-			WriteableBitmap testBmp = WBMP.Create(GraphDrawer.gradient.Count(), 255);
+			SpectrumDrawer.Init(1, 1, 10);
+			WriteableBitmap testBmp = WBMP.Create(SpectrumDrawer.gradient.Count(), 255);
 
-			for (int i = 0; i < GraphDrawer.gradient.Count(); i++)
-				testBmp.DrawLine(i, 0, i, 255, GraphDrawer.gradient[i]);
+			for (int i = 0; i < SpectrumDrawer.gradient.Count(); i++)
+				testBmp.DrawLine(i, 0, i, 255, SpectrumDrawer.gradient[i]);
 
 			Disk2.SaveImagePng(testBmp, $"{Disk2._programFiles}\\Grafics\\SpectrumGraident.bmp");
+		}
+
+		public static void Logging()
+		{
+			var chars = new char[] { 'g', 'H', 'a', 'I', '2', 's', 'f', '7', '0', ' ' };
+
+			string[] strs = new string[7];
+
+			for (int s = 0; s < strs.Count(); s++)
+			{
+				strs[s] = "";
+
+				int r = Math2.rnd.Next(500);
+
+				for (int i = 0; i < r; i++)
+				{
+					int g = Math2.rnd.Next(10);
+					strs[s] += chars[g];
+				}
+			}
+
+			Logger.Log("Logger test started...");
+
+			for (int s = 0; s < strs.Count(); s++)
+				Logger.Log(strs[s]);
+
+			Logger.Log("Logger test ended...");
 		}
 	}
 }

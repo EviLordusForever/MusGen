@@ -6,55 +6,57 @@ using System.Threading.Tasks;
 using MusGen.Voice.Models;
 using System.Threading;
 using Library;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Media.Imaging;
 using System.Drawing;
-using Library;
-using Clr = System.Windows.Media.Color;
 using static MusGen.HardwareParams;
 using System.Runtime.InteropServices;
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Media;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Threading;
 
 namespace MusGen
 {
-	public static class EffectsCreator2
+	public static class AudioAnalyser
 	{
-		//PARAMS:
+		//PARAMS FFT:
+
+		public static int channels = 10;
+		public static int FFTsize = 1024;
+		public static float trashSize = 10;
+
+		public static string pointsConnectingX = "logarithmic";
+		public static string pointsConnectingY = "logarithmic";
+
+		public static float lfsY = 0.95f;
+		public static float lfsX = 4000f;
+
+		//PARAMS recreation:
 
 		public static string waveForm = "sin";
 		public static int limitSec = 2500;
 		public static int FFTPerSecond = 100;
-		public static int channels = 10;
 		public static float fadeTime = 0.99f;
-		public static bool drawGraph = true;
-		public static int FFTsize = 1024;
-		public static float trashSize = 10;
+
 		public static float amplitudeThreshold = 0;
-		public static float lfsY = 0.95f;
-		public static float lfsX = 4000f;
-		public static string pointsConnectingX = "logarithmic";
-		public static string pointsConnectingY = "logarithmic";
+
+		//PARAMS graph
+
+		public static bool drawGraph = true;
 		public static int graphResX = 256 * 2;
 		public static int graphResY = 16 * 9 * 2;
 		public static int graphType = 2;
-		public static uint sampleRate = 44100;
 
 		//VARIABLES
+
+		public static uint sampleRate;
 
 		public static Wav wavIn;
 		public static Wav wavOut;
 
-		public static float adaptiveCeiling = 3;
+		public static float adaptiveCeiling;
 
 		public static int fadeSamplesLeft;
 		public static float signal;
@@ -86,12 +88,13 @@ namespace MusGen
 		public static long limit;
 
 		public static WriteableBitmap wbmp;
-		//public static WriteableBitmap wbmp2;
 
 		//CODE
 
 		public static void Startup(string originPath, string outName3)
 		{
+			sampleRate = 44100;
+
 			if (!string.IsNullOrEmpty(originPath))
 			{
 				wavIn = new Wav();
@@ -123,6 +126,8 @@ namespace MusGen
 				limit = Math.Min(wavIn.L.Length, sampleRate * limitSec);
 			}
 
+			adaptiveCeiling = 3;
+
 			pi2 = MathF.PI * 2;
 			buf = pi2 / sampleRate;
 
@@ -145,7 +150,7 @@ namespace MusGen
 			FrequencyFinder.amplitudeMaxWholeTrack = 0.1f;
 			FrequencyFinder.amplitudeMax = 0;
 			FrequencyFinder.CalculateSmoothMask(lfsX, lfsY, FFTsize, sampleRate);
-			GraphDrawer.Init(graphResX, graphResY, channels);
+			SpectrumDrawer.Init(graphResX, graphResY, channels);
 		}
 
 		public static void FFT(string originPath, string outName2)
@@ -186,7 +191,7 @@ namespace MusGen
 					WriteSample(s);
 					if (drawGraph && s % graphDuration == 0)
 					{
-						DrawGraph();
+						DrawSpectrum();
 						SaveGraph($"{s}");
 						ProgressShower.SetProgress(1.0 * s / limit);
 					}
@@ -318,7 +323,7 @@ namespace MusGen
 				var format = wbmp.Format;
 				var backBufferStride = wbmp.BackBufferStride;
 
-				AudioCapture.Start();
+				AudioCapture.Start(sampleRate, 16, 1);
 
 				Wav wav = new Wav();
 				wav.sampleRate = sampleRate;
@@ -337,7 +342,7 @@ namespace MusGen
 					ConnectNewPoints();
 
 					FrequencyFinder.amplitudeMaxWholeTrack *= 0.995f;
-					DrawGraph();
+					DrawSpectrum();
 
 					byte[] buffer = new byte[bufferSize];
 					Marshal.Copy(wbmp.BackBuffer, buffer, 0, bufferSize);					
@@ -356,49 +361,9 @@ namespace MusGen
 						WindowsManager._realtimeFFTWindow.img.Source = bitmapSource;
 						WindowsManager._realtimeFFTWindow.img.UpdateLayout();
 					});
-
-/*					if (Math2.rnd.Next(300) == 0)
-					{
-						Graphics2.SaveJPG100(wbmp, $"{Disk2._programFiles}GG.bmp");
-						string l = string.Join('\n', wav.L);
-						Disk2.WriteToProgramFiles("gg", "csv", l, false);
-
-						string p = UserAsker.AskFile("wav");
-						wavIn = new Wav();
-						wavIn.Read(p, 0);
-						wavIn.L = AudioCapture.samples.ToArray();
-						wavIn.R = wavIn.L;
-						wavIn.SaveTo($"{Disk2._programFiles}gg.wav");
-					}*/
 				}
 			}
-		}
-
-		public static float GetSoundPressureLevel(float frequency)
-		{
-			float[] soundPressureLevels = new float[] { 0f, 0.2f, 0.4f, 0.6f, 0.7f, 0.9f, 0.8913f, 0.8913f, 1.1220f, 1.4125f, 1.5849f, 1.4983f, 1.1220f, 1.0f, 0.8913f, 0.8913f, 1.2589f, 1.5849f, 1.4983f, 1.1220f, 0.8913f, 0.7943f, 0.7943f, 1.1220f, 2.2387f, 4.4668f, 6.3096f, 5.6234f, 2.5119f, 1.2589f, 0.8913f, 0.5012f, 0f };
-
-			float[] frequencies = new float[] { 0f, 20, 25, 31.5f, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000, 12500, 16000, 20000, 25000 };
-
-			int index = Array.BinarySearch(frequencies, frequency);
-			if (index >= 0)
-				return soundPressureLevels[index];
-			else
-			{
-				index = ~index;
-				int index1 = index - 1;
-				if (index1 < 0) index1 = 0;
-				int index2 = index;
-				if (index2 >= frequencies.Length) index2 = frequencies.Length - 1;
-
-				float x1 = frequencies[index1];
-				float x2 = frequencies[index2];
-				float y1 = soundPressureLevels[index1];
-				float y2 = soundPressureLevels[index2];
-				float y = y1 + (y2 - y1) * (frequency - x1) / (x2 - x1);
-				return y;
-			}
-		}
+		}		
 
 		//STATIC
 
@@ -476,7 +441,7 @@ namespace MusGen
 			FrequencyFinder.leadIndexes = idxsCompared;
 		}
 
-		public static void DrawGraph()
+		public static void DrawSpectrum()
 		{
 			if (graphType == 1)
 			{
@@ -484,23 +449,18 @@ namespace MusGen
 				for (int index = 0; index < FrequencyFinder.spectrum.Length; index++)
 				{
 					float a = FrequencyFinder.spectrum[index];
-					float b = GetSoundPressureLevel(FrequencyFinder.frequencies[index]);
+					float b = SoundPressureModel.GetSoundPressureLevel(FrequencyFinder.frequencies[index]);
 
 					fix[index] = a * b;
-
-					if (float.IsNaN(fix[index]))
-					{
-					}
 				}
 
-				float[] frqsLg = Array2.RescaleArrayToLog(fix, FFTsize);
-				wbmp = GraphDrawer.Draw(frqsLg, idxsLg, ampsNew, adaptiveCeiling, FrequencyFinder.amplitudeMaxWholeTrack);
+				float[] frqsLg = Array2.RescaleArrayToLog(fix, FFTsize, graphResX);
+				wbmp = SpectrumDrawer.Draw(frqsLg, idxsLg, ampsNew, adaptiveCeiling, FrequencyFinder.amplitudeMaxWholeTrack);
 			}
 			else if (graphType == 2)
-				wbmp = GraphDrawer.DrawType2(idxsLg, ampsNew, adaptiveCeiling, FrequencyFinder.amplitudeMaxWholeTrack);
+				wbmp = SpectrumDrawer.DrawType2(idxsLg, ampsNew, adaptiveCeiling, FrequencyFinder.amplitudeMaxWholeTrack);
 			else if (graphType == 3)
-			{
-			}
+				wbmp = SpectrumDrawer.DrawType3(idxsLg, ampsLg, adaptiveCeiling, FrequencyFinder.amplitudeMaxWholeTrack);
 		}
 
 		public static void FindLg()
@@ -513,7 +473,7 @@ namespace MusGen
 			}
 
 			idxsLgOld = idxsLg;
-			idxsLg = Array2.RescaleIndexesToLog(FrequencyFinder.leadIndexes, FrequencyFinder.spectrum.Length);
+			idxsLg = Array2.RescaleIndexesToLog(FrequencyFinder.leadIndexes, graphResX);
 		}
 
 		public static double F(double t)
@@ -535,116 +495,5 @@ namespace MusGen
 			else
 				return MathF.Sin(t);
 		}
-	}
-
-	public static class AudioCapturer
-	{
-		private static int samplesPerBuffer;
-		public static readonly List<float> audioBuffer;
-		public static WasapiLoopbackCapture loopbackCapture;
-		private static bool captureStarted = false;
-
-		static AudioCapturer()
-		{
-			audioBuffer = new List<float>();
-		}
-
-		public static void StartCapture(int samplesPerBuffer)
-		{
-			AudioCapturer.samplesPerBuffer = samplesPerBuffer;
-
-			if (!captureStarted)
-			{
-				loopbackCapture = new WasapiLoopbackCapture();
-				loopbackCapture.DataAvailable += OnDataAvailable;
-				loopbackCapture.StartRecording();
-
-				captureStarted = true;
-			}
-		}
-
-		public static float[] GetLastSamples()
-		{
-			lock (audioBuffer)
-			{
-				int startIndex = audioBuffer.Count - samplesPerBuffer;
-				if (startIndex < 0) startIndex = 0;
-				float[] samples = new float[samplesPerBuffer];
-				if (audioBuffer.Count >= samplesPerBuffer)
-					samples = audioBuffer.GetRange(startIndex, samplesPerBuffer).ToArray();
-				//audioBuffer.Clear();
-				return samples;
-			}
-		}
-
-		private static void OnDataAvailable(object sender, WaveInEventArgs e)
-		{
-			byte[] buffer = e.Buffer;
-			int bytesRecorded = e.BytesRecorded;
-
-			for (int i = 0; i < bytesRecorded; i += 2)
-			{
-				short sample = (short)((buffer[i + 1] << 8) | buffer[i]);
-				float sample32 = sample / 32768f;
-				lock (audioBuffer)
-				{
-					audioBuffer.Add(sample32);
-				}
-			}
-		}
-	}
-
-	public static class AudioCapture
-	{
-		public static WaveInEvent waveIn;
-		public static BufferedWaveProvider bufferedWaveProvider;
-		public static List<float> samples = new List<float>();
-
-		public static void Start()
-		{
-			waveIn = new WaveInEvent();
-			waveIn.WaveFormat = new WaveFormat(44100, 16, 1);
-			waveIn.BufferMilliseconds = 1000 / 100;
-			bufferedWaveProvider = new BufferedWaveProvider(waveIn.WaveFormat);
-			waveIn.DataAvailable += (sender, e) =>
-			{
-				try
-				{
-					bufferedWaveProvider.AddSamples(e.Buffer, 0, e.BytesRecorded);
-				}
-				catch
-				{
-					bufferedWaveProvider.ClearBuffer();
-				}
-			};
-
-			waveIn.StartRecording();
-		}
-
-		public static float[] GetSamples(int count)
-		{
-			byte[] buffer = new byte[bufferedWaveProvider.BufferedBytes];
-			int byteCount = bufferedWaveProvider.Read(buffer, 0, buffer.Length);
-			short[] newSamples = new short[byteCount / 2];
-			Buffer.BlockCopy(buffer, 0, newSamples, 0, byteCount);
-
-			for (int i = 0; i < newSamples.Length; i++)
-				samples.Add((float)newSamples[i] / (float)short.MaxValue);			
-
-			float[] res = new float[count];
-
-			int startIndex = samples.Count - count;
-
-			if (startIndex >= 0)
-				res = samples.GetRange(startIndex, count).ToArray();
-
-			return res;
-		}
-
-		public static void Stop()
-		{
-			waveIn.StopRecording();
-			waveIn.Dispose();
-		}
-	}
+	}	
 }

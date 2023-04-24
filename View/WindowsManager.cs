@@ -18,12 +18,7 @@ namespace MusGen
 
 		public static void OpenRealtimeFFTWindow()
 		{
-			if (_realtimeFFTWindow == null)
-			{
-				_realtimeFFTWindow = new RealtimeFFTWindow();
-				_realtimeFFTWindow.Show();
-			}
-			else if (!_realtimeFFTWindow.IsVisible)
+			if (_realtimeFFTWindow == null || !_realtimeFFTWindow.IsVisible)
 			{
 				_realtimeFFTWindow = new RealtimeFFTWindow();
 				_realtimeFFTWindow.Show();
@@ -35,12 +30,7 @@ namespace MusGen
 
 		public static void OpenProgressWindow(string text)
 		{
-			if (_progressWindow == null)
-			{
-				_progressWindow = new ProgressWindow();
-				_progressWindow.Show();
-			}
-			else if (!_progressWindow.IsVisible)
+			if (_progressWindow == null || !_progressWindow.IsVisible)
 			{
 				_progressWindow = new ProgressWindow();
 				_progressWindow.Show();
@@ -51,34 +41,28 @@ namespace MusGen
 
 		public static void OpenLogWindow()
 		{
-			if (_logWindow == null)
+			if (_logWindow == null || !_logWindow.IsVisible)
 			{
-				_logWindow = new LoggerWindow();
-				_logWindow.Show();
-			}
-			else if (!_logWindow.IsVisible)
-			{
-				_logWindow = new LoggerWindow();
-				_logWindow.Show();
+				Application.Current.Dispatcher.Invoke(() =>
+				{
+					_logWindow = new LoggerWindow();
+					_logWindow.Show();
+				});
 			}
 		}
 
 		public static void OpenAudioRecreationWindow()
 		{
-			if (_audioRecreationWindow == null)
+			if (_audioRecreationWindow == null || !_audioRecreationWindow.IsVisible)
 			{
-				_audioRecreationWindow = new AudioRecreationWindow();
-				_audioRecreationWindow.Show();
-			}
-			else if (!_audioRecreationWindow.IsVisible)
-			{
-				_audioRecreationWindow = new AudioRecreationWindow();
-				_audioRecreationWindow.Show();
+				Application.Current.Dispatcher.Invoke(() =>
+				{
+					_audioRecreationWindow = new AudioRecreationWindow();
+					_audioRecreationWindow.Show();
+				});
 			}
 			else if (_audioRecreationWindow.WindowState == WindowState.Minimized)
-			{
 				_audioRecreationWindow.WindowState = WindowState.Normal;
-			}
 
 			_audioRecreationWindow.Activate();
 		}

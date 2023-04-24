@@ -69,7 +69,7 @@ namespace MusGen.View.Windows
 			
 			void Tr()
 			{
-				EffectsCreator2.FFT(path, outName);
+				AudioAnalyser.FFT(path, outName);
 			}
 		}
 	}

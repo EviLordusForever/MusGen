@@ -19,9 +19,54 @@ namespace MusGen.View.Windows
 	/// </summary>
 	public partial class RealtimeFFTWindow : Window
 	{
-		public RealtimeFFTWindow()
+        private WindowStyle _windowStyle;
+        private ResizeMode _resizeMode;
+        private WindowState _windowState;
+        private bool _topmost;
+        private bool _isFullScreen;
+
+        public RealtimeFFTWindow()
 		{
 			InitializeComponent();
-		}
-	}
+
+            _topmost = false;
+            _windowState = WindowState.Normal;
+            _resizeMode = ResizeMode.CanResize;
+            _windowStyle = WindowStyle.SingleBorderWindow;
+            _isFullScreen = true;
+
+            FullScreen();
+        }
+
+		private void Window_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		{
+            if (!_isFullScreen)
+                FullScreen();
+            else
+                RestoreFromFullScreen();
+        }
+
+        private void FullScreen()
+        {
+            _windowStyle = WindowStyle;
+            _resizeMode = ResizeMode;
+            _windowState = WindowState;
+            _topmost = Topmost;
+
+            WindowStyle = WindowStyle.None;
+            ResizeMode = ResizeMode.NoResize;
+            WindowState = WindowState.Maximized;
+            Topmost = true;
+            _isFullScreen = true;
+        }
+
+        private void RestoreFromFullScreen()
+        {
+            WindowStyle = _windowStyle;
+            ResizeMode = _resizeMode;
+            WindowState = _windowState;
+            Topmost = false;
+            _isFullScreen = false;
+        }
+    }
 }

@@ -5,8 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MusGen.View.Windows"
         mc:Ignorable="d"
-        Title="RealtimeFFTWindow" Height="450" Width="800">
+        Title="RealtimeFFTWindow" Height="450" Width="800"
+		MouseDoubleClick="Window_MouseDoubleClick">
     <Grid>
-		<Image Name="img" ></Image>
-    </Grid>
+		<Image Name="img" Stretch="Fill" />
+
+	</Grid>
 </Window>

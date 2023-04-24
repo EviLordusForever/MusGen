@@ -3,29 +3,46 @@ using System.Windows;
 using System.Threading;
 using System.IO;
 using Library;
-using System.Linq;
+using System.Windows.Media;
+using System.Windows.Documents;
 
 namespace MusGen
 {
 	public static class Logger
 	{
 		public static int _logSize = 25000;
+		public static int _fontSize = 14;
+		public static int _lineHeigh = 1;
+		public static int _symbols = 142;
 		public static string _logText;
+		public static FlowDocument _logDocument;
 		public static StreamWriter _writer;
 		public static bool _updated;
 
 		public static Thread _flusherThread;
 		public static Thread _visualizerThread;
 
+		public static string _msg;
+		public static string _date;
+		public static string _time;
+		public static string _dt;
+
 		public static void Log(string text)
+		{
+			Log(text, Brushes.Yellow);
+		}
+
+		public static void Log(string text, Brush brush)
 		{
 			WindowsManager.OpenLogWindow();
 
-			string msg = CreateMessageToShout(text);
-			string date = GetDateToShow(System.DateTime.Now);
-			string time = GetTimeToShow(System.DateTime.Now);
-			LogToFile($"[{date}][{time}] {msg}");
-			LogToWindow($"[{date}][{time}] {msg}");
+			_msg = CreateMessageToShout(text);
+			_date = GetDateToShow(DateTime.Now);
+			_time = GetTimeToShow(DateTime.Now);
+			_dt = $"[{_date}][{_time}]";
+			LogToFile($"{_dt} {_msg}");
+			LogToWindow();
+			_logText = $"{_dt} {_msg}\r\n{_logText}";
 			CutVisibleLog();
 
 			void LogToFile(string text)
@@ -36,9 +53,28 @@ namespace MusGen
 				});
 			}
 
-			void LogToWindow(string text)
+			void LogToWindow()
 			{
-				_logText = $"{text}\r\n{_logText}";
+				Application.Current.Dispatcher.Invoke(() =>
+				{
+					Paragraph paragraph = new Paragraph();
+
+					Span span = new Span(new Run(_dt));
+					span.Foreground = Brushes.Lime;
+
+					paragraph.Inlines.Add(span);
+
+					Span span2 = new Span(new Run(" " + _msg));
+					span2.Foreground = brush;
+
+					paragraph.Inlines.Add(span2);
+
+					paragraph.LineHeight = _lineHeigh;
+					paragraph.FontSize = _fontSize;
+
+					_logDocument.Blocks.Add(paragraph);
+				});
+
 				_updated = true;
 			}
 
@@ -74,8 +110,7 @@ namespace MusGen
 
 
 				string ModyfyText(string str)
-				{
-					int size = 180;
+				{					
 					string res = "";
 					str += "\r\n";
 
@@ -85,21 +120,21 @@ namespace MusGen
 						indexOfR = Math.Min(indexOfR, str.IndexOf(Environment.NewLine));
 
 
-						if (indexOfR < size - 1 && indexOfR != -1 && indexOfR + 2 < str.Length)
+						if (indexOfR < _symbols - 1 && indexOfR != -1 && indexOfR + 2 < str.Length)
 						{
 							res += str.Remove(indexOfR + 1).Replace('\r', ' ').Replace('\n', ' ') + "\r" + datee + timee + whoe + duringe + placee + " ";
 							str = str.Substring(indexOfR + 1);
 						}
-						else if (str.Length <= size)
+						else if (str.Length <= _symbols)
 						{
 							res += str.Replace('\r', ' ').Replace('\n', ' ');
 							break;
 						}
-						else if (str.Length > size)
+						else if (str.Length > _symbols)
 						{
-							string strRemoveSize = str.Remove(size);
+							string strRemoveSize = str.Remove(_symbols);
 
-							int lastSpaceIndex = size;
+							int lastSpaceIndex = _symbols;
 							if (strRemoveSize.Contains(" "))
 								lastSpaceIndex = strRemoveSize.LastIndexOf(' ');
 
@@ -150,8 +185,7 @@ namespace MusGen
 							if (_updated && WindowsManager._logWindow.WindowState != WindowState.Minimized)
 								if (WindowsManager._logWindow.IsVisible)
 								{
-									WindowsManager._logWindow.RTB.Document.Blocks.Clear();
-									WindowsManager._logWindow.RTB.AppendText(_logText); 
+									WindowsManager._logWindow.RTB.Document = _logDocument; 
 
 									_updated = false;
 								}
@@ -241,6 +275,12 @@ namespace MusGen
 		static Logger()
 		{
 			_logText = "";
+			Application.Current.Dispatcher.Invoke(() =>
+			{
+				_logDocument = new FlowDocument();
+				_logDocument.PageWidth = 2048;
+			});		
+
 			_writer = new StreamWriter($"{Disk2._programFiles}Logs\\log.log", true);
 			StartFlusher();
 			StartVisualiser();
