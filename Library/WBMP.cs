@@ -25,6 +25,7 @@ namespace MusGen
             int stride = (int)source.Width * format.BitsPerPixel / 8;
 
             byte[] buffer = new byte[stride * height];
+
             source.CopyPixels(new Int32Rect(sourceX, sourceY, width, height), buffer, stride, 0);
 
             destination.WritePixels(new Int32Rect(destinationX, destinationY, width, height), buffer, stride, 0);

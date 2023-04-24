@@ -23,10 +23,10 @@ namespace MusGen
 
 		public static void Draw(string name, float[] input_array)
 		{
-			Draw(name, input_array, new int[0], new float[0], input_array.Max(), input_array.Max());
+			Draw(input_array, new int[0], new float[0], input_array.Max(), input_array.Max());
 		}
 
-		public static void Draw(string name, float[] input_array, int[] verticalLines, float[] theirSizes, float adaptiveCeiling, float maxCeiling)
+		public static WriteableBitmap Draw(float[] input_array, int[] verticalLines, float[] theirSizes, float adaptiveCeiling, float maxCeiling)
 		{
 			float yScale;
 			float xScale;
@@ -38,7 +38,7 @@ namespace MusGen
 			DrawSpectrum();
 			DrawArray();
 			DrawVerticalLines();
-			Ending();
+			return bmpL1;
 
 			void FillBlack()
 			{
@@ -98,18 +98,9 @@ namespace MusGen
 				powerScale = 1f / maxCeiling;
 				xScale = 1f * resX / input_array.Length;
 			}
-
-			
-
-			void Ending()
-			{
-				string path = $"{Disk2._programFiles}Grafics\\g\\g_{name}.jpg";
-				//Disk2.SaveImage(bmp, path);
-				Graphics2.SaveJPG100(bmpL1, path); 
-			}
 		}
 
-		public static void DrawType2(string name, int[] verticalLines, float[] theirSizes, float adaptiveCeiling, float maxCeiling)
+		public static WriteableBitmap DrawType2(int[] verticalLines, float[] theirSizes, float adaptiveCeiling, float maxCeiling)
 		{
 			float yScaleUp;
 			float xScale;
@@ -120,7 +111,7 @@ namespace MusGen
 			Scales();
 			DrawPartUp();
 			DrawPartDown();
-			Ending();
+			return bmpL1;
 
 			void FillBlack()
 			{
@@ -174,12 +165,6 @@ namespace MusGen
 				yScaleUp = 1f * resY / adaptiveCeiling;
 				yScaleUp /= 4;
 				xScale = 1f * resX / resX;
-			}
-
-			void Ending()
-			{
-				string path = $"{Disk2._programFiles}Grafics\\g\\g_{name}.jpg";
-				Graphics2.SaveJPG100(bmpL1, path);
 			}
 		}
 

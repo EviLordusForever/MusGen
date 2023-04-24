@@ -69,7 +69,7 @@ namespace MusGen.View.Windows
 			
 			void Tr()
 			{
-				EffectsCreator.EffectFFTMulti(path, outName);
+				EffectsCreator2.FFT(path, outName);
 			}
 		}
 	}

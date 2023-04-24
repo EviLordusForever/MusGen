@@ -16,6 +16,7 @@ namespace MusGen
 			Tests.TestHungarianAlgorithm();
 			Tests.GradientDithering();
 			Tests.GraphDrawerGradient();
+			Tests.SPL();
 		}
 	}
 }

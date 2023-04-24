@@ -14,6 +14,18 @@ namespace MusGen
 {
 	public static class Tests
 	{
+		public static void SPL()
+		{
+			List<float> values = new List<float>();
+			for (int f = 20; f < 20000; f += 50)
+			{
+				values.Add(EffectsCreator2.GetSoundPressureLevel(f));
+			}
+
+			string str = String.Join('\n', values);
+			Disk2.WriteToProgramFiles("SPL", "csv", str, false);
+		}
+
 		public static void TestHungarianAlgorithm()
 		{
 			int[,] costMatrix = new int[,] {

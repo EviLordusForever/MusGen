@@ -21,7 +21,7 @@
 			</Grid.RowDefinitions>
 			
 			<Button Width="400" Margin ="0,15,0,15" Content="Audio Recreation" FontSize="35" Grid.Row="0" Click="Button_Click"></Button>
-			<Button Width="400" Margin ="0,15,0,15" Content="Realtime FFT" FontSize="35" Grid.Row="1"></Button>
+			<Button Width="400" Margin ="0,15,0,15" Content="Realtime FFT" FontSize="35" Grid.Row="1" Click="Button_Click_1"></Button>
 		</Grid>	
 	</Grid>
 </Window>

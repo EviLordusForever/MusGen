@@ -112,7 +112,7 @@ namespace MusGen
 
 		public static void ByFFT(ref float[] frequencies, ref float[] amplitudes, Wav wav, int start, int FFTsize, float trashSize)
 		{
-			if (start + FFTsize >= wav.L.Length - 1)
+			if (start + FFTsize > wav.L.Length)
 				return;
 
 			float leadFrequency = 0;
@@ -183,6 +183,14 @@ namespace MusGen
 				for (int i = 0; i < spectrumClone.Length; i++)
 					spectrumClone[i] = spectrumClone[i] * MathF.Abs(MathF.Tanh((i - point) / size));
 			}
+		}
+
+		public static void FillFrqs(int fftSize, uint sampleRate)
+		{
+			frequencies = new float[fftSize];
+
+			for (int index = 0; index < 666; index++)
+				frequencies[index] = (1f * index / fftSize) * sampleRate;
 		}
 	}
 }

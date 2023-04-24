@@ -14,6 +14,24 @@ namespace MusGen
 		public static LoggerWindow _logWindow;
 		public static AudioRecreationWindow _audioRecreationWindow;
 		public static ProgressWindow _progressWindow;
+		public static RealtimeFFTWindow _realtimeFFTWindow;
+
+		public static void OpenRealtimeFFTWindow()
+		{
+			if (_realtimeFFTWindow == null)
+			{
+				_realtimeFFTWindow = new RealtimeFFTWindow();
+				_realtimeFFTWindow.Show();
+			}
+			else if (!_realtimeFFTWindow.IsVisible)
+			{
+				_realtimeFFTWindow = new RealtimeFFTWindow();
+				_realtimeFFTWindow.Show();
+			}
+
+			_realtimeFFTWindow.Activate();
+			_realtimeFFTWindow.WindowState = WindowState.Maximized;
+		}
 
 		public static void OpenProgressWindow(string text)
 		{

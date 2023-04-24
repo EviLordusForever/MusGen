@@ -9,6 +9,18 @@ namespace Library
 {
 	public static class UserAsker
 	{
+		public static string AskFile(string ext)
+		{
+			OpenFileDialog dialog = new OpenFileDialog();
+			dialog.Filter = $".{ext} files | *.{ext}";
+			dialog.Title = $"Please select {ext} file";
+			bool? success = dialog.ShowDialog();
+			if (success == true)
+				return dialog.FileName;
+			else
+				return "";
+		}
+
 		public static bool Ask(string q)
 		{
 			return MessageBox.Show(q, "Hey", MessageBoxButton.YesNo) == MessageBoxResult.Yes;

@@ -15,6 +15,23 @@ namespace Library
 {
 	public static class Graphics2
 	{
+		public static BitmapImage ToBitmapImage(this WriteableBitmap wbm)
+		{
+			BitmapImage bmImage = new BitmapImage();
+			using (MemoryStream stream = new MemoryStream())
+			{
+				PngBitmapEncoder encoder = new PngBitmapEncoder();
+				encoder.Frames.Add(BitmapFrame.Create(wbm));
+				encoder.Save(stream);
+				bmImage.BeginInit();
+				bmImage.CacheOption = BitmapCacheOption.OnLoad;
+				bmImage.StreamSource = stream;
+				bmImage.EndInit();
+				bmImage.Freeze();
+			}
+			return bmImage;
+		}
+
 		public static IEnumerable<Clr0> GetColorGradient(Clr0 from, Clr0 to, int totalNumberOfColors)
 		{
 			if (totalNumberOfColors < 2)
@@ -110,18 +127,28 @@ namespace Library
 			int bytesPerPixel = (bitmap.Format.BitsPerPixel + 7) / 8;
 			byte[] colorBytes = { color.B, color.G, color.R, color.A };
 			int stride = bitmap.BackBufferStride;
-			IntPtr buffer = bitmap.BackBuffer + rect.Y * stride + rect.X * bytesPerPixel;
+			IntPtr buffer = bitmap.BackBuffer;
 
 			bitmap.Lock();
+
+			// Начало строки в памяти
+			IntPtr rowStart = buffer + rect.Y * stride + rect.X * bytesPerPixel;
+
 			for (int y = 0; y < rect.Height; y++)
 			{
-				Marshal.Copy(colorBytes, 0, buffer, colorBytes.Length);
-				buffer += stride;
+				// Копирование цвета в текущую строку
+				for (int x = 0; x < rect.Width; x++)
+				{
+					Marshal.Copy(colorBytes, 0, rowStart + x * bytesPerPixel, colorBytes.Length);
+				}
+
+				// Переход к следующей строке
+				rowStart += stride;
 			}
 
 			bitmap.AddDirtyRect(rect);
 			bitmap.Unlock();
-		} //Check me
+		}
 
 		public static void SaveJPG100(this WriteableBitmap bitmap, string fileName)
 		{

@@ -163,9 +163,7 @@ namespace MusGen
 		}
 
 		public void SaveTo(string path)
-		{
-			//sampleRate;
-
+		{		
 			using (FileStream f = new FileStream(path, FileMode.Create))
 			{
 				f.Write(Math2.StringToByteArray("RIFF")); //RIFF
@@ -183,16 +181,27 @@ namespace MusGen
 				f.Write(Math2.StringToByteArray("data"));
 				f.Write(BitConverter.GetBytes(L.Length * bitDepth * channels));
 
-				for (int i = 0; i < L.Length; i++)
-				{
-					WriteSample(L[i]);
-					if (channels == 2)
-						WriteSample(R[i]);
+				ProgressShower.ShowProgress("Saving wav...");
 
-					void WriteSample(float v)
+				for (int s = 0; s < L.Length; s++)
+				{
+					WriteSample(L[s]);
+					if (channels == 2)
+						WriteSample(R[s]);
+
+					if (s % 5000 == 0) //
+						ProgressShower.SetProgress(1.0 * s / L.Length);
+				}
+
+				ProgressShower.CloseProgressForm();
+
+				void WriteSample(float v)
+				{
+					v = MathF.Min(0.99f, v);
+					v = MathF.Max(-0.99f, v);
+
+					try
 					{
-						//try
-						//{
 						if (bitDepth == 16)
 						{
 							short a = Convert.ToInt16(Math.Floor(v * Math.Pow(2, bitDepth - 1)));
@@ -208,10 +217,9 @@ namespace MusGen
 							long a = Convert.ToInt64(Math.Floor(v * Math.Pow(2, bitDepth - 1)));
 							f.Write(BitConverter.GetBytes(a));
 						}
-						//}
-						//catch (System.OverflowException ex)
-						//{ 
-						//}					
+					}
+					catch (System.OverflowException ex)
+					{
 					}
 				}
 			}

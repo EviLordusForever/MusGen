@@ -8,7 +8,7 @@ namespace Library
 {
 	public static class Array2
 	{
-		public static float[] RescaleArrayToLog2(float[] array)
+		public static float[] RescaleArrayToLog2Fake(float[] array)
 		{
 			//changes array to logarithmic scale with intepolation
 			//scale of array will remain exactly the same
@@ -41,7 +41,7 @@ namespace Library
 			return newArray;
 		}
 
-		public static int[] RescaleIndexesToLog2(int[] indexes, int arraySize)
+		public static int[] RescaleIndexesToLog2Fake(int[] indexes, int arraySize)
 		{
 			//changes indexes of linear array
 			//to indexes of array rescaled to logarithic scale by base 2
@@ -53,6 +53,53 @@ namespace Library
 
 			return indexes;
 		}
+
+		public static float[] RescaleArrayToLog(float[] array, float base_)
+		{
+			int indexA = 0;
+			int indexB = 0;
+			float size = array.Count();
+
+			float[] newArray = new float[(int)size];
+
+			for (int x = 0; x < size; x++)
+			{
+				float index = MathF.Pow(base_, x / size - 1) * size;
+
+				indexB = (int)MathF.Floor(index);
+				if (indexB + 1 >= size)
+				{
+					newArray[x] = array[indexB];
+				}
+				else if (indexB - indexA < 1) //improve?
+				{
+					float power = index - indexB;
+					newArray[x] = array[indexB] * (1 - power) + array[indexB + 1] * power;
+				}
+				else
+				{
+					indexA++;
+
+					for (int i = indexA; i <= indexB; i++)
+						newArray[x] += array[i];
+					newArray[x] /= indexB - indexA + 1;
+				}
+				indexA = indexB;			
+			}
+
+			return newArray;
+		}
+
+		public static int[] RescaleIndexesToLog(int[] indexes, int arraySize)
+		{
+			float L = arraySize;
+
+			for (int x = 0; x < indexes.Length; x++)
+				indexes[x] = (int)(Math2.ToLogScale(indexes[x] / L, L) * L);
+
+			return indexes;
+		}
+
 
 		public static T[] SubArray<T>(this T[] array, int offset, int length)
 		{
