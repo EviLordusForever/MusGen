@@ -4,9 +4,9 @@ using System.Threading;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
 
-namespace Library
+namespace Extensions
 {
-	public class Mouse2
+	public class MouseE
 	{
 		[DllImport("user32.dll")]
 		[return: MarshalAs(UnmanagedType.Bool)]

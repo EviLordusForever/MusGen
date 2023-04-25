@@ -1,5 +1,5 @@
 ﻿using System;
-using Library;
+using Extensions;
 
 namespace MusGen
 {
@@ -24,7 +24,7 @@ namespace MusGen
 		public override void FindBPGradient(int test, float[] innerBPGradients, float[][] innerWeights)
 		{
 			for (int n = 0; n < _perceptrons.Length; n++)
-				_perceptrons[n].FindBPGradient(test, innerBPGradients, Array2.SubArray(innerWeights, n * _perceptrons[0]._nodes.Length, _perceptrons[0]._nodes.Length));
+				_perceptrons[n].FindBPGradient(test, innerBPGradients, ArrayE.SubArray(innerWeights, n * _perceptrons[0]._nodes.Length, _perceptrons[0]._nodes.Length));
 		}
 
 		public override void Dropout()
@@ -76,7 +76,7 @@ namespace MusGen
 				float[][] weights = _perceptrons[0].AllWeights;
 
 				for (int p = 1; p < _perceptrons.Length; p++)
-					weights = Array2.Concatenate(weights, _perceptrons[p].AllWeights);
+					weights = ArrayE.Concatenate(weights, _perceptrons[p].AllWeights);
 
 				return weights;
 				//TEST THIS !!!!!
@@ -88,7 +88,7 @@ namespace MusGen
 			float[] gradients = _perceptrons[0].AllBPGradients(test);
 
 			for (int p = 1; p < _perceptrons.Length; p++)
-				gradients = Array2.Concatenate(gradients, _perceptrons[p].AllBPGradients(test));
+				gradients = ArrayE.Concatenate(gradients, _perceptrons[p].AllBPGradients(test));
 
 			return gradients;
 			//And this

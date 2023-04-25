@@ -12,7 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Library;
+using Extensions;
 
 namespace MusGen
 {
@@ -24,7 +24,7 @@ namespace MusGen
 		public MainWindow()
 		{
 			InitializeComponent();
-			BitmapImage ii = new BitmapImage(new Uri($"{Disk2._programFiles}//Images//img2.png"));
+			BitmapImage ii = new BitmapImage(new Uri($"{DiskE._programFiles}//Images//img2.png"));
 			image.Source = ii;
 			WindowsManager._mainWindow = this;
 		}

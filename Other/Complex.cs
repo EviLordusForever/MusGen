@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Library
+namespace Extensions
 {
 	public class Complex
 	{

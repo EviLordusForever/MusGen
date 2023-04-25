@@ -11,9 +11,9 @@ using Clr0 = System.Drawing.Color;
 using Clr = System.Windows.Media.Color;
 using System.Runtime.InteropServices;
 
-namespace Library
+namespace Extensions
 {
-	public static class Graphics2
+	public static class GraphicsE
 	{
 		public static BitmapImage ToBitmapImage(this WriteableBitmap wbm)
 		{
@@ -77,7 +77,7 @@ namespace Library
 			yield return to;
 		}
 
-		public static IEnumerable<Clr> GetColorGradientM(Clr from, Clr to, int totalNumberOfColors)
+		public static IEnumerable<Clr> GetColorGradient(Clr from, Clr to, int totalNumberOfColors)
 		{
 			if (totalNumberOfColors < 2)
 			{
@@ -131,18 +131,13 @@ namespace Library
 
 			bitmap.Lock();
 
-			// Начало строки в памяти
 			IntPtr rowStart = buffer + rect.Y * stride + rect.X * bytesPerPixel;
 
 			for (int y = 0; y < rect.Height; y++)
 			{
-				// Копирование цвета в текущую строку
 				for (int x = 0; x < rect.Width; x++)
-				{
 					Marshal.Copy(colorBytes, 0, rowStart + x * bytesPerPixel, colorBytes.Length);
-				}
 
-				// Переход к следующей строке
 				rowStart += stride;
 			}
 
@@ -189,12 +184,12 @@ namespace Library
 		public static WriteableBitmap RescaleBitmap(WriteableBitmap bitmap, int width, int height)
 		{
 			WriteableBitmap resizedBitmap = new WriteableBitmap(width, height, bitmap.DpiX, bitmap.DpiY, bitmap.Format, null);
-			//resizedBitmap.Lock();
+			resizedBitmap.Lock();
 
 			bitmap.CopyPixels(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight), resizedBitmap.BackBuffer, resizedBitmap.BackBufferStride * resizedBitmap.PixelHeight, resizedBitmap.BackBufferStride);
 			resizedBitmap.WritePixels(new Int32Rect(0, 0, width, height), resizedBitmap.BackBuffer, resizedBitmap.BackBufferStride * height, resizedBitmap.BackBufferStride);
 
-			//resizedBitmap.Unlock();
+			resizedBitmap.Unlock();
 			return resizedBitmap;
 		}   //Check me
 
@@ -256,62 +251,14 @@ namespace Library
 				{
 					int pixelOffset = rowOffset + x * bytesPerPixel;
 
-					// Получаем значения компонент цвета
-					byte b = pixelData[pixelOffset];
-					byte g = pixelData[pixelOffset + 1];
-					byte r = pixelData[pixelOffset + 2];
-
-					// Инвертируем значения компонент цвета
-					pixelData[pixelOffset] = (byte)(255 - b);
-					pixelData[pixelOffset + 1] = (byte)(255 - g);
-					pixelData[pixelOffset + 2] = (byte)(255 - r);
+					pixelData[pixelOffset] = (byte)(255 - pixelData[pixelOffset]);
+					pixelData[pixelOffset + 1] = (byte)(255 - pixelData[pixelOffset + 1]);
+					pixelData[pixelOffset + 2] = (byte)(255 - pixelData[pixelOffset + 2]);
 				}
 			}
 
 			bitmap.WritePixels(new Int32Rect(0, 0, width, height), pixelData, stride, 0);
 			return bitmap;
 		}
-
-		/*		public static Bitmap TakeScreen2()
-				{
-					int w = Screen.PrimaryScreen.Bounds.Width;
-					int h = Screen.PrimaryScreen.Bounds.Height;
-					Bitmap bmp = new Bitmap(w, h);
-					Graphics gr = Graphics.FromImage(bmp);
-					gr.CopyFromScreen(0, 0, 0, 0, new Size(w, h));
-					return bmp;
-				}*/ //FIX
-
-		/*		public static Bitmap TakeScreen()
-				{
-					Bitmap bmp = new Bitmap(1, 1);
-					SendKeys.SendWait("%{PRTSC}");
-					Thread thread = new Thread(() =>
-					{
-						while (true)
-						{
-							while (!Clipboard.ContainsImage())
-							{
-								Thread.Sleep(10);
-								SendKeys.SendWait("%{PRTSC}");
-							}
-							try
-							{
-								bmp = new Bitmap(Clipboard.GetImage());
-								return;
-							}
-							catch (Exception ex)
-							{
-								continue;
-							}
-						}
-					});
-					thread.SetApartmentState(ApartmentState.STA); //Set the thread to STA
-					thread.Start();
-					thread.Join();
-
-					return bmp;
-				}*/ //FIX
-
 	}
 }

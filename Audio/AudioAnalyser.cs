@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MusGen.Voice.Models;
 using System.Threading;
-using Library;
+using Extensions;
 using System.Windows.Media.Imaging;
 using System.Drawing;
 using static MusGen.HardwareParams;
@@ -167,7 +167,7 @@ namespace MusGen
 			{
 				Startup(originPath, outName2);
 
-				if (UserAsker.Ask($"Name: {_outName}\nWave type: {waveForm}\nRecreation channels: {channels}\nFade time: {fadeTime}\nFFT size: {FFTsize}\nFFT per second: {FFTPerSecond}\nTrash size: {trashSize}\nLow frq smoothing size X: {lfsX}\nLow frq smoothing size Y: {lfsY}\nAmplitude threshold: {amplitudeThreshold}\nPoints connecting X: {pointsConnectingX}\nPoints connecting Y: {pointsConnectingY}\nDraw graph: {drawSpectrum}\nSamples: {lastSample}\nSample rate: {sampleRate}\nSeconds: {(int)(lastSample / sampleRate)}"))
+				if (DialogE.Ask($"Name: {_outName}\nWave type: {waveForm}\nRecreation channels: {channels}\nFade time: {fadeTime}\nFFT size: {FFTsize}\nFFT per second: {FFTPerSecond}\nTrash size: {trashSize}\nLow frq smoothing size X: {lfsX}\nLow frq smoothing size Y: {lfsY}\nAmplitude threshold: {amplitudeThreshold}\nPoints connecting X: {pointsConnectingX}\nPoints connecting Y: {pointsConnectingY}\nDraw graph: {drawSpectrum}\nSamples: {lastSample}\nSample rate: {sampleRate}\nSeconds: {(int)(lastSample / sampleRate)}"))
 					return;
 
 				FindAmplitudeMaxForWholeTrack();
@@ -257,8 +257,8 @@ namespace MusGen
 
 				void SaveGraph(string name)
 				{
-					string path = $"{Disk2._programFiles}Grafics\\g\\g_{name}.jpg";
-					Graphics2.SaveJPG100(wbmp, path);
+					string path = $"{DiskE._programFiles}Grafics\\g\\g_{name}.jpg";
+					GraphicsE.SaveJPG100(wbmp, path);
 				}
 
 				void Normalize()
@@ -337,7 +337,7 @@ namespace MusGen
 				var stopwatch = new Stopwatch();
 				stopwatch.Start();
 
-				AudioCapture.Start(sampleRate, 16, 1);
+				AudioCapturer.Start(sampleRate, 16, 1);
 
 				Wav wav = new Wav();
 				wav.sampleRate = sampleRate;
@@ -348,7 +348,7 @@ namespace MusGen
 					FPS();
 					Olds();
 
-					wav.L = AudioCapture.GetSamples(FFTsize);
+					wav.L = AudioCapturer.GetSamples(FFTsize);
 
 					FrequencyFinder.ByFFT(ref frqsNew, ref ampsNew, wav, 0, FFTsize, trashSize);
 					AdaptiveCeiling();
@@ -484,7 +484,7 @@ namespace MusGen
 					fix[index] = a * b;
 				}
 
-				float[] frqsLg = Array2.RescaleArrayToLog(fix, FFTsize, graphResX);
+				float[] frqsLg = ArrayE.RescaleArrayToLog(fix, FFTsize, graphResX);
 				wbmp = SpectrumDrawer.DrawType1(frqsLg, idxsLg, ampsNew, adaptiveCeiling, FrequencyFinder.amplitudeMaxWholeTrack);
 			}
 			else if (graphType == 2)
@@ -499,11 +499,11 @@ namespace MusGen
 			{
 				ampsLgOld[c] = ampsLg[c];
 				ampsLg[c] = ampsNew[c];
-				ampsLg[c] = Math2.ToLogScale(ampsLg[c], 10);
+				ampsLg[c] = MathE.ToLogScale(ampsLg[c], 10);
 			}
 
 			idxsLgOld = idxsLg;
-			idxsLg = Array2.RescaleIndexesToLog(FrequencyFinder.leadIndexes, graphResX);
+			idxsLg = ArrayE.RescaleIndexesToLog(FrequencyFinder.leadIndexes, graphResX);
 		}
 
 		public static double F(double t)

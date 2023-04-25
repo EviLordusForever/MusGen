@@ -10,11 +10,13 @@ using Melanchall.DryWetMidi.Core;
 
 namespace MusGen
 {
-	public static class MidiManager
+	public class Midi
 	{
-		public static MidiFile Read(string path)
+		public MidiFile _midiFile;
+
+		public void Read(string path)
 		{
-			return MidiFile.Read(path);
+			_midiFile = MidiFile.Read(path);
 		}
 	}
 }

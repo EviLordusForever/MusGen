@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media.Imaging;
 using System.Drawing;
-using Library;
+using Extensions;
 using Clr = System.Windows.Media.Color;
 using static MusGen.HardwareParams;
 
@@ -37,7 +37,7 @@ namespace MusGen
 
 			void FillBlack()
 			{
-				Graphics2.FillRectangle(wbmpL1, Clr.FromRgb(0, 0, 0), new System.Windows.Int32Rect(0, 0, resX, yHalf + 1));
+				GraphicsE.FillRectangle(wbmpL1, Clr.FromRgb(0, 0, 0), new System.Windows.Int32Rect(0, 0, resX, yHalf + 1));
 			}
 
 			void DrawVerticalLines()
@@ -50,7 +50,7 @@ namespace MusGen
 					int x = Convert.ToInt32(verticalLines[i] * xScale);
 					int y = Convert.ToInt32(theirSizes[i] * yScale);
 
-					Clr clr = Graphics2.RainbowM(i * 1f / verticalLines.Length);
+					Clr clr = GraphicsE.RainbowM(i * 1f / verticalLines.Length);
 					int w = (int)((10f / 1920f) * resX);
 
 					wbmpL1.DrawLineAa(x, yHalf - y, x, yHalf, clr, w);
@@ -110,7 +110,7 @@ namespace MusGen
 
 			void FillBlack()
 			{
-				Graphics2.FillRectangle(wbmpL1, Clr.FromRgb(0, 0, 0), new System.Windows.Int32Rect(0, 0, resX, yHalf + 1));
+				GraphicsE.FillRectangle(wbmpL1, Clr.FromRgb(0, 0, 0), new System.Windows.Int32Rect(0, 0, resX, yHalf + 1));
 			}
 
 			void DrawPartDown()
@@ -149,7 +149,7 @@ namespace MusGen
 					int x = Convert.ToInt32(verticalLines[i] * xScale);
 					int y = Convert.ToInt32(power0_1 * yScaleUp * 0.95);
 
-					Clr clr = Graphics2.RainbowM(i * 1f / verticalLines.Length);
+					Clr clr = GraphicsE.RainbowM(i * 1f / verticalLines.Length);
 
 					wbmpL1.DrawLineAa(x, yHalf / 2 - y, x, yHalf / 2 + y, clr, penWidth);
 				}
@@ -191,7 +191,7 @@ namespace MusGen
 					int x = Convert.ToInt32(verticalLines[i] * xScale);
 
 					float power0_1 = theirSizes[i];
-					power0_1 = Math2.ToLogScale(power0_1, 10);
+					power0_1 = MathE.ToLogScale(power0_1, 10);
 					float power0_255 = 255 * MathF.Sqrt(power0_1 * yScaleDown);
 					byte power = Math.Min((byte)power0_255, (byte)255);
 					Clr clr = Clr.FromArgb(255, power, power, power);
@@ -210,14 +210,14 @@ namespace MusGen
 						continue;
 
 					float power0_1 = theirSizes[i];
-					power0_1 = Math2.ToLogScale(power0_1, 10);
+					power0_1 = MathE.ToLogScale(power0_1, 10);
 					float power0_255 = 255 * power0_1;
 					byte power = (byte)Math.Min(power0_255, 255);
 
 					int x = Convert.ToInt32(verticalLines[i] * xScale);
 					int y = yHalf - penWidth - Convert.ToInt32(power0_1 * yScaleUp * 0.95);
 
-					Clr clr = Graphics2.RainbowM(i * 1f / verticalLines.Length);
+					Clr clr = GraphicsE.RainbowM(i * 1f / verticalLines.Length);
 
 					wbmpL1.DrawLineAa(oldXs[i], oldYs[i], x, y, clr, penWidth);
 
@@ -287,7 +287,7 @@ namespace MusGen
 			gradient = new List<Clr>();
 
 			for (int i = 0; i < sizes.Length; i++)
-				gradient.AddRange(Graphics2.GetColorGradientM(clrs[i], clrs[i + 1], sizes[i]));
+				gradient.AddRange(GraphicsE.GetColorGradient(clrs[i], clrs[i + 1], sizes[i]));
 		}
 	}
 }

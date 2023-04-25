@@ -1,6 +1,6 @@
 ﻿using System;
 using Newtonsoft.Json;
-using Library;
+using Extensions;
 
 namespace MusGen
 {
@@ -50,14 +50,14 @@ namespace MusGen
 			//How better to dropout megatron??
 			if (_dropoutProbability > 0)
 				for (int i = 0; i < _dropoutLayer.Length; i++)
-					_dropoutLayer[i] = Math2.rnd.NextSingle() <= _dropoutProbability;
+					_dropoutLayer[i] = MathE.rnd.NextSingle() <= _dropoutProbability;
 		}
 
 		public override void FindBPGradient(int test, float[] innerBPGradients, float[][] innerWeights)
 		{
 			int gradientsPerSubCount = innerBPGradients.Length / _subs.Length;
 			for (int sub = 0; sub < _subs.Length; sub++)
-				FindBPGradientOneSub(test, sub, Array2.SubArray(innerBPGradients, sub * gradientsPerSubCount, gradientsPerSubCount), Array2.SubArray(innerWeights, sub * _outsPerSubCount, _outsPerSubCount));
+				FindBPGradientOneSub(test, sub, ArrayE.SubArray(innerBPGradients, sub * gradientsPerSubCount, gradientsPerSubCount), ArrayE.SubArray(innerWeights, sub * _outsPerSubCount, _outsPerSubCount));
 		}
 
 		private void FindBPGradientOneSub(int test, int sub, float[] innerBPGradients, float[][] innerWeights)

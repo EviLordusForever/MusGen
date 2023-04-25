@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using static MusGen.Logger;
 using static MusGen.HardwareParams;
-using Library;
+using Extensions;
 
 namespace MusGen
 {
@@ -150,7 +150,7 @@ namespace MusGen
 		public static void CalculateRandomnesses()
 		{
 			for (int section = 0; section < _sections.Count; section++)
-				_randomnesses[section] = Math2.CalculateRandomness(_wins[section], _tests[section]);
+				_randomnesses[section] = MathE.Randomness(_wins[section], _tests[section]);
 		}
 
 		public static void ClearStat()
@@ -194,11 +194,11 @@ namespace MusGen
 		public static void FindDetailedSectionsStatistics(Tester tester, string name)
 		{
 			string csv = GetDetailedStatisticsCsv(_predictions, tester, -1, 1, 0.001f, false);
-			Disk2.WriteToProgramFiles($"Detailed Sections Statistics ({name}) (Both sides)", "csv", csv, false);
+			DiskE.WriteToProgramFiles($"Detailed Sections Statistics ({name}) (Both sides)", "csv", csv, false);
 			Log($"Detatiled sections statistics created ({name}) (Both sides)");
 
 			csv = GetDetailedStatisticsCsv(_predictions, tester, 0, 1, 0.001f, true);
-			Disk2.WriteToProgramFiles($"Detailed Sections Statistics ({name}) (Single Side)", "csv", csv, false);
+			DiskE.WriteToProgramFiles($"Detailed Sections Statistics ({name}) (Single Side)", "csv", csv, false);
 			Log($"Detatiled sections statistics created ({name}) (Single side)");			
 		}
 
@@ -223,7 +223,7 @@ namespace MusGen
 						CheckWin(test);
 
 				if (predictionsCount > 0)
-					csv += $"cutter:,{cutter},{wins},/,{predictionsCount},=,WINRATE:,{wins / predictionsCount},count,{predictionsCount / tester._testsCount},randomness,{Math2.CalculateRandomness(wins, (int)predictionsCount, 0.5f)}\n";
+					csv += $"cutter:,{cutter},{wins},/,{predictionsCount},=,WINRATE:,{wins / predictionsCount},count,{predictionsCount / tester._testsCount},randomness,{MathE.Randomness(wins, (int)predictionsCount, 0.5f)}\n";
 			}
 			return csv;
 

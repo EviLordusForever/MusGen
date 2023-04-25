@@ -1,11 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Library
+namespace Extensions
 {
-	public static class Text2
+	public static class TextE
 	{
-		public static string[] StringSuperSplit(string str, string after, string before)
+		public static string[] SplitPro(string str, string separator)
+		{
+			//Like ususal spit, but with string separators
+
+			return str.Split(str.Replace(separator, "~"));
+		}
+
+		public static string[] SuperSplit(string str, string after, string before)
 		{
 			//blablabla(this)blabla(this)bla(this)blablabla
 			string res = "";
@@ -23,7 +30,7 @@ namespace Library
 			return res.Split('~');
 		}
 
-		public static string[] StringUltraSuperSplit(string str, string opener, string closer, int maximumSymbols)
+		public static string[] UltraSplit(string str, string opener, string closer, int maximumSymbols)
 		{
 			//ffffffff {tttt{ttt{tt}tt{tt}tt}t} ffff {tt} ff {tt}
 
@@ -71,7 +78,46 @@ namespace Library
 			return res.Remove(res.Length - 1).Split('~');
 		}
 
-		public static string BeforeClosing(string str, char opener, char closer)
+		public static string[] OmegaSplit(string str, params char[] cs)
+		{
+			//Like usual split, but it is not deleting original separatos
+			//And more separators
+			for (int i = 0; i < str.Length; i++)
+			{
+				foreach (char c in cs)
+				{
+					if (str[i] == c)
+					{
+						str = str.Insert(i, "~");
+						i++;
+						break;
+					}
+				}
+			}
+
+			return str.Split('~');
+		}
+
+		public static List<string> SplitReverse(string str, char c, int count)
+		{
+			List<string> res = new List<string>(0);
+
+			for (int i = 0; i < count; i++)
+			{
+				if (!str.Contains(c))
+				{
+					res.Add(str);
+					break;
+				}
+
+				res.Add(TextE.StringAfterLast(str, c.ToString()));
+				str = TextE.StringBeforeLast(str, c.ToString());
+			}
+
+			return res;
+		}
+
+		public static string BeforeLastCloser(string str, char opener, char closer)
 		{
 			int level = 1;
 			int i = 0;
@@ -193,7 +239,7 @@ namespace Library
 			return (str.Length - str.Replace(str0, "").Length) / str0.Length;
 		}
 
-		public static int CharsCount(string str, char c)
+		public static int SymbolsCount(string str, char c)
 		{
 			int count = 0;
 
@@ -204,26 +250,7 @@ namespace Library
 			return count;
 		}
 
-		public static List<string> StringSplitLast(string str, char c, int count)
-		{
-			List<string> res = new List<string>(0);
-
-			for (int i = 0; i < count; i++)
-			{
-				if (!str.Contains(c))
-				{
-					res.Add(str);
-					break;
-				}
-
-				res.Add(Text2.StringAfterLast(str, c.ToString()));
-				str = Text2.StringBeforeLast(str, c.ToString());
-			}
-
-			return res;
-		}
-
-		public static string ModifyStringAsList(string str)
+		public static string ModifyAsList(string str)
 		{
 			//Deleting double enters, spaces, tabs,
 			//empty strings,
@@ -257,7 +284,7 @@ namespace Library
 			return str;
 		}
 
-		public static string ToPositiveIntegerNumberOrZero(string str)
+		public static string ToPositiveIntegerOrZero(string str)
 		{
 			for (int i = str.Length - 1; i >= 0; i--)
 				if (!IsNumber(str[i]))
@@ -269,7 +296,7 @@ namespace Library
 			return str;
 		}
 
-		public static string ToIntegerNumber(string str)
+		public static string ToInteger(string str)
 		{
 			if (str.Length > 0)
 			{
@@ -285,33 +312,6 @@ namespace Library
 			}
 
 			return str;
-		}
-
-		public static string[] ProSplit(string str, string separator)
-		{
-			//Like ususal spit, but with string separators
-
-			return str.Split(str.Replace(separator, "~"));
-		}
-
-		public static string[] OmegaSplit(string str, params char[] cs)
-		{
-			//Like usual split, but it is not deleting separatos
-			//And more separators
-			for (int i = 0; i < str.Length; i++)
-			{
-				foreach (char c in cs)
-				{
-					if (str[i] == c)
-					{
-						str = str.Insert(i, "~");
-						i++;
-						break;
-					}
-				}
-			}
-
-			return str.Split('~');
 		}
 
 		public static string ToClearUrl(string str)

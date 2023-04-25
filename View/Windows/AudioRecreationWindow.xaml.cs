@@ -15,7 +15,7 @@ using Microsoft.Win32;
 using System.Threading;
 using System.Runtime.CompilerServices;
 using System.ComponentModel;
-using Library;
+using Extensions;
 
 namespace MusGen.View.Windows
 {
@@ -48,7 +48,7 @@ namespace MusGen.View.Windows
 				if (isGood)
 				{
 					SelBtn.Content = name;
-					outNameTb.Text = Text2.StringBeforeLast(name, ".wav");
+					outNameTb.Text = TextE.StringBeforeLast(name, ".wav");
 				}
 				else
 				{

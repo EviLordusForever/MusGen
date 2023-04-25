@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MusGen.Voice.Models;
 using System.Threading;
-using Library;
+using Extensions;
 
 namespace MusGen
 {
@@ -13,8 +13,6 @@ namespace MusGen
 	{
 		public static Wav wavIn;
 		public static Wav wavOut;
-		public static string waveForm = "sin";
-		public static float adaptiveCeiling = 3;
 
 		public static void Startup(string originPath)
 		{
@@ -42,11 +40,6 @@ namespace MusGen
 				wavOut.R = new float[Math.Min(limitSec * wavIn.sampleRate, wavIn.R.Length)];
 		}
 
-		public static void Export(string name)
-		{
-			wavOut.Export(name);
-		}
-
 		public static void EffectPanWaving(string originPath, string outName)
 		{
 			Startup(originPath);
@@ -65,7 +58,7 @@ namespace MusGen
 				t += Math.Sin(i / 8080.0) + 1;
 			}
 
-			Export(outName);
+			wavOut.Export(outName);
 		}
 
 		public static void EffectSqrt(string originPath, string outName)
@@ -84,27 +77,7 @@ namespace MusGen
 				else
 					wavOut.R[i] = -(float)Math.Pow(-wavIn.R[(int)i], 0.5);
 
-			Export(outName);
-		}
-
-		public static double F(double t)
-		{
-			if (waveForm == "sin")
-				return Math.Sin(t);
-			else if (waveForm == "sqaure")
-				return Math.Sign(Math.Sin(t));
-			else
-				return Math.Sin(t);
-		}
-
-		public static float F(float t)
-		{
-			if (waveForm == "sin")
-				return MathF.Sin(t);
-			else if (waveForm == "sqaure")
-				return MathF.Sign(MathF.Sin(t));
-			else
-				return MathF.Sin(t);
+			wavOut.Export(outName);
 		}
 	}
 }

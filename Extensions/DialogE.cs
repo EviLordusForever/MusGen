@@ -5,9 +5,9 @@ using System.Runtime.InteropServices;
 using Microsoft.Win32;
 using WPFFolderBrowser;
 
-namespace Library
+namespace Extensions
 {
-	public static class UserAsker
+	public static class DialogE
 	{
 		public static string AskFile(string ext)
 		{

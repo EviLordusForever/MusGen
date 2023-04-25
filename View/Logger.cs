@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Threading;
 using System.IO;
-using Library;
+using Extensions;
 using System.Windows.Media;
 using System.Windows.Documents;
 
@@ -281,7 +281,7 @@ namespace MusGen
 				_logDocument.PageWidth = 2048;
 			});		
 
-			_writer = new StreamWriter($"{Disk2._programFiles}Logs\\log.log", true);
+			_writer = new StreamWriter($"{DiskE._programFiles}Logs\\log.log", true);
 			StartFlusher();
 			StartVisualiser();
 		}

@@ -5,7 +5,7 @@ using System.Threading;
 using Newtonsoft.Json;
 using static MusGen.Logger;
 using static MusGen.HardwareParams;
-using Library;
+using Extensions;
 
 namespace MusGen
 {
@@ -44,7 +44,7 @@ namespace MusGen
 
 		public static void Save(NN nn)
 		{
-			string path = Directory.GetFiles(Disk2._programFiles + "\\NN")[0];
+			string path = Directory.GetFiles(DiskE._programFiles + "\\NN")[0];
 			Save(nn, path);
 		}
 
@@ -59,7 +59,7 @@ namespace MusGen
 
 		public static NN Load()
 		{
-			var files = Directory.GetFiles(Disk2._programFiles + "\\NN");
+			var files = Directory.GetFiles(DiskE._programFiles + "\\NN");
 
 			string json = File.ReadAllText(files[0]);
 
@@ -70,7 +70,7 @@ namespace MusGen
 			Log("Neural Network loaded from disk!");
 
 			NN nn = JsonConvert.DeserializeObject<NN>(json, jss);
-			nn._name = Text2.StringInsideLast(files[0], "\\", ".json");
+			nn._name = TextE.StringInsideLast(files[0], "\\", ".json");
 			nn.Init();
 			return nn;
 		}
@@ -86,7 +86,7 @@ namespace MusGen
 			Log("Neural Network loaded from disk!");
 
 			NN nn = JsonConvert.DeserializeObject<NN>(json, jss);
-			nn._name = Text2.StringInsideLast(path, "\\", ".json");
+			nn._name = TextE.StringInsideLast(path, "\\", ".json");
 			nn.Init();
 			return nn;
 		}
@@ -208,12 +208,12 @@ namespace MusGen
 				if (localGeneration % _statisticsRecalculatePeriod == _statisticsRecalculatePeriod - 1)
 				{
 					string validation = Statistics.CalculateStatistics(this, _testerV);
-					Disk2.WriteToProgramFiles("Stat", "csv", Statistics.StatToCsv("Validation") + "\n", true);
-					Disk2.WriteToProgramFiles("FittingHistory (Version for speedup)", "csv", $"{Statistics._loss},", true);
+					DiskE.WriteToProgramFiles("Stat", "csv", Statistics.StatToCsv("Validation") + "\n", true);
+					DiskE.WriteToProgramFiles("FittingHistory (Version for speedup)", "csv", $"{Statistics._loss},", true);
 
 					string training = Statistics.CalculateStatistics(this, _testerT);
-					Disk2.WriteToProgramFiles("Stat", "csv", Statistics.StatToCsv("Training"), true);
-					Disk2.WriteToProgramFiles("FittingHistory (Version for speedup)", "csv", $"{Statistics._loss}\n", true);
+					DiskE.WriteToProgramFiles("Stat", "csv", Statistics.StatToCsv("Training"), true);
+					DiskE.WriteToProgramFiles("FittingHistory (Version for speedup)", "csv", $"{Statistics._loss}\n", true);
 
 					Log("Training dataset:\n" + training);
 					Log("Validation dataset:\n" + validation);
@@ -232,9 +232,9 @@ namespace MusGen
 				if (vLoss < vLossRecord)
 				{
 					vLossRecord = vLoss;
-					var path = Directory.GetFiles(Disk2._programFiles + "\\NN")[0];
-					Disk2.ClearDirectory($"{Disk2._programFiles}\\NN\\EarlyStopping");
-					File.Copy(path, $"{Disk2._programFiles}\\NN\\EarlyStopping\\{_name} ({vLoss}).json");
+					var path = Directory.GetFiles(DiskE._programFiles + "\\NN")[0];
+					DiskE.ClearDirectory($"{DiskE._programFiles}\\NN\\EarlyStopping");
+					File.Copy(path, $"{DiskE._programFiles}\\NN\\EarlyStopping\\{_name} ({vLoss}).json");
 					Log(" ▲ NN copied for early stopping.");
 				}
 			}
@@ -259,15 +259,15 @@ namespace MusGen
 
 			void SaveFittingHistory()
 			{
-				Disk2.WriteToProgramFiles("FittingHistory", "csv", $"{tLoss}, {vLoss}\r\n", true);
+				DiskE.WriteToProgramFiles("FittingHistory", "csv", $"{tLoss}, {vLoss}\r\n", true);
 			}
 
 			float GetVLossRecord()
 			{
-				string[] files = Directory.GetFiles(Disk2._programFiles + "NN\\EarlyStopping");
+				string[] files = Directory.GetFiles(DiskE._programFiles + "NN\\EarlyStopping");
 				if (files.Length > 0)
 				{
-					string record = Text2.StringInsideLast(files[0], " (", ").json");
+					string record = TextE.StringInsideLast(files[0], " (", ").json");
 					return Convert.ToSingle(record);
 				}
 				else
@@ -402,7 +402,7 @@ namespace MusGen
 				for (int w = 0; w < (_layers[_layers.Count - 1] as LayerPerceptron)._nodes[0]._weights.Length; w++)
 					str += (_layers[_layers.Count - 1] as LayerPerceptron)._nodes[0]._weights[w] + ",";
 
-				Disk2.WriteToProgramFiles("weights", "csv", str + "\n", true);
+				DiskE.WriteToProgramFiles("weights", "csv", str + "\n", true);
 			}
 		}
 

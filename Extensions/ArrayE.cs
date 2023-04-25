@@ -4,9 +4,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Library
+namespace Extensions
 {
-	public static class Array2
+	public static class ArrayE
 	{
 		public static float[] RescaleArrayToLog(float[] array, float base_, int new_size)
 		{
@@ -49,7 +49,7 @@ namespace Library
 			float L = arraySize;
 
 			for (int x = 0; x < indexes.Length; x++)
-				indexes[x] = (int)(Math2.ToLogScale(indexes[x] / L, L) * L);
+				indexes[x] = (int)(MathE.ToLogScale(indexes[x] / L, L) * L);
 
 			return indexes;
 		}

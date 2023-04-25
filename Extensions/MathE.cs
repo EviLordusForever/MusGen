@@ -3,9 +3,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Library
+namespace Extensions
 {
-	public static class Math2
+	public static class MathE
 	{
 		public static Random rnd = new Random();
 
@@ -86,18 +86,6 @@ namespace Library
 			return max;
 		}
 
-		public static int IndexOfMax(float[] array)
-		{
-			float max = array[0];
-			int id = 0;
-			for (int i = 1; i < array.Length; i++)
-				if (array[i] > max)
-				{
-					id = i;
-				}
-			return id;
-		}
-
 		public static int Max(int[] array)
 		{
 			int max = array[0];
@@ -114,6 +102,19 @@ namespace Library
 				if (array[i] < min)
 					min = array[i];
 			return min;
+		}
+
+		public static int IndexOfMax(float[] array)
+		{
+			float max = array[0];
+			int id = 0;
+			for (int i = 1; i < array.Length; i++)
+				if (array[i] > max)
+				{
+					max = array[i];
+					id = i;
+				}
+			return id;
 		}
 
 		public static void FindMinAndMaxForLastNPoints(List<float> array, ref float currentMin, ref float currentMax, int n)
@@ -150,7 +151,7 @@ namespace Library
 			}
 		}
 
-		public static float FindStandartDeviation(float[] input)
+		public static float StandartDeviation(float[] input)
 		{
 			float standartDeviation = 0;
 			for (int i = 0; i < input.Length; i++)
@@ -160,7 +161,7 @@ namespace Library
 			return standartDeviation;
 		}
 
-		public static double CalculateRandomness(double k, int n)
+		public static double Randomness(double k, int n)
 		{
 			if (k == n / 2.0)
 				return 1;
@@ -169,15 +170,15 @@ namespace Library
 				double randomness;
 
 				if (k <= n / 2.0)
-					randomness = CumulativeDistributionFunction(k, n, 0.5);
+					randomness = CumulativeDistribution(k, n, 0.5);
 				else
-					randomness = CumulativeDistributionFunction(n - k, n, 0.5);
+					randomness = CumulativeDistribution(n - k, n, 0.5);
 
 				return randomness * 2;
 			}
 		}
 
-		public static double CalculateRandomness(double k, int n, double p)
+		public static double Randomness(double k, int n, double p)
 		{
 			if (k == n * p)
 				return 1;
@@ -186,20 +187,20 @@ namespace Library
 				double randomness;
 
 				if (k < n * p)
-					randomness = CumulativeDistributionFunction(k, n, p);
+					randomness = CumulativeDistribution(k, n, p);
 				else
-					randomness = CumulativeDistributionFunction(n - k, n, 1 - p);
+					randomness = CumulativeDistribution(n - k, n, 1 - p);
 
 				return randomness * 2;
 			}
 		}
 
-		public static double CumulativeDistributionFunction(double k, int n, double p)
+		public static double CumulativeDistribution(double k, int n, double p)
 		{
 			var d = new MathNet.Numerics.Distributions.Binomial(p, n);
 			return d.CumulativeDistribution(k);
 		}
 
-		public static bool CheckIfIsNumberic(string value) => int.TryParse(value, out int _);
+		public static bool IsNumeric(string value) => int.TryParse(value, out int _);
 	}
 }

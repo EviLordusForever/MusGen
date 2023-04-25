@@ -1,7 +1,7 @@
 ﻿using System;
-using static Library.Array2;
+using static Extensions.ArrayE;
 
-namespace Library
+namespace Extensions
 {
 	public static class FFT
 	{

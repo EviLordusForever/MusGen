@@ -3,7 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using static MusGen.Logger;
 using Newtonsoft.Json;
-using Library;
+using Extensions;
 
 namespace MusGen
 {
@@ -41,7 +41,7 @@ namespace MusGen
 
 		private void LoadOriginalGraph(string graphFolder, string reason)
 		{
-			var files = Directory.GetFiles(Disk2._programFiles + graphFolder);
+			var files = Directory.GetFiles(DiskE._programFiles + graphFolder);
 			var graphL = new List<float>();
 			_availableGraphPoints = new List<int>();
 			_availableGraphPointsForHorizonGraph = new List<int>();
@@ -68,7 +68,7 @@ namespace MusGen
 					l++; g++;
 				}
 
-				Log($"Loaded graph: \"{Text2.StringBeforeLast(Text2.StringAfterLast(files[f], "\\"), ".")}\"");
+				Log($"Loaded graph: \"{TextE.StringBeforeLast(TextE.StringAfterLast(files[f], "\\"), ".")}\"");
 			}
 
 			_originalGraph = graphL.ToArray();
@@ -126,12 +126,12 @@ namespace MusGen
 			{
 				int offset = _availableGraphPoints[Convert.ToInt32(delta)];
 
-				_tests[test] = Array2.SubArray(_derivativeOfGraph, offset, _ownerNN._inputWindow);
+				_tests[test] = ArrayE.SubArray(_derivativeOfGraph, offset, _ownerNN._inputWindow);
 
-				float standartDeviation = Math2.FindStandartDeviation(_tests[test]);
+				float standartDeviation = MathE.StandartDeviation(_tests[test]);
 				_tests[test] = Normalize(_tests[test], standartDeviation, _ownerNN._inputAF, _moveInputsOverZero);
 
-				float[] ar = Array2.SubArray(_derivativeOfGraph, offset + _ownerNN._inputWindow, _ownerNN._horizon);
+				float[] ar = ArrayE.SubArray(_derivativeOfGraph, offset + _ownerNN._inputWindow, _ownerNN._horizon);
 				for (int j = 0; j < ar.Length; j++)
 					_answers[test] += ar[j];
 
@@ -154,18 +154,18 @@ namespace MusGen
 			{
 				int offset = _availableGraphPoints[Convert.ToInt32(delta)];
 
-				_tests[test] = Array2.SubArray(_originalGraph, offset, _ownerNN._inputWindow);
+				_tests[test] = ArrayE.SubArray(_originalGraph, offset, _ownerNN._inputWindow);
 
 				float final = _tests[test][_tests.Length - 1]; //check me
 
 				for (int i = 0; i < _tests[test].Length; i++)
 					_tests[test][i] = _tests[test][i] - final;
 
-				float standartDeviation = Math2.FindStandartDeviation(_tests[test]);
+				float standartDeviation = MathE.StandartDeviation(_tests[test]);
 
 				Normalize(_tests[test], standartDeviation, _ownerNN._inputAF, _moveInputsOverZero);
 
-				float[] ar = Array2.SubArray(_derivativeOfGraph, offset + _ownerNN._inputWindow, _ownerNN._horizon);
+				float[] ar = ArrayE.SubArray(_derivativeOfGraph, offset + _ownerNN._inputWindow, _ownerNN._horizon);
 				for (int j = 0; j < ar.Length; j++)
 					_answers[test] += ar[j];
 
@@ -188,8 +188,8 @@ namespace MusGen
 			{
 				int offset = _availableGraphPointsForHorizonGraph[Convert.ToInt32(delta)];
 
-				_tests[test] = Array2.SubArray(_horizonGraph, offset, _ownerNN._inputWindow);
-				float standartDeviation = Math2.FindStandartDeviation(_tests[test]);
+				_tests[test] = ArrayE.SubArray(_horizonGraph, offset, _ownerNN._inputWindow);
+				float standartDeviation = MathE.StandartDeviation(_tests[test]);
 				_tests[test] = Normalize(_tests[test], standartDeviation, _ownerNN._inputAF, _moveInputsOverZero);
 
 				_answers[test] = _horizonGraph[offset + _ownerNN._inputWindow + _ownerNN._horizon];
@@ -223,7 +223,7 @@ namespace MusGen
 				int i = 0;
 				while (i < count)
 				{
-					int n = Math2.rnd.Next(_testsCount);
+					int n = MathE.rnd.Next(_testsCount);
 					if (!_batch[n])
 					{
 						_batch[n] = true;

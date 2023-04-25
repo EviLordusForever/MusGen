@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Library;
+using Extensions;
 
 namespace MusGen
 {
@@ -159,17 +159,17 @@ namespace MusGen
 
 		public void Export(string name)
 		{
-			SaveTo($"{Disk2._programFiles}\\Export\\{name}.wav");
+			SaveTo($"{DiskE._programFiles}\\Export\\{name}.wav");
 		}
 
 		public void SaveTo(string path)
 		{		
 			using (FileStream f = new FileStream(path, FileMode.Create))
 			{
-				f.Write(Math2.StringToByteArray("RIFF")); //RIFF
+				f.Write(MathE.StringToByteArray("RIFF")); //RIFF
 				f.Write(BitConverter.GetBytes((uint)(44 + L.Length * bitDepth * channels))); //?
-				f.Write(Math2.StringToByteArray("WAVE"));
-				f.Write(Math2.StringToByteArray("fmt "));
+				f.Write(MathE.StringToByteArray("WAVE"));
+				f.Write(MathE.StringToByteArray("fmt "));
 				f.Write(BitConverter.GetBytes(16)); //Subchunk 1 size = 16
 
 				f.Write(BitConverter.GetBytes((ushort)1)); //type format = 1 PCM
@@ -178,7 +178,7 @@ namespace MusGen
 				f.Write(BitConverter.GetBytes(sampleRate * bitDepth * channels / 8)); //CORRECT
 				f.Write(BitConverter.GetBytes(fmtBlockAlign)); //Block align
 				f.Write(BitConverter.GetBytes(bitDepth)); //Bits per sample
-				f.Write(Math2.StringToByteArray("data"));
+				f.Write(MathE.StringToByteArray("data"));
 				f.Write(BitConverter.GetBytes(L.Length * bitDepth * channels));
 
 				ProgressShower.ShowProgress("Saving wav...");
@@ -227,7 +227,7 @@ namespace MusGen
 
 		public static bool CheckWav(string path)
 		{
-			if (Text2.StringAfterLast(path, ".").ToLower() != "wav")
+			if (TextE.StringAfterLast(path, ".").ToLower() != "wav")
 				return false;
 
 			Wav localWav = new Wav();

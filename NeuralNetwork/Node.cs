@@ -1,6 +1,6 @@
 ﻿using System;
 using Newtonsoft.Json;
-using Library;
+using Extensions;
 
 namespace MusGen
 {
@@ -35,7 +35,7 @@ namespace MusGen
 			float scale = MathF.Abs(_ownerNN._weightsInitMax - _ownerNN._weightsInitMin);
 
 			for (int i = 0; i < _weights.Length; i++)
-				_weights[i] = Math2.rnd.NextSingle() * scale + _ownerNN._weightsInitMin;
+				_weights[i] = MathE.rnd.NextSingle() * scale + _ownerNN._weightsInitMin;
 			_bias = 0;
 		}
 
@@ -88,7 +88,7 @@ namespace MusGen
 
 		public void Mutate(float mutagen)
 		{
-			_lastMutatedWeight = Math2.rnd.Next(_weights.Length + 1);
+			_lastMutatedWeight = MathE.rnd.Next(_weights.Length + 1);
 
 			if (_lastMutatedWeight == _weights.Length)
 				_bias += mutagen;
@@ -128,7 +128,7 @@ namespace MusGen
 
 		public void Dropout(float probability)
 		{
-			_droppedOut = Math2.rnd.NextSingle() <= probability;
+			_droppedOut = MathE.rnd.NextSingle() <= probability;
 		}
 
 		public static float FindSummOfBPGradientsPerWeights(float[] gradients, float[] weights)

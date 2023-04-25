@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MusGen.Voice;
-using Library;
+using Extensions;
 using Clr = System.Windows.Media.Color;
 using Clr0 = System.Drawing.Color;
 using System.Windows.Media.Imaging;
@@ -20,7 +20,7 @@ namespace MusGen
 			for (float f = 20; f < 20000; f *= 1.2f)
 				str += $"{f};{SoundPressureModel.GetSoundPressureLevel(f)}\n";
 
-			Disk2.WriteToProgramFiles("SPL", "csv", str, false);
+			DiskE.WriteToProgramFiles("SPL", "csv", str, false);
 		}
 
 		public static void HungarianAlgorithm()
@@ -32,7 +32,7 @@ namespace MusGen
 			{ 16, 17, 18, 19, 20 },
 			{ 21, 22, 23, 24, 25 }};
 
-			int[] res = Library.HungarianAlgorithm.Run(costMatrix);
+			int[] res = Extensions.HungarianAlgorithm.Run(costMatrix);
 			Logger.Log(string.Join(' ', res));
 		}
 
@@ -42,14 +42,14 @@ namespace MusGen
 
 			List<Clr> gradient = new List<Clr>();
 
-			gradient.AddRange(Graphics2.GetColorGradientM(Colors.Black, Colors.White, size));
+			gradient.AddRange(GraphicsE.GetColorGradient(Colors.Black, Colors.White, size));
 
 			WriteableBitmap testBmp = WBMP.Create(size, 255);
 
 			for (int i = 0; i < size; i++)
 				testBmp.DrawLine(i, 0, i, 255, gradient[i]);
 
-			Disk2.SaveImagePng(testBmp, $"{Disk2._programFiles}\\Grafics\\GraidentDitheting.bmp");
+			DiskE.SaveImagePng(testBmp, $"{DiskE._programFiles}\\Grafics\\GraidentDitheting.bmp");
 		}
 
 		public static void GraphDrawerGradient()
@@ -60,7 +60,7 @@ namespace MusGen
 			for (int i = 0; i < SpectrumDrawer.gradient.Count(); i++)
 				testBmp.DrawLine(i, 0, i, 255, SpectrumDrawer.gradient[i]);
 
-			Disk2.SaveImagePng(testBmp, $"{Disk2._programFiles}\\Grafics\\SpectrumGraident.bmp");
+			DiskE.SaveImagePng(testBmp, $"{DiskE._programFiles}\\Grafics\\SpectrumGraident.bmp");
 		}
 
 		public static void Logging()
@@ -73,10 +73,10 @@ namespace MusGen
 			{
 				strs[s] = "";
 
-				int r = Math2.rnd.Next(500);
+				int r = MathE.rnd.Next(500);
 
 				for (int i = 0; i < r; i++)
-					strs[s] += chars[Math2.rnd.Next(10)];
+					strs[s] += chars[MathE.rnd.Next(10)];
 			}
 
 			Logger.Log("Logger test started...");

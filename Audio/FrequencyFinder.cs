@@ -1,6 +1,6 @@
 ﻿using System;
-using Library;
-using static Library.Array2;
+using Extensions;
+using static Extensions.ArrayE;
 
 namespace MusGen
 {
@@ -187,7 +187,7 @@ namespace MusGen
 		{
 			frequencies = new float[fftSize];
 
-			for (int index = 0; index < 666; index++)
+			for (int index = 0; index < fftSize; index++)
 				frequencies[index] = (1f * index / fftSize) * sampleRate;
 		}
 	}
