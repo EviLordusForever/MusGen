@@ -51,13 +51,16 @@ namespace MusGen
 
 		public static float GetSoundPressureLevel(float frq)
 		{
+			if (frq == 0)
+				return 0;
+
 			float lowerKey = sf.Keys.Where(x => x <= frq).Max();
 			float upperKey = sf.Keys.Where(x => x >= frq).Min();
 
 			float lowerValue = sf[lowerKey];
 			float upperValue = sf[upperKey];
 
-			return lowerValue + (upperValue - lowerValue) * (frq - lowerKey) / (upperKey - lowerKey);
+			return (lowerValue + (upperValue - lowerValue) * (frq - lowerKey) / (upperKey - lowerKey)) / 5.6234f;
 		}
 	}
 }

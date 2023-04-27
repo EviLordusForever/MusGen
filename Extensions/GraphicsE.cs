@@ -183,15 +183,8 @@ namespace Extensions
 
 		public static WriteableBitmap RescaleBitmap(WriteableBitmap bitmap, int width, int height)
 		{
-			WriteableBitmap resizedBitmap = new WriteableBitmap(width, height, bitmap.DpiX, bitmap.DpiY, bitmap.Format, null);
-			resizedBitmap.Lock();
-
-			bitmap.CopyPixels(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight), resizedBitmap.BackBuffer, resizedBitmap.BackBufferStride * resizedBitmap.PixelHeight, resizedBitmap.BackBufferStride);
-			resizedBitmap.WritePixels(new Int32Rect(0, 0, width, height), resizedBitmap.BackBuffer, resizedBitmap.BackBufferStride * height, resizedBitmap.BackBufferStride);
-
-			resizedBitmap.Unlock();
-			return resizedBitmap;
-		}   //Check me
+			return WriteableBitmapExtensions.Resize(bitmap, width, height, WriteableBitmapExtensions.Interpolation.Bilinear);
+		}
 
 		public static WriteableBitmap ToBlackWhite(WriteableBitmap bitmap)
 		{

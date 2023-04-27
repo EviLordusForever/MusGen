@@ -39,7 +39,7 @@ namespace MusGen
 				float[] amplitudes = new float[channelsCount];
 				float adaptiveCeiling = 0;
 
-				FrequencyFinder.ByDFT(ref samples[s].periods, ref samples[s].amplitudes, wav, (int)(sps * s), 4000, 20, 15, "", ref adaptiveCeiling);
+				SpectrumFinder.ByDFT(ref samples[s].periods, ref samples[s].amplitudes, wav, (int)(sps * s), 4000, 20, 15, "", ref adaptiveCeiling);
 				ProgressShower.SetProgress(1.0 * s / nadSamplesCount);
 			}
 

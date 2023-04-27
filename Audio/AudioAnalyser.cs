@@ -148,13 +148,13 @@ namespace MusGen
 			ampsLgOld = new float[channels];
 			idxsLgOld = new int[channels];
 
-			FrequencyFinder.spectrum = new float[FFTsize];
-			FrequencyFinder.leadIndexes = new int[channels];
+			SpectrumFinder._spectrum = new float[FFTsize];
+			SpectrumFinder.leadIndexes = new int[channels];
 			
-			FrequencyFinder.FillFrqs(FFTsize, sampleRate);
-			FrequencyFinder.amplitudeMaxWholeTrack = 0.1f;
-			FrequencyFinder.amplitudeMax = 0;
-			FrequencyFinder.CalculateSmoothMask(lfsX, lfsY, FFTsize, sampleRate);
+			SpectrumFinder.FillFrqs(FFTsize, sampleRate);
+			SpectrumFinder.amplitudeMaxWholeTrack = 0.1f;
+			SpectrumFinder.amplitudeMax = 0;
+			SpectrumFinder.CalculateSmoothMask(lfsX, lfsY, FFTsize, sampleRate);
 			SpectrumDrawer.Init(graphResX, graphResY, channels);
 		}
 
@@ -180,7 +180,7 @@ namespace MusGen
 					{
 						Olds();
 
-						FrequencyFinder.ByFFT(ref frqsNew, ref ampsNew, wavIn, s, FFTsize, trashSize);
+						SpectrumFinder.FindByFFT(ref frqsNew, ref ampsNew, wavIn, s, FFTsize, trashSize);
 						AdaptiveCeiling();
 
 						FindLg();
@@ -286,7 +286,7 @@ namespace MusGen
 
 					for (int i = 3; i < 23; i++)
 					{
-						FrequencyFinder.ByFFT(ref frqsNew, ref ampsNew, wavIn, i * step, FFTsize, trashSize);
+						SpectrumFinder.FindByFFT(ref frqsNew, ref ampsNew, wavIn, i * step, FFTsize, trashSize);
 						ProgressShower.SetProgress((i - 3) / 20.0);
 					}
 
@@ -350,13 +350,13 @@ namespace MusGen
 
 					wav.L = AudioCapturer.GetSamples(FFTsize);
 
-					FrequencyFinder.ByFFT(ref frqsNew, ref ampsNew, wav, 0, FFTsize, trashSize);
+					SpectrumFinder.FindByFFT(ref frqsNew, ref ampsNew, wav, 0, FFTsize, trashSize);
 					AdaptiveCeiling();
 
 					FindLg();
 					ConnectNewPoints();
 
-					FrequencyFinder.amplitudeMaxWholeTrack *= 0.995f;
+					SpectrumFinder.amplitudeMaxWholeTrack *= 0.995f;
 					DrawSpectrum();
 
 					byte[] buffer = new byte[bufferSize];
@@ -408,7 +408,7 @@ namespace MusGen
 		public static void AdaptiveCeiling()
 		{			
 			adaptiveCeiling *= 0.99f;
-			adaptiveCeiling = Math.Max(adaptiveCeiling, FrequencyFinder.amplitudeMax / FrequencyFinder.amplitudeMaxWholeTrack);
+			adaptiveCeiling = Math.Max(adaptiveCeiling, SpectrumFinder.amplitudeMax / SpectrumFinder.amplitudeMaxWholeTrack);
 			adaptiveCeiling = Math.Max(adaptiveCeiling, 0.0001f);
 		}
 
@@ -425,7 +425,7 @@ namespace MusGen
 					if (pointsConnectingX == "logarithmic")
 					{
 						x = idxsLgOld[idOld] - idxsLg[idNew];
-						x /= FrequencyFinder.spectrum.Length;
+						x /= SpectrumFinder._spectrum.Length;
 						x *= 4; //check
 					}
 					else if (pointsConnectingX == "linear")
@@ -460,7 +460,7 @@ namespace MusGen
 
 				ampsCompared[oldid] = ampsNew[newid];
 				frqsCompared[oldid] = frqsNew[newid];
-				idxsCompared[oldid] = FrequencyFinder.leadIndexes[newid];
+				idxsCompared[oldid] = SpectrumFinder.leadIndexes[newid];
 
 				ampsLgCompared[oldid] = ampsLg[newid];
 				idxsLgCompared[oldid] = idxsLg[newid]; //
@@ -468,29 +468,45 @@ namespace MusGen
 
 			ampsNew = ampsCompared;
 			frqsNew = frqsCompared;
-			FrequencyFinder.leadIndexes = idxsCompared;
+			SpectrumFinder.leadIndexes = idxsCompared;
 		}
 
 		public static void DrawSpectrum()
 		{
 			if (graphType == 1)
 			{
-				float[] fix = new float[FrequencyFinder.spectrum.Length];
-				for (int index = 0; index < FrequencyFinder.spectrum.Length; index++)
+				float[] fix = new float[SpectrumFinder._spectrum.Length];
+				for (int index = 0; index < SpectrumFinder._spectrum.Length; index++)
 				{
-					float a = FrequencyFinder.spectrum[index];
-					float b = SoundPressureModel.GetSoundPressureLevel(FrequencyFinder.frequencies[index]);
+					float a = SpectrumFinder._spectrum[index];
+					float b = SoundPressureModel.GetSoundPressureLevel(SpectrumFinder._frequencies[index]);
 
 					fix[index] = a * b;
 				}
 
 				float[] frqsLg = ArrayE.RescaleArrayToLog(fix, FFTsize, graphResX);
-				wbmp = SpectrumDrawer.DrawType1(frqsLg, idxsLg, ampsNew, adaptiveCeiling, FrequencyFinder.amplitudeMaxWholeTrack);
+				wbmp = SpectrumDrawer.DrawType1(frqsLg, idxsLg, ampsNew, adaptiveCeiling, SpectrumFinder.amplitudeMaxWholeTrack);
 			}
 			else if (graphType == 2)
-				wbmp = SpectrumDrawer.DrawType2(idxsLg, ampsNew, adaptiveCeiling, FrequencyFinder.amplitudeMaxWholeTrack);
+				wbmp = SpectrumDrawer.DrawType2(idxsLg, ampsNew, adaptiveCeiling, SpectrumFinder.amplitudeMaxWholeTrack);
 			else if (graphType == 3)
-				wbmp = SpectrumDrawer.DrawType3(idxsLg, ampsLg, adaptiveCeiling, FrequencyFinder.amplitudeMaxWholeTrack);
+				wbmp = SpectrumDrawer.DrawType3(idxsLg, ampsLg, adaptiveCeiling, SpectrumFinder.amplitudeMaxWholeTrack);
+		}
+
+		public static float[] SPLtoAmps(float[] amps)
+		{
+			float[] res = new float[channels];
+
+			for (int c = 0; c < channels; c++)
+			{
+				int index = SpectrumFinder.leadIndexes[c];
+				float frequency = SpectrumFinder._frequencies[index];
+				float spl = SoundPressureModel.GetSoundPressureLevel(frequency);
+
+				res[c] *= amps[c] * spl;
+			}
+
+			return res;
 		}
 
 		public static void FindLg()
@@ -498,12 +514,13 @@ namespace MusGen
 			for (int c = 0; c < channels; c++)
 			{
 				ampsLgOld[c] = ampsLg[c];
+
 				ampsLg[c] = ampsNew[c];
 				ampsLg[c] = MathE.ToLogScale(ampsLg[c], 10);
 			}
 
 			idxsLgOld = idxsLg;
-			idxsLg = ArrayE.RescaleIndexesToLog(FrequencyFinder.leadIndexes, graphResX);
+			idxsLg = ArrayE.RescaleIndexesToLog(SpectrumFinder.leadIndexes, graphResX);
 		}
 
 		public static double F(double t)
