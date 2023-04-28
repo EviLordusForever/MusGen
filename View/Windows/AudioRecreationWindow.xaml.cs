@@ -69,7 +69,7 @@ namespace MusGen.View.Windows
 			
 			void Tr()
 			{
-				AudioAnalyser.FFT(path, outName);
+				WavNadNadWav.Make(path, outName);
 			}
 		}
 	}

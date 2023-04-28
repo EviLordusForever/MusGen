@@ -37,7 +37,7 @@ namespace MusGen
 		private void Button_Click_1(object sender, RoutedEventArgs e)
 		{
 			WindowsManager.OpenRealtimeFFTWindow();
-			AudioAnalyser.RealtimeFFT();
+			RealtimeFFT.Start();
 		}
 	}
 }

@@ -8,7 +8,7 @@ namespace MusGen
 {
 	internal class ProgressShower
 	{
-		public static void ShowProgress(string text)
+		public static void Show(string text)
 		{
 			Application.Current.Dispatcher.Invoke(() =>
 			{
@@ -16,7 +16,7 @@ namespace MusGen
 			});
 		}
 
-		public static void SetProgress(double value)
+		public static void Set(double value)
 		{
 			Application.Current.Dispatcher.Invoke(() =>
 			{
@@ -24,7 +24,7 @@ namespace MusGen
 			});
 		}
 
-		public static void CloseProgressForm()
+		public static void Close()
 		{
 			Application.Current.Dispatcher.Invoke(() =>
 			{

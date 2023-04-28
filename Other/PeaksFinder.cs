@@ -10,6 +10,8 @@ namespace MusGen
 
 		public static int[] Find(float[] array, int count, float peakSize)
 		{
+			float[] array2 = (float[])array.Clone();
+
 		    int[] peakIndexes = new int[count];
 			peakIndexes[0] = FindPeak();
 			for (int i = 1; i < count; i++)
@@ -21,13 +23,13 @@ namespace MusGen
 
 			int FindPeak()
 			{
-				return MathE.IndexOfMax(array);
+				return MathE.IndexOfMax(array2);
 			}
 
 			void RemovePeak(int point)
 			{
-				for (int i = 0; i < array.Length; i++)
-					array[i] = array[i] * MathF.Abs(MathF.Tanh((i - point) / peakSize));
+				for (int i = 0; i < array2.Length; i++)
+					array2[i] = array2[i] * MathF.Abs(MathF.Tanh((i - point) / peakSize));
 			}
 		}
 	}

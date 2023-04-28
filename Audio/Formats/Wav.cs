@@ -20,7 +20,7 @@ namespace MusGen
 
 		uint fmtCode;
 		public uint channels;
-		public uint sampleRate;
+		public int sampleRate;
 		uint byteRate;
 		ushort fmtBlockAlign;
 		ushort bitDepth;
@@ -51,7 +51,6 @@ namespace MusGen
 						fileSize = reader.ReadUInt32();
 						riffType = reader.ReadUInt32();
 
-
 						// chunk 1
 						fmtID = reader.ReadUInt32();
 						fmtSize = reader.ReadUInt32(); // bytes for this chunk (expect 16 or 18)
@@ -59,7 +58,7 @@ namespace MusGen
 						// 16 bytes coming...
 						fmtCode = reader.ReadUInt16();
 						channels = reader.ReadUInt16();
-						sampleRate = reader.ReadUInt32();
+						sampleRate = (int)reader.ReadUInt32();
 						byteRate = reader.ReadUInt32();
 						fmtBlockAlign = reader.ReadUInt16();
 						bitDepth = reader.ReadUInt16();
@@ -120,16 +119,16 @@ namespace MusGen
 						int nSamps = nValues / 2;
 						L = new float[nSamps];
 						R = new float[nSamps];
-						ProgressShower.ShowProgress("Reading wav...");
+						ProgressShower.Show("Reading wav...");
 						for (int s = 0, v = 0; s < nSamps; s++)
 						{
 							L[s] = asFloat[v++];
 							R[s] = asFloat[v++];
 
 							if (s % 10000 == 0) //
-								ProgressShower.SetProgress(1.0 * s / nSamps);
+								ProgressShower.Set(1.0 * s / nSamps);
 						}
-						ProgressShower.CloseProgressForm();
+						ProgressShower.Close();
 						return true;
 					default:
 						return false;
@@ -181,7 +180,7 @@ namespace MusGen
 				f.Write(MathE.StringToByteArray("data"));
 				f.Write(BitConverter.GetBytes(L.Length * bitDepth * channels));
 
-				ProgressShower.ShowProgress("Saving wav...");
+				ProgressShower.Show("Saving wav...");
 
 				for (int s = 0; s < L.Length; s++)
 				{
@@ -190,10 +189,10 @@ namespace MusGen
 						WriteSample(R[s]);
 
 					if (s % 5000 == 0) //
-						ProgressShower.SetProgress(1.0 * s / L.Length);
+						ProgressShower.Set(1.0 * s / L.Length);
 				}
 
-				ProgressShower.CloseProgressForm();
+				ProgressShower.Close();
 
 				void WriteSample(float v)
 				{

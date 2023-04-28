@@ -9,6 +9,14 @@ namespace Extensions
 	{
 		public static Random rnd = new Random();
 
+		public static T[] GetValues<T>(T[] array, int[] indexes)
+		{
+			T[] values = new T[indexes.Length];
+			for (int i = 0; i < indexes.Length; i++)
+				values[i] = array[indexes[i]];
+			return values;
+		}
+
 		public static byte[] StringToByteArray(string hex)
 		{
 			return Encoding.ASCII.GetBytes(hex);
