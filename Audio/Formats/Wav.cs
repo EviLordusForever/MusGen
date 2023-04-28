@@ -30,6 +30,24 @@ namespace MusGen
 
 		byte[] byteArray;
 
+		public Wav()
+		{
+			fileSize = 0;
+			riffType = 0;
+			fmtID = 0;
+			fmtSize = 16;
+
+			fmtCode = 1;
+			channels = 1;
+			sampleRate = 44100;
+			byteRate = 176400;
+			fmtBlockAlign = 4;
+			bitDepth = 16;
+
+			dataID = 0;
+			bytes = 0;
+		}
+
 		public bool Read(string path)
 		{
 			return Read(path, 0);

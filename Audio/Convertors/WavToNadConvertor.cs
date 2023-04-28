@@ -52,7 +52,7 @@ namespace MusGen
 					nad._samples[ns] = Compare(nad._samples[ns - 1], nad._samples[ns]);
 
 				if (ns % progressStep == 0)
-					ProgressShower.Set(ns / nad._samples.Length);
+					ProgressShower.Set(1.0 * ns / nad._samples.Length);
 			}
 
 			ProgressShower.Close();

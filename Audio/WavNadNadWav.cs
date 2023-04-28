@@ -25,7 +25,7 @@ namespace MusGen
 				Nad nad = wtn.Make(wavIn);
 				Wav wavOut = ntw.Make(nad);
 				wavOut.Export(exportName);
-				Logger.Log("Wav to Nad, Nad to Wav finished.");
+				Logger.Log($"Wav to Nad, Nad to Wav finished. Saved as ({exportName})");
 			}
 		}
 	}

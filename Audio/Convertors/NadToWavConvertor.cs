@@ -35,6 +35,7 @@ namespace MusGen
 			int progressStep = (int)(length / 2000);
 
 			Wav wav = new Wav();
+			wav.L = new float[length];
 			ProgressShower.Show("Making wav from nad...");
 
 			int ns = 0;

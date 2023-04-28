@@ -72,7 +72,7 @@ namespace MusGen
 					paragraph.LineHeight = _lineHeigh;
 					paragraph.FontSize = _fontSize;
 
-					_logDocument.Blocks.Add(paragraph);
+					_logDocument.Blocks.InsertBefore(_logDocument.Blocks.FirstBlock, paragraph);
 				});
 
 				_updated = true;
@@ -279,6 +279,8 @@ namespace MusGen
 			{
 				_logDocument = new FlowDocument();
 				_logDocument.PageWidth = 2048;
+
+				_logDocument.Blocks.Add(new Paragraph());
 			});		
 
 			_writer = new StreamWriter($"{DiskE._programFiles}Logs\\log.log", true);
