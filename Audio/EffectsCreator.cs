@@ -23,7 +23,7 @@ namespace MusGen
 			wavOut.Read(originPath, 0);
 
 			wavOut.L = new float[wavIn.L.Length];
-			if (wavOut.channels == 2)
+			if (wavOut._channels == 2)
 				wavOut.R = new float[wavIn.R.Length];
 		}
 
@@ -35,9 +35,9 @@ namespace MusGen
 			wavOut = new Wav();
 			wavOut.Read(originPath, 0);
 
-			wavOut.L = new float[Math.Min(limitSec * wavIn.sampleRate, wavIn.L.Length)];
-			if (wavOut.channels == 2)
-				wavOut.R = new float[Math.Min(limitSec * wavIn.sampleRate, wavIn.R.Length)];
+			wavOut.L = new float[Math.Min(limitSec * wavIn._sampleRate, wavIn.L.Length)];
+			if (wavOut._channels == 2)
+				wavOut.R = new float[Math.Min(limitSec * wavIn._sampleRate, wavIn.R.Length)];
 		}
 
 		public static void EffectPanWaving(string originPath, string outName)

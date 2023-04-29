@@ -47,7 +47,7 @@ namespace MusGen
 				SpectrumDrawer.Init(AP._wbmpResX, AP._wbmpResY, AP._channels);
 
 				Wav wav = new Wav();
-				wav.sampleRate = (int)AP._sampleRate;
+				wav._sampleRate = (int)AP._sampleRate;
 				wav.L = new float[AP._fftSize];
 
 				while (true)

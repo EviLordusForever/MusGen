@@ -33,7 +33,7 @@ namespace MusGen
 		public Nad Make(Wav wav)
 		{
 			_lastSample = wav.Length - _fftSize;
-			_sampleRate = wav.sampleRate;
+			_sampleRate = wav._sampleRate;
 			_step = _sampleRate / _nadSamplesPerSecond;
 			int samplesCount = (int)Math.Ceiling(_lastSample / _step);
 			int duration = (int)Math.Ceiling(wav.Length / _sampleRate);

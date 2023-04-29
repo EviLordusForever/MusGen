@@ -22,10 +22,27 @@ namespace MusGen
 			Logger.Log("Nad to wav convertor was initialized.");
 		}
 
+		public Wav Make(Nad nad, string wavPath)
+		{
+			Wav wav = new Wav();
+			wav.Read(wavPath);
+
+			return Make(nad, wav);
+		}
+
 		public Wav Make(Nad nad)
 		{
-			_channels = nad._channelsCount;
 			int length = _sampleRate * nad._duration;
+			Wav wav = new Wav();
+			wav.L = new float[length];
+
+			return Make(nad, wav);
+		}
+
+		public Wav Make(Nad nad, Wav wav)
+		{
+			_channels = nad._channelsCount;
+			int length = wav.Length;
 			double[] t = new double[_channels];
 			double[] tOld = new double[_channels];
 			int fadeSamplesLeft = 0;
@@ -34,8 +51,6 @@ namespace MusGen
 			float buf = pi2 / _sampleRate;
 			int progressStep = (int)(length / 2000);
 
-			Wav wav = new Wav();
-			wav.L = new float[length];
 			ProgressShower.Show("Making wav from nad...");
 
 			int ns = 0;
