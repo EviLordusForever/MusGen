@@ -54,11 +54,10 @@ namespace MusGen
 
 		public static void GraphDrawerGradient()
 		{
-			SpectrumDrawer.Init(1, 1, 10);
-			WriteableBitmap testBmp = WBMP.Create(SpectrumDrawer.gradient.Count(), 255);
+			WriteableBitmap testBmp = WBMP.Create(SpectrumDrawer._gradient.Count(), 255);
 
-			for (int i = 0; i < SpectrumDrawer.gradient.Count(); i++)
-				testBmp.DrawLine(i, 0, i, 255, SpectrumDrawer.gradient[i]);
+			for (int i = 0; i < SpectrumDrawer._gradient.Count(); i++)
+				testBmp.DrawLine(i, 0, i, 255, SpectrumDrawer._gradient[i]);
 
 			DiskE.SaveImagePng(testBmp, $"{DiskE._programFiles}\\Grafics\\SpectrumGraident.bmp");
 		}

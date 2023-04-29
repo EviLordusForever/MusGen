@@ -19,8 +19,7 @@ namespace MusGen
 			{
 				Logger.Log($"Wav to Nad, Nad to Wav started for ({wavInPath}).");
 				Wav wavIn = new Wav();
-				wavIn.Read(wavInPath);
-				SpectrumFinder.Init(AP._fftSize, AP._sampleRate, AP._smoothXScale, AP._smoothYScale);
+				wavIn.Read(wavInPath);				
 				Nad nad = WavToNadConvertor.Make(wavIn);
 				Wav wavOut = NadToWavConvertor.Make(nad);
 				wavOut.Export(exportName);

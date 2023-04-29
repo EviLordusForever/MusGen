@@ -6,7 +6,6 @@ namespace MusGen
 {
 	public static class SpectrumFinder
 	{
-		private static int _fftSize;
 		public static float[] _spectrum;
 		public static float[] _spectrumLogarithmic;
 		public static float[] _oldSpectrum;
@@ -15,12 +14,11 @@ namespace MusGen
 		public static float[] _frequenciesLogarithmic;
 		public static float[] _smoothMask;
 
-		public static void Init(int fftSize, uint sampleRate, float smoothXScale, float smoothYScale)
+		static SpectrumFinder()
 		{
-			_fftSize = fftSize;
-			_spectrum = new float[fftSize / 2];
-			_spectrumLogarithmic = new float[fftSize / 2];
-			_oldSpectrum = new float[fftSize / 2];
+			_spectrum = new float[AP._fftSize / 2];
+			_spectrumLogarithmic = new float[AP._fftSize / 2];
+			_oldSpectrum = new float[AP._fftSize / 2];
 			InitFrequencies();
 			InitFrequenciesLogarithmic();
 			CalculateSmoothMask();
@@ -28,23 +26,23 @@ namespace MusGen
 
 			void InitFrequencies()
 			{
-				_frequenciesLinear = new float[_fftSize / 2];
+				_frequenciesLinear = new float[AP._fftSize / 2];
 
-				for (int index = 0; index < _fftSize / 2; index++)
-					_frequenciesLinear[index] = (1f * index / fftSize) * sampleRate;
+				for (int index = 0; index < AP._fftSize / 2; index++)
+					_frequenciesLinear[index] = (1f * index / AP._fftSize) * AP._sampleRate;
 			}
 
 			void InitFrequenciesLogarithmic()
 			{
-				_frequenciesLogarithmic = ArrayE.RescaleArrayToLog(_frequenciesLinear, _fftSize, _fftSize / 2);
+				_frequenciesLogarithmic = ArrayE.RescaleArrayToLog(_frequenciesLinear, AP._fftSize, AP._fftSize / 2);
 			}
 
 			void CalculateSmoothMask()
 			{
-				_smoothMask = new float[fftSize];
+				_smoothMask = new float[AP._fftSize];
 
-				for (int x = 0; x < fftSize; x++)
-					_smoothMask[x] = smoothYScale / MathF.Pow(MathF.E, x * sampleRate / (fftSize * smoothXScale));
+				for (int x = 0; x < AP._fftSize; x++)
+					_smoothMask[x] = AP._smoothYScale / MathF.Pow(MathF.E, x * AP._sampleRate / (AP._fftSize * AP._smoothXScale));
 			}
 		}
 
@@ -60,17 +58,20 @@ namespace MusGen
 
 			void FillComplexFromWav()
 			{
-				complex = new Complex[_fftSize];
-				for (int i = 0; i < _fftSize; i++)
-					complex[i] = new Complex(wav.L[start + i], 0);
+				complex = new Complex[AP._fftSize];
+				for (int i = 0; i < AP._fftSize; i++)
+				{
+					float wf = WindowFunction.F(i);
+					complex[i] = new Complex(wav.L[start + i] * wf, 0);
+				}
 			}
 
 			void ProcessComplex()
 			{
 				_oldSpectrum = _spectrum;
-				_spectrum = new float[_fftSize / 2];
+				_spectrum = new float[AP._fftSize / 2];
 
-				for (int i = 1; i < _fftSize / 2; i++)
+				for (int i = 1; i < AP._fftSize / 2; i++)
 				{
 					float newValue = (float)(Math.Sqrt(Math.Pow(complex[i].Real, 2) + Math.Pow(complex[i].Imaginary, 2)));
 					_spectrum[i] = _oldSpectrum[i] * _smoothMask[i] + newValue * (1 - _smoothMask[i]);
@@ -80,7 +81,7 @@ namespace MusGen
 
 		public static float[] Logarithmise()
 		{
-			_spectrumLogarithmic = ArrayE.RescaleArrayToLog(_spectrum, _fftSize, _fftSize / 2);
+			_spectrumLogarithmic = ArrayE.RescaleArrayToLog(_spectrum, AP._fftSize, AP._fftSize / 2);
 			return _spectrumLogarithmic;
 		}
 	}

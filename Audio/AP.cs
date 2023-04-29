@@ -18,6 +18,8 @@
 		public static float _fadeTime = 0.99f;
 		public static string _waveForm = "sin";
 
+		public static string _windowFunction = "hamming";
+
 		public static int _graphType = 1;
 	}
 }

@@ -42,8 +42,7 @@ namespace MusGen
 				stopwatch.Start();
 
 				AudioCapturer.Start(AP._sampleRate, 16, 1);
-				SpectrumFinder.Init(AP._fftSize, AP._sampleRate, AP._smoothXScale, AP._smoothYScale);
-				SpectrumDrawer.Init(AP._wbmpResX, AP._wbmpResY, AP._channels);
+				SpectrumDrawer.Init();
 
 				Wav wav = new Wav();
 				wav._sampleRate = (int)AP._sampleRate;
