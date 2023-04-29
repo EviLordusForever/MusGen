@@ -70,7 +70,7 @@ namespace MusGen
 				_oldSpectrum = _spectrum;
 				_spectrum = new float[_fftSize / 2];
 
-				for (int i = 0; i < _fftSize / 2; i++)
+				for (int i = 1; i < _fftSize / 2; i++)
 				{
 					float newValue = (float)(Math.Sqrt(Math.Pow(complex[i].Real, 2) + Math.Pow(complex[i].Imaginary, 2)));
 					_spectrum[i] = _oldSpectrum[i] * _smoothMask[i] + newValue * (1 - _smoothMask[i]);

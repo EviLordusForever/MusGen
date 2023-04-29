@@ -6,23 +6,9 @@ using System.Threading.Tasks;
 
 namespace MusGen
 {
-	public class NadToWavConvertor
+	public static class NadToWavConvertor
 	{
-		int _sampleRate;
-		float _fadeTime;
-		int _channels;
-		string _waveForm;
-
-		public NadToWavConvertor(int sampleRate, float fadeTime, string waveForm)
-		{
-			_sampleRate = sampleRate;
-			_fadeTime = fadeTime;
-			_waveForm =	waveForm;
-
-			Logger.Log("Nad to wav convertor was initialized.");
-		}
-
-		public Wav Make(Nad nad, string wavPath)
+		public static Wav Make(Nad nad, string wavPath)
 		{
 			Wav wav = new Wav();
 			wav.Read(wavPath);
@@ -30,26 +16,26 @@ namespace MusGen
 			return Make(nad, wav);
 		}
 
-		public Wav Make(Nad nad)
+		public static Wav Make(Nad nad)
 		{
-			int length = _sampleRate * nad._duration;
+			int length = (int)AP._sampleRate * nad._duration;
 			Wav wav = new Wav();
 			wav.L = new float[length];
 
 			return Make(nad, wav);
 		}
 
-		public Wav Make(Nad nad, Wav wav)
+		public static Wav Make(Nad nad, Wav wav)
 		{
-			_channels = nad._channelsCount;
 			int length = wav.Length;
-			double[] t = new double[_channels];
-			double[] tOld = new double[_channels];
+			double[] t = new double[AP._channels];
+			double[] tOld = new double[AP._channels];
 			int fadeSamplesLeft = 0;
-			int samplesForFade = 0;
+			int samplesForFade = (int)(AP._fadeTime * AP._sampleRate / AP._nadSamplesPerSecond);
 			float pi2 = MathF.PI * 2;
-			float buf = pi2 / _sampleRate;
+			float buf = pi2 / AP._sampleRate;
 			int progressStep = (int)(length / 2000);
+			float max = 0;
 
 			ProgressShower.Show("Making wav from nad...");
 
@@ -61,6 +47,7 @@ namespace MusGen
 				{
 					ns = newNs;
 					fadeSamplesLeft = samplesForFade;
+					SetTimeOld();
 				}
 				else
 					fadeSamplesLeft--;
@@ -69,40 +56,48 @@ namespace MusGen
 				Progress(s);
 			}
 
+			Normalize();
 			ProgressShower.Close();
 			return wav;
 
 			void WriteSample(int s,int ns)
 			{
 				float signal = 0;
+				float fade = 0;
+				float antifade = 1;
 
-				for (int c = 0; c < _channels; c++)
+				if (fadeSamplesLeft > 0)
+				{
+					float status = 1 - 1f * fadeSamplesLeft / samplesForFade;
+					fade = (MathF.Cos(status * MathF.PI) + 1) / 2;
+					antifade = 1 - fade;
+				}
+
+				for (int c = 0; c < AP._channels; c++)
 				{
 					if (nad._samples[ns]._frequencies[c] < 20f)
 						nad._samples[ns]._frequencies[c] = 20f;
 
 					if (fadeSamplesLeft > 0)
 					{
-						float fade = 1 - 1f * fadeSamplesLeft / samplesForFade;
-						fade = (MathF.Cos(fade * MathF.PI) + 1) / 2;
-						float antifade = 1 - fade;
-
-						float amp = nad._samples[ns - 1]._amplitudes[c] * fade;
 						tOld[c] += buf * nad._samples[ns - 1]._frequencies[c];
-						signal += (float)F(tOld[c]) * amp;
+						signal += (float)F(tOld[c]) * nad._samples[ns - 1]._amplitudes[c] * fade;
+					}
 
-						amp = nad._samples[ns]._amplitudes[c] * antifade;
-						t[c] += buf * nad._samples[ns]._frequencies[c];
-						signal += (float)F(t[c]) * amp;
-					}
-					else
-					{
-						t[c] += buf * nad._samples[ns]._frequencies[c];
-						signal += (float)F(t[c]) * nad._samples[ns]._amplitudes[c];
-					}
+					t[c] += buf * nad._samples[ns]._frequencies[c];
+					signal += (float)F(t[c]) * nad._samples[ns]._amplitudes[c] * antifade;
 				}
 
-				wav.L[s] = signal / _channels;
+				wav.L[s] = signal / AP._channels;
+
+				if (Math.Abs(wav.L[s]) > max)
+					max = Math.Abs(wav.L[s]);
+			}
+
+			void SetTimeOld()
+			{
+				for (int c = 0; c < AP._channels; c++)
+					tOld[c] = t[c];
 			}
 
 			void Progress(int s)
@@ -110,25 +105,39 @@ namespace MusGen
 				if (s % progressStep == 0)
 					ProgressShower.Set(1.0 * s / length);
 			}
+
+			void Normalize()
+			{
+				ProgressShower.Show("Normalization");
+				ProgressShower.Set(0);
+				for (int s = 0; s < length; s++)
+				{
+					wav.L[s] /= max;
+					if (wav._channels == 2)
+						wav.R[s] = wav.L[s];
+
+					Progress(s);
+				}
+			}
 		}
 
 		//
 
-		public double F(double t)
+		public static double F(double t)
 		{
-			if (_waveForm == "sin")
+			if (AP._waveForm == "sin")
 				return Math.Sin(t);
-			else if (_waveForm == "sqaure")
+			else if (AP._waveForm == "sqaure")
 				return Math.Sign(Math.Sin(t));
 			else
 				return Math.Sin(t);
 		}
 
-		public float F(float t)
+		public static float F(float t)
 		{
-			if (_waveForm == "sin")
+			if (AP._waveForm == "sin")
 				return MathF.Sin(t);
-			else if (_waveForm == "sqaure")
+			else if (AP._waveForm == "sqaure")
 				return MathF.Sign(MathF.Sin(t));
 			else
 				return MathF.Sin(t);

@@ -7,38 +7,21 @@ using Extensions;
 
 namespace MusGen
 {
-	public class WavToNadConvertor
+	public static class WavToNadConvertor
 	{
-		private int _fftSize;
-		private float _nadSamplesPerSecond;
-		private int _channels;
-		private float _peakSize;
-		private bool _logarithmic;
+		private static float _lastSample;
+		private static float _sampleRate;
+		private static double _step;
 
-		private float _lastSample;
-		private float _sampleRate;
-		private double _step;
-
-		public WavToNadConvertor(int fftSize, float nadSamplesPerSecond, int channels, float peakSize, bool logarithmic)
+		public static Nad Make(Wav wav)
 		{
-			_fftSize = fftSize;
-			_nadSamplesPerSecond = nadSamplesPerSecond;
-			_channels = channels;
-			_peakSize = peakSize;
-			_logarithmic = logarithmic;
-
-			Logger.Log("Wav to nad convertor was initialized.");
-		}
-
-		public Nad Make(Wav wav)
-		{
-			_lastSample = wav.Length - _fftSize;
+			_lastSample = wav.Length - AP._fftSize;
 			_sampleRate = wav._sampleRate;
-			_step = _sampleRate / _nadSamplesPerSecond;
+			_step = _sampleRate / AP._nadSamplesPerSecond;
 			int samplesCount = (int)Math.Ceiling(_lastSample / _step);
 			int duration = (int)Math.Ceiling(wav.Length / _sampleRate);
 
-			Nad nad = new Nad(_channels, samplesCount, duration);
+			Nad nad = new Nad(AP._channels, samplesCount, duration);
 
 			ProgressShower.Show("Making nad from wav...");
 			int progressStep = nad._samples.Length / 1000;
@@ -59,22 +42,23 @@ namespace MusGen
 			return nad;
 		}
 
-		public NadSample MakeSample(Wav wav, int s)
+		public static NadSample MakeSample(Wav wav, int s)
 		{
-			NadSample ns = new NadSample(_channels);
+			NadSample ns = new NadSample(AP._channels);
 
 			SpectrumFinder.Find(wav, s);
 			SpectrumFinder.Logarithmise();
 
-			if (!_logarithmic)
+
+			if (!AP._logarithmicNad)
 			{
-				ns._indexes = PeaksFinder.Find(SpectrumFinder._spectrum, _channels, _peakSize);
+				ns._indexes = PeaksFinder.Find(SpectrumFinder._spectrum, AP._channels, AP._peakSize);
 				ns._amplitudes = MathE.GetValues(SpectrumFinder._spectrum, ns._indexes);
 				ns._frequencies = MathE.GetValues(SpectrumFinder._frequenciesLinear, ns._indexes);
 			}
 			else
 			{
-				ns._indexes = PeaksFinder.Find(SpectrumFinder._spectrumLogarithmic, _channels, _peakSize);
+				ns._indexes = PeaksFinder.Find(SpectrumFinder._spectrumLogarithmic, AP._channels, AP._peakSize);
 				ns._amplitudes = MathE.GetValues(SpectrumFinder._spectrumLogarithmic, ns._indexes);
 				ns._frequencies = MathE.GetValues(SpectrumFinder._frequenciesLogarithmic, ns._indexes);
 			}
@@ -82,9 +66,9 @@ namespace MusGen
 			return ns;
 		}
 
-		public NadSample Compare(NadSample oldNad, NadSample newNad)
+		public static NadSample Compare(NadSample oldNad, NadSample newNad)
 		{
-			int c = _channels;
+			int c = AP._channels;
 			int[,] distances = new int[c, c];
 			float x = 0;
 			float y = 0;
@@ -103,9 +87,9 @@ namespace MusGen
 
 			int[] compares = HungarianAlgorithm.Run(distances);
 
-			int[] _indexesCompared = new int[_channels];
-			float[] _amplitudesCompared = new float[_channels];
-			float[] _frequenciesCompared = new float[_channels];
+			int[] _indexesCompared = new int[AP._channels];
+			float[] _amplitudesCompared = new float[AP._channels];
+			float[] _frequenciesCompared = new float[AP._channels];
 
 			for (int id = 0; id < c; id++)
 			{

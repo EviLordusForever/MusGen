@@ -18,8 +18,7 @@ namespace MusGen
 			void Tr()
 			{
 				Logger.Log("Realtime FFT started.");
-				WavToNadConvertor wtn = new WavToNadConvertor(AP._fftSize, AP._nadSamplesPerSecond, AP._channels, AP._peakSize, AP._logarithmicNad);
-
+				
 				BitmapSource bitmapSource;
 
 				WriteableBitmap _wbmp = WBMP.Create(AP._wbmpResX, AP._wbmpResY);
@@ -57,7 +56,7 @@ namespace MusGen
 					wav.L = AudioCapturer.GetSamples(AP._fftSize);
 
 					nadsOld = nads;
-					nads = wtn.MakeSample(wav, 0);
+					nads = WavToNadConvertor.MakeSample(wav, 0);
 					AdaptiveCeiling();
 
 					DrawSpectrum();

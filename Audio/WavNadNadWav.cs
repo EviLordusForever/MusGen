@@ -21,10 +21,8 @@ namespace MusGen
 				Wav wavIn = new Wav();
 				wavIn.Read(wavInPath);
 				SpectrumFinder.Init(AP._fftSize, AP._sampleRate, AP._smoothXScale, AP._smoothYScale);
-				WavToNadConvertor wtn = new WavToNadConvertor(AP._fftSize, AP._nadSamplesPerSecond, AP._channels, AP._peakSize, AP._logarithmicNad);
-				NadToWavConvertor ntw = new NadToWavConvertor(wavIn._sampleRate, AP._fadeTime, AP._waveForm);
-				Nad nad = wtn.Make(wavIn);
-				Wav wavOut = ntw.Make(nad);
+				Nad nad = WavToNadConvertor.Make(wavIn);
+				Wav wavOut = NadToWavConvertor.Make(nad);
 				wavOut.Export(exportName);
 				Logger.Log($"Wav to Nad, Nad to Wav finished. Saved as ({exportName})");
 			}

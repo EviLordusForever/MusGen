@@ -5,9 +5,6 @@ namespace MusGen
 {
 	public static class PeaksFinder
 	{
-		//peakSize * FFTsize / 1024 !!!
-		//array[0] = 0; !!!
-
 		public static int[] Find(float[] array, int count, float peakSize)
 		{
 			float[] array2 = (float[])array.Clone();
