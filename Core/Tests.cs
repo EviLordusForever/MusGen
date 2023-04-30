@@ -62,6 +62,64 @@ namespace MusGen
 			DiskE.SaveImagePng(testBmp, $"{DiskE._programFiles}\\Grafics\\SpectrumGraident.bmp");
 		}
 
+		public static void ArrayToLog()
+		{
+			float[] array1 = new float[1024];
+			for (int i = 0; i < 1024; i++)
+				array1[i] = i;
+			array1 = ArrayE.RescaleArrayToLog(array1, 1024, 2048);
+
+
+			float[] array2 = new float[1024];
+			for (int i = 0; i < 1024; i++)
+				array2[i] = i;
+			array2 = ArrayE.RescaleArrayToLog(array2, 2, 2048);
+
+			float[] array3 = new float[1024];
+			for (int i = 0; i < 1024; i++)
+				array3[i] = (i % 32 > 16 ? 1 : -1);
+			float[] array3_2 = ArrayE.RescaleArrayToLog(array3, 1024, 2048);
+
+			float[] array4 = new float[1024];
+			int m = 1;
+			for (int i = 0; i < 1024; i++)
+			{
+				if (i >= m * 2)
+				{
+					array4[i] = 1;
+					m = i;
+				}
+			}
+			float[] array4_2 = ArrayE.RescaleArrayToLog(array4, 1024, 1024);
+
+			float[] array5 = new float[1024];
+			m = 1;
+			for (int i = 0; i < 1024; i++)
+			{
+				if (i >= m * 1.5)
+				{
+					array5[i] = 1;
+					m = i;
+				}
+			}
+			float[] array5_2 = ArrayE.RescaleArrayToLog(array5, 1024, 1024);
+
+			string csv = "";
+			for (int i = 0; i < 2048; i++)
+			{
+				csv += $"{(i < array1.Length ? array1[i] : "")};" +
+					$"{(i < array2.Length ? array2[i] : "")};" +
+					$"{(i < array3.Length ? array3[i] : "")};" +
+					$"{(i < array3_2.Length ? array3_2[i] : "")};" +
+					$"{(i < array4.Length ? array4[i] : "")};" +
+					$"{(i < array4_2.Length ? array4_2[i] : "")};" +
+					$"{(i < array5.Length ? array5[i] : "")};" +
+					$"{(i < array5_2.Length ? array5_2[i] : "")}\n";
+			}
+
+			DiskE.WriteToProgramFiles("LogArrays", "csv", csv, false);
+		}
+
 		public static void Logging()
 		{
 			var chars = new char[] { 'g', 'H', 'a', 'I', '2', 's', 'f', '7', '0', ' ' };

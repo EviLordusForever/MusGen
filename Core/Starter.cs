@@ -27,7 +27,8 @@ namespace MusGen
 				Tests.HungarianAlgorithm();
 				Tests.GradientDithering();
 				Tests.GraphDrawerGradient();
-				Tests.SPL();			
+				Tests.SPL();
+				Tests.ArrayToLog();
 
 				Logger.Log("Tests are completed.");
 

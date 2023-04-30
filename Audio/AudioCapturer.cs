@@ -33,8 +33,8 @@ namespace MusGen
 			if (startIndex >= 0)
 				res = _samples.GetRange(startIndex, count).ToArray();
 
-			if (_samples.Count > 110000)
-				_samples.RemoveRange(0, 50000);
+			if (_samples.Count > 300000)
+				_samples.RemoveRange(0, 100000);
 
 			return res;
 		}

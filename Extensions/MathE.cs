@@ -30,6 +30,11 @@ namespace Extensions
 			return s / 32768.0;
 		}
 
+		public static float Fade(float count)
+		{
+			return (MathF.Cos(count * MathF.PI) + 1) / 2;
+		}
+
 		public static float ToLogScale(float x, float base_)
 		{
 			return MathF.Log(x * (base_ - 1) + 1, base_);

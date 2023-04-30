@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Extensions;
 
 namespace MusGen
 {
@@ -69,7 +66,7 @@ namespace MusGen
 				if (fadeSamplesLeft > 0)
 				{
 					float status = 1 - 1f * fadeSamplesLeft / samplesForFade;
-					fade = (MathF.Cos(status * MathF.PI) + 1) / 2;
+					fade = MathE.Fade(status);
 					antifade = 1 - fade;
 				}
 

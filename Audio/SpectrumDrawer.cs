@@ -51,7 +51,7 @@ namespace MusGen
 					int y = Convert.ToInt32(theirSizes[i] * yScale);
 
 					Clr clr = GraphicsE.RainbowM(i * 1f / verticalLines.Length);
-					int w = (int)((10f / 1920f) * _resX);
+					int w = (int)((5f / 1920f) * _resX);
 
 					_wbmpL1.DrawLineAa(x, _yHalf - y, x, _yHalf, clr, w);
 				}
@@ -126,9 +126,10 @@ namespace MusGen
 
 					float power0_1 = theirSizes[i];
 					//power0_1 = Math2.ToLogScale(power0_1, 10);
-					float power0_2559 = (2559 * power0_1);
-					int power = Math.Min((int)power0_2559, 2559);
-					Clr clr = _gradient[power];
+					//float power0_2559 = (2559 * power0_1);
+					//int power = Math.Min((int)power0_2559, 2559);
+					//FIX ME
+					Clr clr = _gradient[2559];
 
 					_wbmpL1.DrawLineAa(x, _yHalf + 1, x, _yHalf + 2, clr, penWidth);
 				}

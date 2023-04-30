@@ -35,8 +35,8 @@ namespace Extensions
 					indexA++;
 
 					for (int i = indexA; i <= indexB; i++)
-						newArray[x] += array[i];
-					newArray[x] /= indexB - indexA + 1;
+						newArray[x] = MathF.Max(newArray[x], array[i]);
+					//newArray[x] /= indexB - indexA + 1;
 				}
 				indexA = indexB;			
 			}
