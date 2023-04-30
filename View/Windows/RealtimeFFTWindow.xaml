@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:MusGen.View.Windows"
         mc:Ignorable="d"
         Title="RealtimeFFTWindow" Height="450" Width="800"
-		MouseDoubleClick="Window_MouseDoubleClick">
+		MouseDoubleClick="Window_MouseDoubleClick"
+		Closing="Window_Closing">
 	<Grid>
 		<Image Name="img" Stretch="Fill" />
 		<TextBlock Name="fps" Text="60" Margin="0,0,5,0" TextAlignment="Right" VerticalAlignment="Top" HorizontalAlignment="Right" Height="25" Width="60" FontFamily="Consolas" FontSize="20" Foreground="Blue"/>

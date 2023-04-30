@@ -46,6 +46,8 @@ namespace MusGen
 		{
 			NadSample ns = new NadSample(AP._channels);
 
+			
+
 			SpectrumFinder.Find(wav, s);
 			SpectrumFinder.Logarithmise();
 

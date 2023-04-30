@@ -35,6 +35,11 @@ namespace Extensions
 			return MathF.Log(x * (base_ - 1) + 1, base_);
 		}
 
+		public static float ToLogScaleReverse(float y, float base_)
+		{
+			return (MathF.Pow(base_, y) - 1) / (base_ - 1);
+		}
+
 		public static byte[] FloatToBytes(float d)
 		{
 			return BitConverter.GetBytes(d);

@@ -9,11 +9,14 @@ namespace MusGen
 {
 	public static class RealtimeFFT
 	{
+		private static Thread _tr;
+		private static bool _started;
+
 		public static void Start()
 		{
-			Thread tr = new(Tr);
-			tr.Name = "Realtime FFT";
-			tr.Start();
+			_tr = new(Tr);
+			_tr.Name = "Realtime FFT";
+			_tr.Start();
 
 			void Tr()
 			{
@@ -48,11 +51,13 @@ namespace MusGen
 				wav._sampleRate = (int)AP._sampleRate;
 				wav.L = new float[AP._fftSize];
 
-				while (true)
-				{
-					FPS();					
+				_started = true;
 
-					wav.L = AudioCapturer.GetSamples(AP._fftSize);
+				while (_started)
+				{
+					FPS();
+
+					wav.L = AudioCapturer.GetSamples(AP._fftSize * AP._lc);
 
 					nadsOld = nads;
 					nads = WavToNadConvertor.MakeSample(wav, 0);
@@ -101,18 +106,7 @@ namespace MusGen
 				void DrawSpectrum()
 				{
 					if (AP._graphType == 1)
-					{
-						float[] fix = new float[SpectrumFinder._spectrum.Length];
-						for (int index = 0; index < SpectrumFinder._spectrum.Length; index++)
-						{
-							float a = SpectrumFinder._spectrum[index];
-							float b = SoundPressureModel.GetSoundPressureLevel(SpectrumFinder._frequenciesLinear[index]);
-
-							fix[index] = a * b;
-						} /////////////////////////////////////////////////////////
-
 						_wbmp = SpectrumDrawer.DrawType1(SpectrumFinder._spectrumLogarithmic, nads._indexes, nads._amplitudes, adaptiveCeiling, adaptiveCeiling);
-					}
 					else if (AP._graphType == 2)
 						_wbmp = SpectrumDrawer.DrawType2(nads._indexes, nads._amplitudes, adaptiveCeiling, adaptiveCeiling);
 					else if (AP._graphType == 3)
@@ -125,6 +119,20 @@ namespace MusGen
 					adaptiveCeiling = Math.Max(adaptiveCeiling, nads._amplitudes[0]);
 					adaptiveCeiling = Math.Max(adaptiveCeiling, 0.0001f);
 				}
+			}
+		}
+
+		public static void Stop()
+		{
+			Thread stopThread = new(StopThread);
+			stopThread.Name = "Stop Thread";
+			stopThread.Start();
+
+			void StopThread()
+			{
+				_started = false;
+				while (_tr.ThreadState != System.Threading.ThreadState.Stopped) { };
+				AudioCapturer.Stop();
 			}
 		}
 	}

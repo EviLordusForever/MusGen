@@ -4,6 +4,8 @@
 	{
 		public static uint _sampleRate = 44100;
 		public static int _fftSize = 2048;
+		public static int _fftSizeLow = 2048;
+		public static int _lc = 8;
 		public static int _channels = 10;
 		public static int _nadSamplesPerSecond = 100;
 		public static float _peakSize = 70; //

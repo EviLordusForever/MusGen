@@ -63,5 +63,10 @@ namespace MusGen.View.Windows
             WindowState = _windowState;
             _isFullScreen = false;
         }
-    }
+
+		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+		{
+            RealtimeFFT.Stop();
+		}
+	}
 }
