@@ -127,11 +127,11 @@ namespace MusGen
 			_spectrumLogarithmic = ArrayE.RescaleArrayToLog(_spectrum, AP._fftSize, AP._fftSize / 2);
 
 			float lastIndex = AP._fftSize / 2 / AP._lc;
-			lastIndex *= 1.1f;
+			lastIndex *= 1.25f;
 			int L = AP._fftSize / 2;
 			float y = (int)(MathE.ToLogScale(lastIndex / L, L) * L);
 
-			_spectrumLowLogarithmic = ArrayE.RescaleArrayToLog(_spectrumLow, AP._fftSizeLow, (int)y);
+			_spectrumLowLogarithmic = ArrayE.RescaleArrayToLog(_spectrumLow, AP._fftSizeLow / AP._lc, (int)y);
 			if (gg % 100 > 66)
 				AP._lc = 16;
 			else
