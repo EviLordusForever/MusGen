@@ -2,16 +2,15 @@
 {
 	public static class AP
 	{
-		public static uint _sampleRate = 88200;
+		public static uint _sampleRateNadToWav = 44100;
+		public static uint _sampleRateRTFFTMicrophone = 44100;
+		public static uint _sampleRateRTFFTSystem = 44100;
+		private static uint _sampleRate = 44100;
 		public static int _fftSize = 1024;
 		public static int _lc = 16; //how much fftLow bigger than fft
 		public static int _channels = 10;
 		public static int _nadSamplesPerSecond = 100;
 		public static float _peakSize = 70; //
-		public static bool _logarithmicNad = true; //
-
-		public static float _smoothXScale = 2000f;
-		public static float _smoothYScale = 0.95f;
 
 		public static int _wbmpResX = 256 * 2;
 		public static int _wbmpResY = 16 * 9 * 2;
@@ -24,5 +23,19 @@
 		public static string _windowFunction = "hamming";
 
 		public static int _graphType = 1;
+
+		public static uint SampleRate
+		{
+			get
+			{
+				return _sampleRate;
+			}
+			set
+			{
+				_sampleRate = value;
+				Logger.Log($"Sample rate was set to {_sampleRate}");
+				SpectrumFinder.InitFrequencies();
+			}
+		}
 	}
 }

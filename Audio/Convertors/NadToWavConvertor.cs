@@ -15,22 +15,22 @@ namespace MusGen
 
 		public static Wav Make(Nad nad)
 		{
-			int length = (int)AP._sampleRate * nad._duration;
-			Wav wav = new Wav();
-			wav.L = new float[length];
+			int length = (int)AP._sampleRateNadToWav * nad._duration;
+			Wav wav = new Wav(length, 1);
 
 			return Make(nad, wav);
 		}
 
 		public static Wav Make(Nad nad, Wav wav)
 		{
+			AP.SampleRate = AP._sampleRateNadToWav;
 			int length = wav.Length;
 			double[] t = new double[AP._channels];
 			double[] tOld = new double[AP._channels];
 			int fadeSamplesLeft = 0;
-			int samplesForFade = (int)(AP._fadeTime * AP._sampleRate / AP._nadSamplesPerSecond);
+			int samplesForFade = (int)(AP._fadeTime * AP.SampleRate / AP._nadSamplesPerSecond);
 			float pi2 = MathF.PI * 2;
-			float buf = pi2 / AP._sampleRate;
+			float buf = pi2 / AP.SampleRate;
 			int progressStep = (int)(length / 2000);
 			float max = 0;
 
@@ -117,8 +117,6 @@ namespace MusGen
 				}
 			}
 		}
-
-		//
 
 		public static double F(double t)
 		{

@@ -5,7 +5,7 @@ using NAudio.Wave;
 
 namespace MusGen
 {
-	public static class AudioCapturer
+	public static class AudioCapturerMicrophone
 	{
 		public static WaveInEvent _waveInEvent;
 		public static List<float> _samples = new List<float>();
@@ -14,7 +14,7 @@ namespace MusGen
 		{
 			_waveInEvent = new WaveInEvent();
 			_waveInEvent.WaveFormat = new WaveFormat((int)sampleRate, bits, channels);
-			_waveInEvent.BufferMilliseconds = 1000 / 100;
+			_waveInEvent.BufferMilliseconds = 1000 / AP._nadSamplesPerSecond;
 			_waveInEvent.DataAvailable += (sender, e) =>
 			{
 				for (int i = 0; i < e.Buffer.Length; i += 2)
@@ -22,6 +22,8 @@ namespace MusGen
 			};
 
 			_waveInEvent.StartRecording();
+
+			Logger.Log($"Capturing from microphone was started.");
 		}
 
 		public static float[] GetSamples(int count)
@@ -43,6 +45,7 @@ namespace MusGen
 		{
 			_waveInEvent.StopRecording();
 			_waveInEvent.Dispose();
+			Logger.Log($"Capturing from microphone was stopped.");
 		}
 	}
 }

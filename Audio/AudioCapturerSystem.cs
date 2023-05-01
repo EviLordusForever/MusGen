@@ -44,6 +44,7 @@ namespace MusGen
 			};
 
 			_capture.StartRecording();
+			Logger.Log($"Capturing from system was started.");
 		}
 
 		public static float[] GetSamples(int count)
@@ -73,6 +74,7 @@ namespace MusGen
 		{
 			_capture.StopRecording();
 			_capture.Dispose();
+			Logger.Log($"Capturing from system was stopped.");
 		}
 	}
 }

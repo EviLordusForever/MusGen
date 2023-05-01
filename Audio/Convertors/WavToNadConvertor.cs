@@ -10,18 +10,14 @@ namespace MusGen
 	public static class WavToNadConvertor
 	{
 		private static float _lastSample;
-		private static float _sampleRate;
 		private static double _step;
-		private static float _delme;
-		private static int _delme2;
 
 		public static Nad Make(Wav wav)
 		{
 			_lastSample = wav.Length - AP._fftSize;
-			_sampleRate = wav._sampleRate;
-			_step = _sampleRate / AP._nadSamplesPerSecond;
+			_step = wav._sampleRate / AP._nadSamplesPerSecond;
 			int samplesCount = (int)Math.Ceiling(_lastSample / _step);
-			int duration = (int)Math.Ceiling(wav.Length / _sampleRate);
+			int duration = (int)Math.Ceiling(1f * wav.Length / wav._sampleRate);
 
 			Nad nad = new Nad(AP._channels, samplesCount, duration);
 
@@ -48,32 +44,11 @@ namespace MusGen
 		{
 			NadSample ns = new NadSample(AP._channels);
 
-/*			if (wav.L[5000] == _delme)
-				_delme2++;
-			else
-				_delme2 = 0;
-
-			if (_delme2 > 8)
-			{
-			}*/
-
-			//_delme = wav.L[5000];
-
 			SpectrumFinder.Find(wav, s);
-			SpectrumFinder.Logarithmise();
 
-			if (!AP._logarithmicNad)
-			{
-				ns._indexes = PeaksFinder.Find(SpectrumFinder._spectrum, AP._channels, AP._peakSize);
-				ns._amplitudes = MathE.GetValues(SpectrumFinder._spectrum, ns._indexes);
-				ns._frequencies = MathE.GetValues(SpectrumFinder._frequenciesLinear, ns._indexes);
-			}
-			else
-			{
-				ns._indexes = PeaksFinder.Find(SpectrumFinder._spectrumLogarithmic, AP._channels, AP._peakSize);
-				ns._amplitudes = MathE.GetValues(SpectrumFinder._spectrumLogarithmic, ns._indexes);
-				ns._frequencies = MathE.GetValues(SpectrumFinder._frequenciesLogarithmic, ns._indexes);
-			}
+			ns._indexes = PeaksFinder.Find(SpectrumFinder._spectrumLogarithmic, AP._channels, AP._peakSize);
+			ns._amplitudes = MathE.GetValues(SpectrumFinder._spectrumLogarithmic, ns._indexes);
+			ns._frequencies = MathE.GetValues(SpectrumFinder._frequenciesLogarithmic, ns._indexes);
 
 			return ns;
 		}

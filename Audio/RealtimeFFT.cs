@@ -39,7 +39,7 @@ namespace MusGen
 				var backBufferStride = _wbmp.BackBufferStride;
 
 				int frames = 0;
-				var fps = 0;
+				int fps = 0;
 				float adaptiveCeiling = 3; //
 				NadSample nads = new NadSample(AP._channels);
 				NadSample nadsOld = new NadSample(AP._channels);
@@ -47,14 +47,20 @@ namespace MusGen
 				stopwatch.Start();
 
 				if (AP._captureType == "microphone")
-					AudioCapturer.Start(AP._sampleRate, 16, 1);
+				{
+					AP.SampleRate = AP._sampleRateRTFFTMicrophone;
+					AudioCapturerMicrophone.Start(AP.SampleRate, 16, 1);
+				}
 				else if (AP._captureType == "system")
-					AudioCapturerSystem.Start(AP._sampleRate, 16, 1);
+				{
+					AP.SampleRate = AP._sampleRateRTFFTSystem;
+					AudioCapturerSystem.Start(AP.SampleRate, 16, 1);
+				}
 
 				SpectrumDrawer.Init();
 
 				Wav wav = new Wav();
-				wav._sampleRate = (int)AP._sampleRate;
+				wav._sampleRate = (int)AP.SampleRate;
 				wav.L = new float[AP._fftSize];
 
 				_started = true;
@@ -64,7 +70,7 @@ namespace MusGen
 					FPS();
 
 					if (AP._captureType == "microphone")
-						wav.L = AudioCapturer.GetSamples(AP._fftSize * AP._lc);
+						wav.L = AudioCapturerMicrophone.GetSamples(AP._fftSize * AP._lc);
 					else if (AP._captureType == "system")
 						wav.L = AudioCapturerSystem.GetSamples(AP._fftSize * AP._lc);
 
@@ -145,7 +151,7 @@ namespace MusGen
 					while (_tr.ThreadState != System.Threading.ThreadState.Stopped) { };
 
 					if (AP._captureType == "microphone")
-						AudioCapturer.Stop();
+						AudioCapturerMicrophone.Stop();
 					else if (AP._captureType == "system")
 						AudioCapturerSystem.Stop();
 				}
