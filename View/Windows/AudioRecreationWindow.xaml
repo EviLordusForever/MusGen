@@ -6,17 +6,16 @@
         xmlns:local="clr-namespace:MusGen.View.Windows"
 		xmlns:tbPro="clr-namespace:MusGen.View.Controls" d:DataContext="{d:DesignInstance Type=tbPro:TextBoxPro}"
 		mc:Ignorable="d"
-        Title="AudioRecreationWindow" Height="256" Width="400">
-    <Grid>
+        Title="Audio recreation" Height="256" Width="400">
+    <Grid Margin="10,10,10,10">
 		<Grid.RowDefinitions>
 			<RowDefinition/>
-			<RowDefinition Height="1*" />
+			<RowDefinition/>
 			<RowDefinition/>
 		</Grid.RowDefinitions>
 
-		<Button Name ="SelBtn" Width="350" Height="50" Content="Select .wav file" FontSize="25" Click="SelBtn_Click"></Button>
-		<Label Content="GG" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1"></Label>
-		<Button Name ="ProcessBtn" Width="350" Height="50" Content="Process" FontSize="25" Grid.Row="2" Click="ProcessBtn_Click"></Button>
-		<tbPro:TextBoxPro x:Name ="outNameTb" Placeholder="Out file name" Width="350" Height="50" Grid.Row="1"></tbPro:TextBoxPro>
+		<Button Margin="10,10,10,10" Name ="SelBtn"  Content="Select .wav file" FontSize="25" Click="SelBtn_Click"></Button>
+		<Button Margin="10,10,10,10" Name ="ProcessBtn"  Content="Process" FontSize="25" Grid.Row="2" Click="ProcessBtn_Click"></Button>
+		<tbPro:TextBoxPro Margin="10,10,10,10" VerticalAlignment="Stretch" x:Name ="outNameTb" Placeholder="Out file name" Grid.Row="1"></tbPro:TextBoxPro>
 	</Grid>	
 </Window>

@@ -16,6 +16,7 @@ namespace MusGen
 		public static ProgressWindow _progressWindow;
 		public static RealtimeFFTWindow _realtimeFFTWindow;
 		public static MainWindow _mainWindow;
+		public static AboutWindow _aboutWindow;
 
 		public static void OpenRealtimeFFTWindow()
 		{
@@ -27,6 +28,18 @@ namespace MusGen
 
 			_realtimeFFTWindow.Activate();
 			_realtimeFFTWindow.WindowState = WindowState.Maximized;
+		}
+
+		public static void OpenAboutWindow()
+		{
+			if (_aboutWindow == null || !_aboutWindow.IsVisible)
+			{
+				_aboutWindow = new AboutWindow();
+				_aboutWindow.Show();
+			}
+
+			_aboutWindow.Activate();
+			_aboutWindow.WindowState = WindowState.Normal;
 		}
 
 		public static void OpenProgressWindow(string text)

@@ -30,14 +30,15 @@ namespace MusGen
 			MoveDown();
 			FillBlack();
 			Scales();
-			DrawSpectrum();
-			DrawArray();
+			DrawPartDown();
+			DrawPartUp();
 			DrawVerticalLines();
 			return _wbmpL1;
 
 			void FillBlack()
 			{
 				GraphicsE.FillRectangle(_wbmpL1, Clr.FromRgb(0, 0, 0), new System.Windows.Int32Rect(0, 0, _resX, _yHalf + 1));
+				_wbmpL1.DrawLine(0, _yHalf, _resX, _yHalf, Clr.FromRgb(25, 25, 25));
 			}
 
 			void DrawVerticalLines()
@@ -53,11 +54,12 @@ namespace MusGen
 					Clr clr = GraphicsE.RainbowM(i * 1f / verticalLines.Length);
 					int w = (int)((5f / 1920f) * _resX);
 
-					_wbmpL1.DrawLineAa(x, _yHalf - y, x, _yHalf, clr, w);
+					if (y >= 1)
+						_wbmpL1.DrawLineAa(x, _yHalf - 1, x, _yHalf - y, clr, w);
 				}
 			}
 
-			void DrawArray()
+			void DrawPartUp()
 			{
 				for (int i = 0; i < input_array.Length; i++)
 				{
@@ -67,11 +69,12 @@ namespace MusGen
 
 					int x = Convert.ToInt32(i * xScale);
 
-					_wbmpL1.DrawLineAa(x, _yHalf - y, x, _yHalf, Clr.FromRgb(255, 255, 255), 1); //
+					if (y >= 1)
+						_wbmpL1.DrawLineAa(x, _yHalf - 1, x, _yHalf - y, Clr.FromRgb(255, 255, 255), 1); //
 				}
 			}
 
-			void DrawSpectrum()
+			void DrawPartDown()
 			{
 				int penWidth = Convert.ToInt32(xScale) + 1;
 
@@ -104,6 +107,7 @@ namespace MusGen
 			MoveDown();
 			FillBlack();
 			Scales();
+			int penWidth = Convert.ToInt32(xScale) / 2 + 1;
 			DrawPartUp();
 			DrawPartDown();
 			return _wbmpL1;
@@ -115,8 +119,6 @@ namespace MusGen
 
 			void DrawPartDown()
 			{
-				int penWidth = Convert.ToInt32(xScale) + 1;
-
 				for (int i = 0; i < verticalLines.Length; i++)
 				{
 					if (theirSizes[i] > Int32.MaxValue)
@@ -124,12 +126,10 @@ namespace MusGen
 
 					int x = Convert.ToInt32(verticalLines[i] * xScale);
 
-					float power0_1 = theirSizes[i];
-					//power0_1 = Math2.ToLogScale(power0_1, 10);
-					//float power0_2559 = (2559 * power0_1);
-					//int power = Math.Min((int)power0_2559, 2559);
-					//FIX ME
-					Clr clr = _gradient[2559];
+					float power0_1 = theirSizes[i] / adaptiveCeiling;
+					float power0_2559 = (2559 * power0_1);
+
+					Clr clr = _gradient[(int)power0_2559];
 
 					_wbmpL1.DrawLineAa(x, _yHalf + 1, x, _yHalf + 2, clr, penWidth);
 				}
@@ -137,15 +137,12 @@ namespace MusGen
 
 			void DrawPartUp()
 			{
-				int penWidth = Convert.ToInt32(xScale) + 1;
-
 				for (int i = 0; i < verticalLines.Length; i++)
 				{
 					if (theirSizes[i] > Int32.MaxValue)
 						continue;
 
 					float power0_1 = theirSizes[i];
-					//power0_1 = Math2.ToLogScale(power0_1, 10);
 
 					int x = Convert.ToInt32(verticalLines[i] * xScale);
 					int y = Convert.ToInt32(power0_1 * yScaleUp * 0.95);

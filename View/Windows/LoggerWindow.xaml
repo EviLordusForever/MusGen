@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MusGen.View.Windows"
         mc:Ignorable="d"
-        Title="LoggerWindow" Height="450" Width="800">
+        Title="Logs" Height="450" Width="800">
     <Grid>
 		<RichTextBox Name="RTB" IsReadOnly="true" FontFamily="Consolas" Background="Black" Foreground="Lime">
 			<FlowDocument>

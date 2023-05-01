@@ -5,20 +5,26 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MusGen"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="798">
-
+        Title="MusGen" Height="450" Width="798">
 	<Grid>
 		<Image Name ="image" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="UniformToFill"></Image>
-		<Grid Margin="20, 50, 20, 50">
+		<Grid Margin="20, 80, 20, 80">
 			<Grid.RowDefinitions>
+				<RowDefinition/>
+				<RowDefinition/>
 				<RowDefinition/>
 				<RowDefinition/>
 				<RowDefinition/>
 			</Grid.RowDefinitions>
 
-			<Button Width="440" Height="70" Margin ="0,15,0,15" Content="Audio Recreation" FontSize="32" Grid.Row="0" Click="Button_Click"></Button>
-			<Button Width="440" Height="70" Margin ="0,15,0,15" Content="Realtime FFT (system)" FontSize="32" Grid.Row="1" Click="Button_Click_2"></Button>
-			<Button Width="440" Height="70" Margin ="0,15,0,15" Content="Realtime FFT (microphone)" FontSize="32" Grid.Row="2" Click="Button_Click_1"></Button>
+			<Button FontSize="22" Width="400" Margin ="0,3,0,3" Content="Realtime spectrogram (system)"  Grid.Row="0" Click="Button_Click_2"></Button>
+			<Button FontSize="22" Width="400" Margin ="0,3,0,3" Content="Realtime spectrogram (microphone)" Grid.Row="1" Click="Button_Click_1"></Button>
+			<ComboBox FontSize="22" Width="400" Margin ="0,3,0,3" Name="combobox" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" SelectedIndex="0" Grid.Row="2" SelectionChanged="ComboBox_Selected">
+				<ComboBoxItem>Spectrogram type 1</ComboBoxItem>
+				<ComboBoxItem>Spectrogram type 2</ComboBoxItem>
+			</ComboBox>
+			<Button FontSize="22" Width="400" Margin ="0,3,0,3" Content="Audio Recreation"  Grid.Row="3" Click="Button_Click"></Button>
+			<Button FontSize="22" Width="400" Margin ="0,3,0,3" Content="About" Grid.Row="4" Click="Button_Click_3"></Button>
 		</Grid>
-		</Grid>
+	</Grid>
 </Window>

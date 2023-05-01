@@ -36,16 +36,29 @@ namespace MusGen
 
 		private void Button_Click_1(object sender, RoutedEventArgs e)
 		{
-			RealtimeFFT.Stop();
 			WindowsManager.OpenRealtimeFFTWindow();
 			RealtimeFFT.Start("microphone");
 		}
 
 		private void Button_Click_2(object sender, RoutedEventArgs e)
 		{
-			RealtimeFFT.Stop();
 			WindowsManager.OpenRealtimeFFTWindow();
 			RealtimeFFT.Start("system");
+		}
+
+		private void ComboBox_Selected(object sender, RoutedEventArgs e)
+		{
+			ComboBoxItem selectedItem = combobox.SelectedItem as ComboBoxItem;
+			string s = selectedItem.Content.ToString();
+			if (s == "Spectrogram type 1")
+				AP._graphType = 1;
+			else if (s == "Spectrogram type 2")
+				AP._graphType = 2;
+		}
+
+		private void Button_Click_3(object sender, RoutedEventArgs e)
+		{
+			WindowsManager.OpenAboutWindow();
 		}
 	}
 }

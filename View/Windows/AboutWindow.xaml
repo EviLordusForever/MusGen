@@ -1,0 +1,43 @@
+﻿<Window x:Class="MusGen.View.Windows.AboutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MusGen.View.Windows"
+        mc:Ignorable="d"
+        Title="About" Height="260" Width="500">
+	<Grid>
+		<Grid Margin="0,0,0,0">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="1.8*"/>
+				<RowDefinition Height="2.8*"/>
+				<RowDefinition Height="1*"/>
+				<RowDefinition Height="8*"/>
+				<RowDefinition Height="2.5*"/>
+			</Grid.RowDefinitions>
+			<TextBlock TextAlignment="Center" VerticalAlignment="Center" FontSize="20" Grid.Row="1" FontWeight="Bold">
+				MusGen
+			</TextBlock>
+			<Grid Grid.Row="3" Margin="0,0,0,0">
+				<Grid.RowDefinitions>
+					<RowDefinition/>
+					<RowDefinition/>
+					<RowDefinition/>
+					<RowDefinition/>
+				</Grid.RowDefinitions>
+				<TextBlock TextAlignment="Center" VerticalAlignment="Center" FontSize="20" Grid.Row="0">
+				Auhtor:
+				</TextBlock>
+				<TextBlock TextAlignment="Center" VerticalAlignment="Center" FontSize="20" Grid.Row="1">
+				vk.com/kesha_two
+				</TextBlock>
+				<TextBlock TextAlignment="Center" VerticalAlignment="Center" FontSize="20" Grid.Row="2">
+				youtube.com/evilordusforever
+				</TextBlock>
+				<TextBlock TextAlignment="Center" VerticalAlignment="Center" FontSize="20" Grid.Row="3">
+				devil.mining.999@gmail.com
+				</TextBlock>
+			</Grid>
+		</Grid>
+	</Grid>
+</Window>

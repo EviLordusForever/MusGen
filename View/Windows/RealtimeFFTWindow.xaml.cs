@@ -20,7 +20,6 @@ namespace MusGen.View.Windows
 	public partial class RealtimeFFTWindow : Window
 	{
         private WindowStyle _windowStyle;
-        private ResizeMode _resizeMode;
         private WindowState _windowState;
         private bool _isFullScreen;
 
@@ -29,7 +28,6 @@ namespace MusGen.View.Windows
 			InitializeComponent();
 
             _windowState = WindowState.Normal;
-            _resizeMode = ResizeMode.CanResize;
             _windowStyle = WindowStyle.SingleBorderWindow;
             _isFullScreen = true;
 
@@ -47,11 +45,9 @@ namespace MusGen.View.Windows
         private void FullScreen()
         {
             _windowStyle = WindowStyle;
-            _resizeMode = ResizeMode;
             _windowState = WindowState;
 
             WindowStyle = WindowStyle.None;
-            ResizeMode = ResizeMode.NoResize;
             WindowState = WindowState.Maximized;
             _isFullScreen = true;
         }
@@ -59,14 +55,13 @@ namespace MusGen.View.Windows
         private void RestoreFromFullScreen()
         {
             WindowStyle = _windowStyle;
-            ResizeMode = _resizeMode;
             WindowState = _windowState;
             _isFullScreen = false;
         }
 
 		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
 		{
-            RealtimeFFT.Stop();
+            RealtimeFFT.StopAsync();
 		}
 	}
 }

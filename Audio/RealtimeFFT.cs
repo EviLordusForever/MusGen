@@ -9,19 +9,32 @@ namespace MusGen
 {
 	public static class RealtimeFFT
 	{
-		private static Thread _tr;
+		private static Thread _rtfftThread;
 		private static bool _started;
 
 		public static void Start(string type)
 		{
-			AP._captureType = type;
+			Thread startingThread = new(StartingThread);
+			startingThread.Name = "Starting thread";
+			startingThread.Start();
 
-			_tr = new(Tr);
-			_tr.Name = "Realtime FFT";
-			_tr.Start();
-
-			void Tr()
+			void StartingThread()
 			{
+				Stop();
+				AP._captureType = type;
+				Start();
+			}
+		}
+
+		private static void Start()
+		{
+			_rtfftThread = new(RTFFThread);
+			_rtfftThread.Name = "Realtime FFT";
+			_rtfftThread.Start();
+
+			void RTFFThread()
+			{
+				_started = true;
 				Logger.Log("Realtime FFT started.");
 				
 				BitmapSource bitmapSource;
@@ -62,8 +75,6 @@ namespace MusGen
 				Wav wav = new Wav();
 				wav._sampleRate = (int)AP.SampleRate;
 				wav.L = new float[AP._fftSize];
-
-				_started = true;
 
 				while (_started)
 				{
@@ -141,23 +152,23 @@ namespace MusGen
 		{
 			if (_started)
 			{
-				Thread stopThread = new(StopThread);
-				stopThread.Name = "Stop Thread";
-				stopThread.Start();
+				_started = false;
+				while (_rtfftThread.ThreadState != System.Threading.ThreadState.Stopped) { };
 
-				void StopThread()
-				{
-					_started = false;
-					while (_tr.ThreadState != System.Threading.ThreadState.Stopped) { };
+				if (AP._captureType == "microphone")
+					AudioCapturerMicrophone.Stop();
+				else if (AP._captureType == "system")
+					AudioCapturerSystem.Stop();
 
-					if (AP._captureType == "microphone")
-						AudioCapturerMicrophone.Stop();
-					else if (AP._captureType == "system")
-						AudioCapturerSystem.Stop();
-
-					Logger.Log("Realtime FFT stopped.");
-				}
+				Logger.Log("Realtime FFT stopped.");
 			}
+		}
+
+		public static void StopAsync()
+		{
+			Thread stoppingThread = new(Stop);
+			stoppingThread.Name = "Stopping async";
+			stoppingThread.Start();
 		}
 	}
 }
