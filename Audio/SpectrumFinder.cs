@@ -28,14 +28,8 @@ namespace MusGen
 			_spectrumLowLogarithmic = new float[AP._fftSize / 2];
 
 			InitFrequencies();
-			InitFrequenciesLogarithmic();
 			FillFadeLowMask();
 			Logger.Log("Spectrum finder was initialized.");
-
-			void InitFrequenciesLogarithmic()
-			{
-				_frequenciesLogarithmic = ArrayE.RescaleArrayToLog(_frequenciesLinear, AP._fftSize, AP._fftSize / 2);
-			}
 
 			void FillFadeLowMask()
 			{
@@ -72,6 +66,8 @@ namespace MusGen
 
 			for (int index = 0; index < AP._fftSize / 2; index++)
 				_frequenciesLinear[index] = (1f * index / AP._fftSize) * AP.SampleRate;
+
+			_frequenciesLogarithmic = ArrayE.RescaleArrayToLog(_frequenciesLinear, AP._fftSize, AP._fftSize / 2);
 		}
 
 		public static void Find(Wav wav, int start)

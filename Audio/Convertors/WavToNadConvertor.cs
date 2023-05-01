@@ -14,7 +14,8 @@ namespace MusGen
 
 		public static Nad Make(Wav wav)
 		{
-			_lastSample = wav.Length - AP._fftSize;
+			_lastSample = wav.Length;
+			Array.Resize(ref wav.L, wav.Length + AP._fftSize * AP._lc);
 			_step = wav._sampleRate / AP._nadSamplesPerSecond;
 			int samplesCount = (int)Math.Ceiling(_lastSample / _step);
 			int duration = (int)Math.Ceiling(1f * wav.Length / wav._sampleRate);
@@ -83,7 +84,7 @@ namespace MusGen
 				int idCompared = compares[id];
 
 				_indexesCompared[id] = newNad._indexes[idCompared];
-				_frequenciesCompared[id] = newNad._indexes[idCompared];
+				_frequenciesCompared[id] = newNad._frequencies[idCompared];
 				_amplitudesCompared[id] = newNad._amplitudes[idCompared];
 			}
 

@@ -154,6 +154,8 @@ namespace MusGen
 						AudioCapturerMicrophone.Stop();
 					else if (AP._captureType == "system")
 						AudioCapturerSystem.Stop();
+
+					Logger.Log("Realtime FFT stopped.");
 				}
 			}
 		}
