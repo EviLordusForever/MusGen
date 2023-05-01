@@ -148,7 +148,6 @@ namespace MusGen
 						AudioCapturer.Stop();
 					else if (AP._captureType == "system")
 						AudioCapturerSystem.Stop();
-
 				}
 			}
 		}

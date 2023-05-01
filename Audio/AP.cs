@@ -2,7 +2,7 @@
 {
 	public static class AP
 	{
-		public static uint _sampleRate = 44100;
+		public static uint _sampleRate = 88200;
 		public static int _fftSize = 1024;
 		public static int _lc = 16; //how much fftLow bigger than fft
 		public static int _channels = 10;
