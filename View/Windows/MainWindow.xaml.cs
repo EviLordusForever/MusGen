@@ -36,8 +36,16 @@ namespace MusGen
 
 		private void Button_Click_1(object sender, RoutedEventArgs e)
 		{
+			RealtimeFFT.Stop();
 			WindowsManager.OpenRealtimeFFTWindow();
-			RealtimeFFT.Start();
+			RealtimeFFT.Start("microphone");
+		}
+
+		private void Button_Click_2(object sender, RoutedEventArgs e)
+		{
+			RealtimeFFT.Stop();
+			WindowsManager.OpenRealtimeFFTWindow();
+			RealtimeFFT.Start("system");
 		}
 	}
 }

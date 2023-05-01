@@ -6,8 +6,6 @@ namespace MusGen
 {
 	public static class SpectrumFinder
 	{
-		public static int gg;
-
 		public static float[] _spectrum;
 		public static float[] _spectrumLogarithmic;
 		public static float[] _oldSpectrum;
@@ -104,7 +102,6 @@ namespace MusGen
 
 			return _spectrum;
 
-
 			void FillComplexFromWav()
 			{
 				complex = new Complex[AP._fftSize];
@@ -113,7 +110,7 @@ namespace MusGen
 				{
 					float wf = WindowFunction.F(i);					
 					complex[i] = new Complex(wav.L[start + offset + i] * wf, 0);
-				}
+				}	
 			}
 
 			void FillComplexFromWavLow()

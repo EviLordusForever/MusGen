@@ -12,8 +12,10 @@ namespace MusGen
 		private static Thread _tr;
 		private static bool _started;
 
-		public static void Start()
+		public static void Start(string type)
 		{
+			AP._captureType = type;
+
 			_tr = new(Tr);
 			_tr.Name = "Realtime FFT";
 			_tr.Start();
@@ -44,7 +46,11 @@ namespace MusGen
 				var stopwatch = new Stopwatch();
 				stopwatch.Start();
 
-				AudioCapturer.Start(AP._sampleRate, 16, 1);
+				if (AP._captureType == "microphone")
+					AudioCapturer.Start(AP._sampleRate, 16, 1);
+				else if (AP._captureType == "system")
+					AudioCapturerSystem.Start(AP._sampleRate, 16, 1);
+
 				SpectrumDrawer.Init();
 
 				Wav wav = new Wav();
@@ -57,7 +63,10 @@ namespace MusGen
 				{
 					FPS();
 
-					wav.L = AudioCapturer.GetSamples(AP._fftSize * AP._lc);
+					if (AP._captureType == "microphone")
+						wav.L = AudioCapturer.GetSamples(AP._fftSize * AP._lc);
+					else if (AP._captureType == "system")
+						wav.L = AudioCapturerSystem.GetSamples(AP._fftSize * AP._lc);
 
 					nadsOld = nads;
 					nads = WavToNadConvertor.MakeSample(wav, 0);
@@ -124,15 +133,23 @@ namespace MusGen
 
 		public static void Stop()
 		{
-			Thread stopThread = new(StopThread);
-			stopThread.Name = "Stop Thread";
-			stopThread.Start();
-
-			void StopThread()
+			if (_started)
 			{
-				_started = false;
-				while (_tr.ThreadState != System.Threading.ThreadState.Stopped) { };
-				AudioCapturer.Stop();
+				Thread stopThread = new(StopThread);
+				stopThread.Name = "Stop Thread";
+				stopThread.Start();
+
+				void StopThread()
+				{
+					_started = false;
+					while (_tr.ThreadState != System.Threading.ThreadState.Stopped) { };
+
+					if (AP._captureType == "microphone")
+						AudioCapturer.Stop();
+					else if (AP._captureType == "system")
+						AudioCapturerSystem.Stop();
+
+				}
 			}
 		}
 	}

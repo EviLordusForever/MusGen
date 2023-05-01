@@ -1,27 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Drawing;
 
 namespace Extensions
 {
-	public static class ScreenE
-	{
-		public static Bitmap TakeScreen()
-		{
-			int w = Screen.PrimaryScreen.Bounds.Width;
-			int h = Screen.PrimaryScreen.Bounds.Height;
-			Bitmap bmp = new Bitmap(w, h);
-			Graphics gr = Graphics.FromImage(bmp);
-			gr.CopyFromScreen(0, 0, 0, 0, new System.Drawing.Size(w, h));
-			return bmp;
-		}
+    public static class ScreenE
+    {
+        public static Bitmap TakeScreen()
+        {
+            int w = Screen.PrimaryScreen.Bounds.Width;
+            int h = Screen.PrimaryScreen.Bounds.Height;
+            Bitmap bmp = new Bitmap(w, h);
+            Graphics gr = Graphics.FromImage(bmp);
+            gr.CopyFromScreen(0, 0, 0, 0, new System.Drawing.Size(w, h));
+            return bmp;
+        }
 
         public static WriteableBitmap TakeScreenWbmp()
         {

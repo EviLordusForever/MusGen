@@ -9,14 +9,16 @@
 
 	<Grid>
 		<Image Name ="image" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="UniformToFill"></Image>
-		<Grid>
+		<Grid Margin="20, 50, 20, 50">
 			<Grid.RowDefinitions>
+				<RowDefinition/>
 				<RowDefinition/>
 				<RowDefinition/>
 			</Grid.RowDefinitions>
 
-			<Button Width="400" Height="100" Margin ="0,15,0,15" Content="Audio Recreation" FontSize="35" Grid.Row="0" Click="Button_Click"></Button>
-			<Button Width="400" Height="100" Margin ="0,15,0,15" Content="Realtime FFT" FontSize="35" Grid.Row="1" Click="Button_Click_1"></Button>
+			<Button Width="440" Height="70" Margin ="0,15,0,15" Content="Audio Recreation" FontSize="32" Grid.Row="0" Click="Button_Click"></Button>
+			<Button Width="440" Height="70" Margin ="0,15,0,15" Content="Realtime FFT (system)" FontSize="32" Grid.Row="1" Click="Button_Click_2"></Button>
+			<Button Width="440" Height="70" Margin ="0,15,0,15" Content="Realtime FFT (microphone)" FontSize="32" Grid.Row="2" Click="Button_Click_1"></Button>
 		</Grid>
 		</Grid>
 </Window>

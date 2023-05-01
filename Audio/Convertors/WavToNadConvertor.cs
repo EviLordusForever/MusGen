@@ -12,6 +12,8 @@ namespace MusGen
 		private static float _lastSample;
 		private static float _sampleRate;
 		private static double _step;
+		private static float _delme;
+		private static int _delme2;
 
 		public static Nad Make(Wav wav)
 		{
@@ -46,11 +48,19 @@ namespace MusGen
 		{
 			NadSample ns = new NadSample(AP._channels);
 
-			
+/*			if (wav.L[5000] == _delme)
+				_delme2++;
+			else
+				_delme2 = 0;
+
+			if (_delme2 > 8)
+			{
+			}*/
+
+			//_delme = wav.L[5000];
 
 			SpectrumFinder.Find(wav, s);
 			SpectrumFinder.Logarithmise();
-
 
 			if (!AP._logarithmicNad)
 			{
