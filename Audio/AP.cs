@@ -13,7 +13,7 @@
 		public static float _peakSize = 70; //
 
 		public static int _wbmpResX = 256 * 2;
-		public static int _wbmpResY = 16 * 9 * 2;
+		public static int _wbmpResY = 16 * 9 * 2 * 2;
 
 		public static float _fadeTime = 0.99f;
 		public static string _waveForm = "sin";

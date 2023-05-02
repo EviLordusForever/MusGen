@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Windows;
+using System.Windows.Media.Imaging;
 using Extensions;
-using static Extensions.ArrayE;
 
 namespace MusGen
 {

@@ -35,6 +35,16 @@ namespace Extensions
 			return (MathF.Cos(count * MathF.PI) + 1) / 2;
 		}
 
+		public static float LogPro(float x, float base_)
+		{
+			return MathF.Pow(base_, x / base_);
+		}
+
+		public static float LogProReverse(float x, float base_)
+		{
+			return base_ * MathF.Log(x, base_);
+		}
+
 		public static float ToLogScale(float x, float base_)
 		{
 			return MathF.Log(x * (base_ - 1) + 1, base_);

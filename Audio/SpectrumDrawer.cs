@@ -37,8 +37,9 @@ namespace MusGen
 
 			void FillBlack()
 			{
-				GraphicsE.FillRectangle(_wbmpL1, Clr.FromRgb(0, 0, 0), new System.Windows.Int32Rect(0, 0, _resX, _yHalf + 1));
+				GraphicsE.FillRectangle(_wbmpL1, Clr.FromArgb(0, 0, 0, 0), new System.Windows.Int32Rect(0, 0, _resX, _yHalf + 1));
 				_wbmpL1.DrawLine(0, _yHalf, _resX, _yHalf, Clr.FromRgb(25, 25, 25));
+				_wbmpL1.DrawLine(0, _yHalf+1, _resX, _yHalf+1, Clr.FromArgb(0, 0, 0, 0));
 			}
 
 			void DrawVerticalLines()
@@ -76,15 +77,13 @@ namespace MusGen
 
 			void DrawPartDown()
 			{
-				int penWidth = Convert.ToInt32(xScale) + 1;
-
 				for (int i = 0; i < input_array.Length; i++)
 				{
 					int power = Math.Min((int)(2559 * input_array[i] * powerScale), 2559);
 
 					int x = Convert.ToInt32(i * xScale);
 
-					_wbmpL1.DrawLineAa(x, _yHalf + 1, x, _yHalf + 2, _gradient[power], penWidth);
+					_wbmpL1.SetPixel(x, _yHalf + 1, _gradient[power]);
 				}
 			}
 
@@ -107,14 +106,16 @@ namespace MusGen
 			MoveDown();
 			FillBlack();
 			Scales();
-			int penWidth = Convert.ToInt32(xScale) / 2 + 1;
+			int penWidth = Convert.ToInt32(xScale)/2 + 1;
 			DrawPartUp();
 			DrawPartDown();
 			return _wbmpL1;
 
 			void FillBlack()
 			{
-				GraphicsE.FillRectangle(_wbmpL1, Clr.FromRgb(0, 0, 0), new System.Windows.Int32Rect(0, 0, _resX, _yHalf + 1));
+				GraphicsE.FillRectangle(_wbmpL1, Clr.FromArgb(0, 0, 0, 0), new System.Windows.Int32Rect(0, 0, _resX, _yHalf + 1));
+				_wbmpL1.DrawLine(0, _yHalf, _resX, _yHalf, Clr.FromRgb(25, 25, 25));
+				_wbmpL1.DrawLine(0, _yHalf + 1, _resX, _yHalf + 1, Clr.FromArgb(0, 0, 0, 0));
 			}
 
 			void DrawPartDown()
@@ -127,11 +128,12 @@ namespace MusGen
 					int x = Convert.ToInt32(verticalLines[i] * xScale);
 
 					float power0_1 = theirSizes[i] / adaptiveCeiling;
-					float power0_2559 = (2559 * power0_1);
+					float powerSqrt = MathF.Sqrt(power0_1);
+					byte power0_255 = (byte)(powerSqrt * 255);
 
-					Clr clr = _gradient[(int)power0_2559];
+					Clr clr = Clr.FromArgb(power0_255, 255, 255, 0);
 
-					_wbmpL1.DrawLineAa(x, _yHalf + 1, x, _yHalf + 2, clr, penWidth);
+					_wbmpL1.DrawLine(x - penWidth, _yHalf + 1, x + penWidth, _yHalf + 1, clr);
 				}
 			}
 
@@ -245,7 +247,7 @@ namespace MusGen
 
 		public static void MoveDown()
 		{
-			WBMP.CopyPixels(_wbmpL1, _wbmpL1, 0, _yHalf, 0, _yHalf + 1, _resX, _yHalf - 1);
+			WBMP.CopyPixels(_wbmpL1, _wbmpL1, 0, _yHalf + 1, 0, _yHalf + 2, _resX, _yHalf - 2);
 		}
 
 		static SpectrumDrawer()
@@ -272,7 +274,7 @@ namespace MusGen
 			Clr[] clrs = new Clr[7];
 			int[] sizes = new int[6];
 
-			clrs[0] = Clr.FromArgb(255, 0, 0, 0);
+			clrs[0] = Clr.FromArgb(0, 0, 0, 0);
 			clrs[1] = Clr.FromArgb(255, 25, 0, 255);
 			clrs[2] = Clr.FromArgb(255, 215, 0, 255);
 			clrs[3] = Clr.FromArgb(255, 185, 25, 0);
