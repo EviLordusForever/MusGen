@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
+using System.Collections;
+using System.IO;
+using System.Linq;
+using System.Globalization;
 
 namespace Extensions
 {
 	public static class TextE
 	{
-		public static string[] SplitPro(string str, string separator)
+		public static string[] ProSplit(string str, string separator)
 		{
 			//Like ususal spit, but with string separators
 
@@ -96,6 +101,32 @@ namespace Extensions
 			}
 
 			return str.Split('~');
+		}
+
+		public static string ToCsvString<T>(params IEnumerable<T>[] arrays)
+		{
+			var columnCount = arrays.Length;
+			var rowCount = arrays.Max(a => a.Count());
+
+			var separator = ";";
+
+			var csvLines = new List<string>();
+
+			for (var i = 0; i < rowCount; i++)
+			{
+				var row = new List<string>();
+
+				for (var j = 0; j < columnCount; j++)
+				{
+					var value = i < arrays[j].Count()
+						? arrays[j].ElementAt(i).ToString() : "";
+					row.Add(value);
+				}
+
+				csvLines.Add(string.Join(separator, row));
+			}
+
+			return string.Join("\n", csvLines);
 		}
 
 		public static List<string> SplitReverse(string str, char c, int count)

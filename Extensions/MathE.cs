@@ -105,44 +105,40 @@ namespace Extensions
 			return (actual - from) / (to - from);
 		}
 
-		public static float Max(float[] array)
+		public static T Max<T>(T[] array) where T : IComparable<T>
 		{
-			float max = array[0];
+			T max = array[0];
 			for (int i = 1; i < array.Length; i++)
-				if (array[i] > max)
+				if (array[i].CompareTo(max) > 0)
 					max = array[i];
+
 			return max;
 		}
 
-		public static int Max(int[] array)
+		public static T Min<T>(T[] array) where T : IComparable<T>
 		{
-			int max = array[0];
-			for (int i = 1; i < array.Length; i++)
-				if (array[i] > max)
-					max = array[i];
-			return max;
-		}
+			T min = array[0];
 
-		public static float Min(float[] array)
-		{
-			float min = array[0];
 			for (int i = 1; i < array.Length; i++)
-				if (array[i] < min)
+				if (array[i].CompareTo(min) < 0)
 					min = array[i];
+
 			return min;
 		}
 
-		public static int IndexOfMax(float[] array)
+		public static int IndexOfMax<T>(T[] array) where T : IComparable<T>
 		{
-			float max = array[0];
-			int id = 0;
+			T max = array[0];
+			int index = 0;
 			for (int i = 1; i < array.Length; i++)
-				if (array[i] > max)
+			{
+				if (array[i].CompareTo(max) > 0)
 				{
 					max = array[i];
-					id = i;
+					index = i;
 				}
-			return id;
+			}
+			return index;
 		}
 
 		public static void FindMinAndMaxForLastNPoints(List<float> array, ref float currentMin, ref float currentMax, int n)

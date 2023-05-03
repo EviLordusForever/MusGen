@@ -6,6 +6,7 @@ using System.Drawing;
 using Extensions;
 using Clr = System.Windows.Media.Color;
 using static MusGen.HardwareParams;
+using System.Windows;
 
 namespace MusGen
 {
@@ -20,6 +21,8 @@ namespace MusGen
 		public static List<Clr> _gradient;
 		public static int[] _oldXs;
 		public static int[] _oldYs;
+		public static float _indexPianoStart;
+		public static float _indexPianoEnd;
 
 		public static WriteableBitmap DrawType1(float[] input_array, int[] verticalLines, float[] theirSizes, float adaptiveCeiling, float maxCeiling)
 		{
@@ -79,7 +82,9 @@ namespace MusGen
 			{
 				for (int i = 0; i < input_array.Length; i++)
 				{
-					int power = Math.Min((int)(2559 * input_array[i] * powerScale), 2559);
+					int lim = _gradient.Count - 1;
+
+					int power = Math.Min((int)(lim * input_array[i] * powerScale), lim);
 
 					int x = Convert.ToInt32(i * xScale);
 
@@ -131,7 +136,7 @@ namespace MusGen
 					float powerSqrt = MathF.Sqrt(power0_1);
 					byte power0_255 = (byte)(powerSqrt * 255);
 
-					Clr clr = Clr.FromArgb(power0_255, 255, 255, 0);
+					Clr clr = Clr.FromArgb(power0_255, 0, 255, 200);
 
 					_wbmpL1.DrawLine(x - penWidth, _yHalf + 1, x + penWidth, _yHalf + 1, clr);
 				}
@@ -250,6 +255,74 @@ namespace MusGen
 			WBMP.CopyPixels(_wbmpL1, _wbmpL1, 0, _yHalf + 1, 0, _yHalf + 2, _resX, _yHalf - 2);
 		}
 
+		public static void SetOctaves()
+		{
+			float spectrumSize = AP._fftSize / 2;
+
+			float b0 = 30.87f;
+			float c1 = 32.7f;
+			float b9 = 15728f;
+			float c10 = 8372.02f * 2;
+
+			float start = (b0 + c1) / 2;
+			float end = (b9 + c10) / 2;
+
+			_indexPianoStart = Find(start);
+			_indexPianoEnd = Find(end);
+
+			double l = _indexPianoStart;
+			double r = spectrumSize - _indexPianoEnd;
+			double w = _indexPianoEnd - _indexPianoStart;
+
+			SetPianoRoll();
+
+			float Find(float f)
+			{
+				int i = 0;
+
+				while (SpectrumFinder._frequenciesLogarithmic[i] < f)
+					i++;
+
+				float fmore = SpectrumFinder._frequenciesLogarithmic[i];
+				float fless = SpectrumFinder._frequenciesLogarithmic[i - 1];
+
+				float value = (f - fless) / (fmore - fless);
+				float indexIdeal = i - 1 + value;
+				return indexIdeal;
+			}
+
+			void SetPianoRoll()
+			{
+				if (WindowsManager._realtimeFFTWindow != null)
+				{
+					WindowsManager._realtimeFFTWindow.Dispatcher.Invoke(() =>
+					{
+						BitmapImage bitmap = new BitmapImage();
+						bitmap.BeginInit();
+						bitmap.UriSource = new Uri($"{DiskE._programFiles}\\Images\\PianoRoll.png");
+						bitmap.EndInit();
+						WriteableBitmap bitmap9 = WBMP.Create((int)bitmap.Width * 9, (int)bitmap.Height);
+
+						for (int i = 0; i < 9; i++)
+						{
+							int x = i * (int)bitmap.Width;
+							WBMP.CopyPixels(bitmap, bitmap9, 0, 0, x, 0, (int)bitmap.Width, (int)bitmap.Height);
+							if (i % 2 == 1)
+								WBMP.MultiplyAlpha(bitmap9, 0.6f, x, 0, (int)bitmap.Width, (int)bitmap.Height);
+						}
+
+						WindowsManager._realtimeFFTWindow.piano.Source = bitmap9;
+						WindowsManager._realtimeFFTWindow.piano.Opacity = 0.075;
+
+						WindowsManager._realtimeFFTWindow.piano.Stretch = System.Windows.Media.Stretch.Fill;
+						WindowsManager._realtimeFFTWindow.grid.ColumnDefinitions[0].Width = new GridLength(l, GridUnitType.Star);
+						WindowsManager._realtimeFFTWindow.grid.ColumnDefinitions[1].Width = new GridLength(w, GridUnitType.Star);
+						WindowsManager._realtimeFFTWindow.grid.ColumnDefinitions[2].Width = new GridLength(r, GridUnitType.Star);
+					});
+				}
+			}
+		}
+
 		static SpectrumDrawer()
 		{
 			Init();
@@ -270,29 +343,30 @@ namespace MusGen
 
 			_wbmpL2 = WBMP.Create(_resX, _resY);
 
-
 			Clr[] clrs = new Clr[7];
 			int[] sizes = new int[6];
 
-			clrs[0] = Clr.FromArgb(0, 0, 0, 0);
-			clrs[1] = Clr.FromArgb(255, 25, 0, 255);
-			clrs[2] = Clr.FromArgb(255, 215, 0, 255);
-			clrs[3] = Clr.FromArgb(255, 185, 25, 0);
-			clrs[4] = Clr.FromArgb(255, 255, 100, 0);
+			clrs[0] = Clr.FromArgb(0, 0, 50, 255);
+			clrs[1] = Clr.FromArgb(255, 30, 0, 255);
+			clrs[2] = Clr.FromArgb(255, 155, 25, 225);
+			clrs[3] = Clr.FromArgb(255, 255, 30, 20);
+			clrs[4] = Clr.FromArgb(255, 255, 90, 0);
 			clrs[5] = Clr.FromArgb(255, 255, 255, 0);
 			clrs[6] = Clr.FromArgb(255, 255, 255, 255);
 
-			sizes[0] = 80; //to blue
-			sizes[1] = 120; //to purple 200
-			sizes[2] = 300; //to red 500
-			sizes[3] = 150; //to orange 650
-			sizes[4] = 800; //to yellow 1450
-			sizes[5] = 1110; //to white 2560
+			sizes[0] = 90; //to blue
+			sizes[1] = 80; //to purple
+			sizes[2] = 110; //to red
+			sizes[3] = 270; //to orange
+			sizes[4] = 590; //to yellow
+			sizes[5] = 1410; //to white
 
 			_gradient = new List<Clr>();
 
 			for (int i = 0; i < sizes.Length; i++)
 				_gradient.AddRange(GraphicsE.GetColorGradient(clrs[i], clrs[i + 1], sizes[i]));
+
+			SetOctaves();
 		}
 	}
 }

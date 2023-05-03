@@ -15,6 +15,8 @@ namespace MusGen
 
 		public static float[] _frequenciesLinear;
 		public static float[] _frequenciesLogarithmic;
+		public static float[] _frequenciesLowLinear;
+		public static float[] _frequenciesLowLogarithmic;
 
 		private static int _spectrumLowEndIndex;
 		private static float[] _fadeLowMask;
@@ -34,10 +36,7 @@ namespace MusGen
 
 			void FillFadeLowMask()
 			{
-				float lastIndex = AP._fftSize / 2f / AP._lc;
-				int L0 = AP._fftSize;
-				int L = AP._fftSize / 2;
-				_spectrumLowEndIndex = (int)(MathE.ToLogScale(lastIndex / L, L0) * L);
+				
 
 				float start = _spectrumLowEndIndex / 2f;
 				float count = _spectrumLowEndIndex - start;
@@ -61,14 +60,35 @@ namespace MusGen
 			}
 		}
 
+		public static void FindLowIndex()
+		{
+			float lastIndex = AP._fftSize / 2f / AP._lc;
+			int L0 = AP._fftSize;
+			int L = AP._fftSize / 2;
+			_spectrumLowEndIndex = (int)(MathE.ToLogScale(lastIndex / L, L0) * L) - 1;
+			_spectrumLowEndIndex -= 1;
+		}
+
 		public static void InitFrequencies()
 		{
+			FindLowIndex();
+
 			_frequenciesLinear = new float[AP._fftSize / 2];
+			_frequenciesLowLinear = new float[AP._fftSize / 2];
 
 			for (int index = 0; index < AP._fftSize / 2; index++)
 				_frequenciesLinear[index] = (1f * index / AP._fftSize) * AP.SampleRate;
 
+			for (int index = 0; index < AP._fftSize / 2; index++)
+				_frequenciesLowLinear[index] = (1f * index / AP._fftSize) * AP.SampleRate / AP._lc;
+
 			_frequenciesLogarithmic = ArrayE.RescaleArrayToLog(_frequenciesLinear, AP._fftSize, AP._fftSize / 2);
+			_frequenciesLowLogarithmic = ArrayE.RescaleArrayToLog(_frequenciesLowLinear, AP._fftSize / AP._lc, (int)_spectrumLowEndIndex);
+			
+			DiskE.WriteToProgramFiles("frqs", "csv", TextE.ToCsvString(_frequenciesLinear, _frequenciesLogarithmic, _frequenciesLowLinear, _frequenciesLowLogarithmic), false);
+
+			for (int i = 0; i < _frequenciesLowLogarithmic.Length; i++)
+				_frequenciesLogarithmic[i] = _frequenciesLowLogarithmic[i];
 		}
 
 		public static void Find(Wav wav, int start)

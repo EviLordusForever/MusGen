@@ -35,6 +35,7 @@
 				_sampleRate = value;
 				Logger.Log($"Sample rate was set to {_sampleRate}");
 				SpectrumFinder.InitFrequencies();
+				SpectrumDrawer.SetOctaves();
 			}
 		}
 	}

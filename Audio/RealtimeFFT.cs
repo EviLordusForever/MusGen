@@ -35,8 +35,6 @@ namespace MusGen
 
 			void RTFFThread()
 			{
-				SetNotes();
-
 				_started = true;
 				Logger.Log("Realtime FFT started.");
 				
@@ -62,6 +60,9 @@ namespace MusGen
 				var stopwatch = new Stopwatch();
 				stopwatch.Start();
 
+				SpectrumFinder.InitFrequencies();
+				SpectrumDrawer.Init();
+
 				if (AP._captureType == "microphone")
 				{
 					AP.SampleRate = AP._sampleRateRTFFTMicrophone;
@@ -71,9 +72,7 @@ namespace MusGen
 				{
 					AP.SampleRate = AP._sampleRateRTFFTSystem;
 					AudioCapturerSystem.Start(AP.SampleRate, 16, 1);
-				}
-
-				SpectrumDrawer.Init();
+				}				
 
 				Wav wav = new Wav();
 				wav._sampleRate = (int)AP.SampleRate;
@@ -165,56 +164,6 @@ namespace MusGen
 
 				Logger.Log("Realtime FFT stopped.");
 			}
-		}
-
-		public static void SetNotes()
-		{
-			WindowsManager._realtimeFFTWindow.Dispatcher.Invoke(() =>
-			{
-				BitmapImage bitmap = new BitmapImage();
-				bitmap.BeginInit();
-				bitmap.UriSource = new Uri($"{DiskE._programFiles}\\Images\\PianoRoll.png");
-				bitmap.EndInit();
-				WindowsManager._realtimeFFTWindow.piano.Source = bitmap;
-				WindowsManager._realtimeFFTWindow.piano.Opacity = 0.05;
-
-				float spectrumSize = AP._fftSize / 2;
-
-				float b0 = 30.87f;
-				float c1 = 32.7f;
-				float b7 = 3951.07f;
-				float c8 = 4186.01f;
-
-				float start = (b0 + c1) / 2;
-				float end = (b7 + c8) / 2;
-
-				float index1 = Find(start);
-				float index2 = Find(end);
-
-				double l = index1;
-				double r = spectrumSize - index2;
-				double w = index2 - index1;
-
-				WindowsManager._realtimeFFTWindow.piano.Stretch = System.Windows.Media.Stretch.Fill;
-				WindowsManager._realtimeFFTWindow.grid.ColumnDefinitions[0].Width = new GridLength(l, GridUnitType.Star);
-				WindowsManager._realtimeFFTWindow.grid.ColumnDefinitions[1].Width = new GridLength(w, GridUnitType.Star);
-				WindowsManager._realtimeFFTWindow.grid.ColumnDefinitions[2].Width = new GridLength(r, GridUnitType.Star);
-			
-				float Find(float f)
-				{
-					int i = 0;
-
-					while (SpectrumFinder._frequenciesLogarithmic[i] < f)
-						i++;
-
-					float fmore = SpectrumFinder._frequenciesLogarithmic[i];
-					float fless = SpectrumFinder._frequenciesLogarithmic[i - 1];
-
-					float value = (f - fless) / (fmore - fless);
-					float indexIdeal = i - 1 + value;
-					return indexIdeal;
-				}
-			});			
 		}
 
 		public static void StopAsync()
