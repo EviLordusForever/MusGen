@@ -22,6 +22,9 @@ namespace MusGen
 					WindowsManager._mainWindow.WindowState = WindowState.Minimized;
 				}));
 
+				SpectrumFinder.Init();
+				SpectrumDrawer.Init();
+
 				Logger.Log("Tests are started...");
 
 				Tests.HungarianAlgorithm();

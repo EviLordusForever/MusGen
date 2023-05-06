@@ -54,6 +54,36 @@ namespace Extensions
 			return indexes;
 		}
 
+		public static T[] InterpolateArray<T>(T[] source, int targetLength) where T : struct, IConvertible
+		{
+			if (!typeof(T).IsPrimitive)
+			{
+				throw new ArgumentException("The type parameter T must be a primitive type.", nameof(T));
+			}
+
+			T[] result = new T[targetLength];
+			double step = (double)(source.Length - 1) / (targetLength - 1);
+
+			for (int i = 0; i < targetLength; i++)
+			{
+				double index = i * step;
+				int roundedIndex = (int)Math.Floor(index);
+				double fraction = index - roundedIndex;
+
+				if (roundedIndex >= source.Length - 1)
+				{
+					result[i] = source[source.Length - 1];
+				}
+				else
+				{
+					dynamic value1 = source[roundedIndex];
+					dynamic value2 = source[roundedIndex + 1];
+					result[i] = (T)((value1 * (1.0 - fraction)) + (value2 * fraction));
+				}
+			}
+
+			return result;
+		}
 
 		public static T[] SubArray<T>(this T[] array, int offset, int length)
 		{

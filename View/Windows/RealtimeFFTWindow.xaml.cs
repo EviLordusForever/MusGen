@@ -28,6 +28,17 @@ namespace MusGen.View.Windows
 		{
 			InitializeComponent();
 
+            if (AP._graphType == 4)
+            {
+                piano.Visibility = Visibility.Hidden;
+                circular.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                piano.Visibility = Visibility.Visible;
+                circular.Visibility = Visibility.Hidden;
+            }
+
             _windowState = WindowState.Normal;
             _windowStyle = WindowStyle.SingleBorderWindow;
             _isFullScreen = true;
@@ -41,6 +52,9 @@ namespace MusGen.View.Windows
                 FullScreen();
             else
                 RestoreFromFullScreen();
+
+            img.InvalidateMeasure();
+            img.InvalidateVisual();
         }
 
         private void FullScreen()

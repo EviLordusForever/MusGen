@@ -100,9 +100,39 @@ namespace Extensions
 			return ret;
 		}
 
-		public static double Interpolate(double from, double to, double actual)
+		public static T Interpolate<T>(T from, T to, T actual) where T : struct, IComparable, IConvertible
 		{
-			return (actual - from) / (to - from);
+			if (!typeof(T).IsPrimitive)
+			{
+				throw new ArgumentException("T must be a primitive type.");
+			}
+
+			double fromDouble = Convert.ToDouble(from);
+			double toDouble = Convert.ToDouble(to);
+			double actualDouble = Convert.ToDouble(actual);
+
+			double resultDouble = (actualDouble - fromDouble) / (toDouble - fromDouble);
+
+			return (T)Convert.ChangeType(resultDouble, typeof(T));
+		}
+
+		public static T GetAngle<T>(T x1, T y1, T x2, T y2) where T : struct, IComparable, IConvertible
+		{
+			if (!typeof(T).IsPrimitive)
+			{
+				throw new ArgumentException("T must be a primitive type.");
+			}
+
+			double x1Double = Convert.ToDouble(x1);
+			double y1Double = Convert.ToDouble(y1);
+			double x2Double = Convert.ToDouble(x2);
+			double y2Double = Convert.ToDouble(y2);
+
+			double angle = Math.Atan2(y2Double - y1Double, x2Double - x1Double);
+			angle += Math.PI;
+			angle /= 2 * Math.PI;
+
+			return (T)Convert.ChangeType(angle, typeof(T));
 		}
 
 		public static T Max<T>(T[] array) where T : IComparable<T>

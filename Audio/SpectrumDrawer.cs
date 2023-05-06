@@ -7,6 +7,7 @@ using Extensions;
 using Clr = System.Windows.Media.Color;
 using static MusGen.HardwareParams;
 using System.Windows;
+using MusGen.View.Windows;
 
 namespace MusGen
 {
@@ -18,11 +19,15 @@ namespace MusGen
 		public static WriteableBitmap _wbmpL1;
 		public static WriteableBitmap _wbmpL2;
 		public static WriteableBitmap _wbmp;
+		public static WriteableBitmap _wbmpO;
 		public static List<Clr> _gradient;
 		public static int[] _oldXs;
 		public static int[] _oldYs;
 		public static float _indexPianoStart;
 		public static float _indexPianoEnd;
+
+		public static WriteableBitmap _pianoRollWbmp;
+		public static WriteableBitmap _circularWbmp;
 
 		public static WriteableBitmap DrawType1(float[] input_array, int[] verticalLines, float[] theirSizes, float adaptiveCeiling, float maxCeiling)
 		{
@@ -42,7 +47,7 @@ namespace MusGen
 			{
 				GraphicsE.FillRectangle(_wbmpL1, Clr.FromArgb(0, 0, 0, 0), new System.Windows.Int32Rect(0, 0, _resX, _yHalf + 1));
 				_wbmpL1.DrawLine(0, _yHalf, _resX, _yHalf, Clr.FromRgb(25, 25, 25));
-				_wbmpL1.DrawLine(0, _yHalf+1, _resX, _yHalf+1, Clr.FromArgb(0, 0, 0, 0));
+				_wbmpL1.DrawLine(0, _yHalf + 1, _resX, _yHalf + 1, Clr.FromArgb(0, 0, 0, 0));
 			}
 
 			void DrawVerticalLines()
@@ -250,98 +255,148 @@ namespace MusGen
 			}
 		}
 
+		public static WriteableBitmap DrawType4(float[] octave, int[] verticalLines, float[] theirSizes, float adaptiveCeiling, float maxCeiling)
+		{
+			float rScale;
+			int octaveSize = octave.Length;
+
+			_wbmpO.Clear();
+			Scales();
+			Draw();
+			return _wbmpO;
+
+			void Draw()
+			{
+				float rot = 0.5f + 1 / 24f;
+				float angle01 = 1f * (octaveSize - 1) / octaveSize + rot;
+				float radians = (angle01 * 360) * MathF.PI / 180;
+				int oldX = (int)(MathF.Sin(radians) * octave[octaveSize - 1] * rScale);
+				int oldY = -(int)(MathF.Cos(radians) * octave[octaveSize - 1] * rScale);
+
+				oldX += _yHalf;
+				oldY += _yHalf;
+
+				for (int i = 0; i < octaveSize; i++)
+				{
+					angle01 = 1f * i / octaveSize + rot;
+					radians = (angle01 * 360) * MathF.PI / 180;
+
+					int x = (int)(MathF.Sin(radians) * octave[i] * rScale);
+
+					int y = -(int)(MathF.Cos(radians) * octave[i] * rScale);
+
+					_yHalf = (int)(_wbmpO.Height / 2);
+
+					x += _yHalf;
+					y += _yHalf;
+
+					_wbmpO.DrawLine(oldX, oldY, x, y, Clr.FromRgb(255, 255, 255));
+
+					oldX = x;
+					oldY = y;
+				}
+			}
+
+			void Scales()
+			{
+				rScale = 1f * _resY / Math.Max(octave.Max(), adaptiveCeiling);
+				rScale /= 2;
+			}
+		}
+
 		public static void MoveDown()
 		{
 			WBMP.CopyPixels(_wbmpL1, _wbmpL1, 0, _yHalf + 1, 0, _yHalf + 2, _resX, _yHalf - 2);
 		}
 
-		public static void SetOctaves()
+		public static void InitPianoImages()
 		{
-			float spectrumSize = AP._fftSize / 2;
+			Application.Current.Dispatcher.Invoke(() => Method());
 
-			float b0 = 30.87f;
-			float c1 = 32.7f;
-			float b9 = 15728f;
-			float c10 = 8372.02f * 2;
-
-			float start = (b0 + c1) / 2;
-			float end = (b9 + c10) / 2;
-
-			_indexPianoStart = Find(start);
-			_indexPianoEnd = Find(end);
-
-			double l = _indexPianoStart;
-			double r = spectrumSize - _indexPianoEnd;
-			double w = _indexPianoEnd - _indexPianoStart;
-
-			SetPianoRoll();
-
-			float Find(float f)
+			void Method()
 			{
-				int i = 0;
+				float spectrumSize = AP._fftSize / 2;
 
-				while (SpectrumFinder._frequenciesLogarithmic[i] < f)
-					i++;
+				BitmapImage bitmap = new BitmapImage();
+				bitmap.BeginInit();
+				bitmap.UriSource = new Uri($"{DiskE._programFiles}\\Images\\PianoRoll.png");
+				bitmap.EndInit();
+				_pianoRollWbmp = WBMP.Create((int)bitmap.Width * 9, (int)bitmap.Height);
 
-				float fmore = SpectrumFinder._frequenciesLogarithmic[i];
-				float fless = SpectrumFinder._frequenciesLogarithmic[i - 1];
-
-				float value = (f - fless) / (fmore - fless);
-				float indexIdeal = i - 1 + value;
-				return indexIdeal;
-			}
-
-			void SetPianoRoll()
-			{
-				if (WindowsManager._realtimeFFTWindow != null)
+				for (int i = 0; i < 9; i++)
 				{
-					WindowsManager._realtimeFFTWindow.Dispatcher.Invoke(() =>
-					{
-						BitmapImage bitmap = new BitmapImage();
-						bitmap.BeginInit();
-						bitmap.UriSource = new Uri($"{DiskE._programFiles}\\Images\\PianoRoll.png");
-						bitmap.EndInit();
-						WriteableBitmap bitmap9 = WBMP.Create((int)bitmap.Width * 9, (int)bitmap.Height);
-
-						for (int i = 0; i < 9; i++)
-						{
-							int x = i * (int)bitmap.Width;
-							WBMP.CopyPixels(bitmap, bitmap9, 0, 0, x, 0, (int)bitmap.Width, (int)bitmap.Height);
-							if (i % 2 == 1)
-								WBMP.MultiplyAlpha(bitmap9, 0.6f, x, 0, (int)bitmap.Width, (int)bitmap.Height);
-						}
-
-						WindowsManager._realtimeFFTWindow.piano.Source = bitmap9;
-						WindowsManager._realtimeFFTWindow.piano.Opacity = 0.075;
-
-						WindowsManager._realtimeFFTWindow.piano.Stretch = System.Windows.Media.Stretch.Fill;
-						WindowsManager._realtimeFFTWindow.grid.ColumnDefinitions[0].Width = new GridLength(l, GridUnitType.Star);
-						WindowsManager._realtimeFFTWindow.grid.ColumnDefinitions[1].Width = new GridLength(w, GridUnitType.Star);
-						WindowsManager._realtimeFFTWindow.grid.ColumnDefinitions[2].Width = new GridLength(r, GridUnitType.Star);
-					});
+					int x = i * (int)bitmap.Width;
+					WBMP.CopyPixels(bitmap, _pianoRollWbmp, 0, 0, x, 0, (int)bitmap.Width, (int)bitmap.Height);
+					if (i % 2 == 1)
+						WBMP.MultiplyAlpha(_pianoRollWbmp, 0.6f, x, 0, (int)bitmap.Width, (int)bitmap.Height);
 				}
+
+				int diameter = AP._circularPianoImageDiameter;
+				int radius = diameter / 2;
+				_circularWbmp = WBMP.Create((int)(diameter * 16f / 9), diameter);
+				for (int x = 0; x < diameter; x++)
+					for (int y = 0; y < diameter; y++)
+					{
+						float distance = MathF.Pow(MathF.Pow((radius - x), 2) + MathF.Pow((radius - y), 2), 0.5f);
+						if (distance < radius && distance > radius * 0.75f)
+						{
+							float angle = MathE.GetAngle((float)x, y, radius, radius);
+
+							float rot = 0.75f - 1 / 24f;
+
+							if (angle > rot)
+								angle -= rot;
+							else
+								angle += (1 - rot);
+
+							int x0 = (int)(angle * bitmap.Width);
+							var clr = _pianoRollWbmp.GetPixel(x0, 0);
+							_circularWbmp.SetPixel(x, y, clr);
+						}
+					}
 			}
 		}
 
-		static SpectrumDrawer()
+		public static void SetPianoImages()
 		{
-			Init();
+			float spectrumSize = AP._fftSize / 2;
+
+			double l = SpectrumFinder._octavesIndexes[0];
+			double r = spectrumSize - SpectrumFinder._octavesIndexes[9];
+			double w = SpectrumFinder._octavesIndexes[9] - SpectrumFinder._octavesIndexes[0];
+
+			if (WindowsManager._realtimeFFTWindow != null)
+			{
+				WindowsManager._realtimeFFTWindow.Dispatcher.Invoke(() => Method());
+
+				void Method()
+				{
+					WindowsManager._realtimeFFTWindow.piano.Source = _pianoRollWbmp;
+					WindowsManager._realtimeFFTWindow.grid.ColumnDefinitions[0].Width = new GridLength(l, GridUnitType.Star);
+					WindowsManager._realtimeFFTWindow.grid.ColumnDefinitions[1].Width = new GridLength(w, GridUnitType.Star);
+					WindowsManager._realtimeFFTWindow.grid.ColumnDefinitions[2].Width = new GridLength(r, GridUnitType.Star);
+					WindowsManager._realtimeFFTWindow.circular.Source = _circularWbmp;
+				}
+			}
 		}
 
 		public static void Init()
 		{
 			_resX = AP._wbmpResX;
 			_resY = AP._wbmpResY;
-			_yHalf = AP._wbmpResY / 2;
+			_yHalf = _resY / 2;
 			_oldXs = new int[AP._channels];
 			_oldYs = new int[AP._channels];
 			for (int i = 0; i < AP._channels; i++)
 				_oldYs[i] = _resY / 2 - 5;
+
 			_wbmp = WBMP.Create(_resX, _resY);
 
 			_wbmpL1 = WBMP.Create(_resX, _resY);
 
 			_wbmpL2 = WBMP.Create(_resX, _resY);
+
+			_wbmpO = WBMP.Create((int)(_resY * 16f / 9), _resY);
 
 			Clr[] clrs = new Clr[7];
 			int[] sizes = new int[6];
@@ -366,7 +421,10 @@ namespace MusGen
 			for (int i = 0; i < sizes.Length; i++)
 				_gradient.AddRange(GraphicsE.GetColorGradient(clrs[i], clrs[i + 1], sizes[i]));
 
-			SetOctaves();
+			InitPianoImages();
+			SetPianoImages();
+
+			Logger.Log("Spectrum Drawer was initialized.");
 		}
 	}
 }

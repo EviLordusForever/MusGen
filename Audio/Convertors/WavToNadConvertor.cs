@@ -65,7 +65,7 @@ namespace MusGen
 				for (int idOld = 0; idOld < c; idOld++)
 				{
 					x = oldNad._indexes[idOld] - newNad._indexes[idNew];
-					x /= (SpectrumFinder._spectrum.Length / 2);
+					x /= (SpectrumFinder._spectrumLinear.Length / 2);
 					x *= 4; //check
 
 					y = oldNad._amplitudes[idOld] - newNad._amplitudes[idNew];

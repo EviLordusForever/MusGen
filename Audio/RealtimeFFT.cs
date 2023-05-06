@@ -12,6 +12,7 @@ namespace MusGen
 	{
 		private static Thread _rtfftThread;
 		private static bool _started;
+		private static float[] _octave;
 
 		public static void Start(string type)
 		{
@@ -40,27 +41,18 @@ namespace MusGen
 				
 				BitmapSource bitmapSource;
 
-				WriteableBitmap _wbmp = WBMP.Create(AP._wbmpResX, AP._wbmpResY);
-
-				var bytesPerPixel = (_wbmp.Format.BitsPerPixel + 7) / 8;
-				var stride = bytesPerPixel * _wbmp.PixelWidth;
-				var bufferSize = stride * _wbmp.PixelHeight;
-				var pixelWidth = _wbmp.PixelWidth;
-				var pixelHeight = _wbmp.PixelHeight;
-				var dpiX = _wbmp.DpiX;
-				var dpiY = _wbmp.DpiY;
-				var format = _wbmp.Format;
-				var backBufferStride = _wbmp.BackBufferStride;
+				WriteableBitmap _wbmp;
 
 				int frames = 0;
 				int fps = 0;
-				float adaptiveCeiling = 3; //
+				float adaptiveCeiling = 10;
+				float adaptiveCeiling2 = 10;
 				NadSample nads = new NadSample(AP._channels);
 				NadSample nadsOld = new NadSample(AP._channels);
 				var stopwatch = new Stopwatch();
 				stopwatch.Start();
 
-				SpectrumFinder.InitFrequencies();
+				SpectrumFinder.Init();
 				SpectrumDrawer.Init();
 
 				if (AP._captureType == "microphone")
@@ -89,10 +81,17 @@ namespace MusGen
 
 					nadsOld = nads;
 					nads = WavToNadConvertor.MakeSample(wav, 0);
-					AdaptiveCeiling();
 
+					Octavisate();
+					AdaptiveCeiling();
 					DrawSpectrum();
 					ShowImage();
+				}
+
+				void Octavisate()
+				{
+					if (AP._graphType == 4)
+						_octave = Octaver.Do(SpectrumFinder._spectrumLogarithmic);
 				}
 
 				void FPS()
@@ -112,6 +111,16 @@ namespace MusGen
 
 				void ShowImage()
 				{
+					var bytesPerPixel = (_wbmp.Format.BitsPerPixel + 7) / 8;
+					var stride = bytesPerPixel * _wbmp.PixelWidth;
+					var bufferSize = stride * _wbmp.PixelHeight;
+					var pixelWidth = _wbmp.PixelWidth;
+					var pixelHeight = _wbmp.PixelHeight;
+					var dpiX = _wbmp.DpiX;
+					var dpiY = _wbmp.DpiY;
+					var format = _wbmp.Format;
+					var backBufferStride = _wbmp.BackBufferStride;
+
 					byte[] buffer = new byte[bufferSize];
 					Marshal.Copy(_wbmp.BackBuffer, buffer, 0, bufferSize);
 
@@ -134,18 +143,37 @@ namespace MusGen
 				void DrawSpectrum()
 				{
 					if (AP._graphType == 1)
-						_wbmp = SpectrumDrawer.DrawType1(SpectrumFinder._spectrumLogarithmic, nads._indexes, nads._amplitudes, adaptiveCeiling, adaptiveCeiling);
+						_wbmp = SpectrumDrawer.DrawType1(SpectrumFinder._spectrumLogarithmic, nads._indexes, nads._amplitudes, adaptiveCeiling2, adaptiveCeiling2);
 					else if (AP._graphType == 2)
 						_wbmp = SpectrumDrawer.DrawType2(nads._indexes, nads._amplitudes, adaptiveCeiling, adaptiveCeiling);
 					else if (AP._graphType == 3)
 						_wbmp = SpectrumDrawer.DrawType3(nads._indexes, nads._amplitudes, adaptiveCeiling, adaptiveCeiling);
+					else if (AP._graphType == 4)
+						_wbmp = SpectrumDrawer.DrawType4(_octave, nads._indexes, nads._amplitudes, adaptiveCeiling2, adaptiveCeiling2);
+					else
+						throw new ArgumentException("Incorrect graphType");
 				}
 
 				void AdaptiveCeiling()
 				{
-					adaptiveCeiling *= 0.99f;
-					adaptiveCeiling = Math.Max(adaptiveCeiling, nads._amplitudes[0]);
+					if (AP._graphType == 4)
+					{
+						adaptiveCeiling *= AP._adaptiveCeilingFallSpeedCircular;
+						adaptiveCeiling = Math.Max(adaptiveCeiling, MathE.Max(_octave));
+					}
+					else
+					{
+						adaptiveCeiling *= AP._adaptiveCeilingFallSpeed;
+						adaptiveCeiling = Math.Max(adaptiveCeiling, nads._amplitudes[0]);
+					}
+
 					adaptiveCeiling = Math.Max(adaptiveCeiling, 0.0001f);
+
+					float c = AP._adaptiveCeiling2Coefficient;
+					if (adaptiveCeiling2 < adaptiveCeiling)
+						adaptiveCeiling2 = c * adaptiveCeiling2 + (1 - c) * adaptiveCeiling;
+					else
+						adaptiveCeiling2 = adaptiveCeiling;
 				}
 			}
 		}

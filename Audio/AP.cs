@@ -19,8 +19,14 @@
 		public static string _waveForm = "sin";
 
 		public static string _captureType = "system";
-
 		public static string _windowFunction = "hamming";
+
+		public static int _circularPianoImageDiameter = 500;
+
+		public static float _adaptiveCeiling2Coefficient = 0.999f;
+
+		public static float _adaptiveCeilingFallSpeed = 0.98f;
+		public static float _adaptiveCeilingFallSpeedCircular = 0.96f;
 
 		public static int _graphType = 1;
 
@@ -34,8 +40,8 @@
 			{
 				_sampleRate = value;
 				Logger.Log($"Sample rate was set to {_sampleRate}");
-				SpectrumFinder.InitFrequencies();
-				SpectrumDrawer.SetOctaves();
+				SpectrumFinder.Init();
+				SpectrumDrawer.SetPianoImages();
 			}
 		}
 	}

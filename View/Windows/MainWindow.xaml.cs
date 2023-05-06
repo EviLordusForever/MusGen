@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Extensions;
+using System.Threading;
 
 namespace MusGen
 {
@@ -54,6 +55,22 @@ namespace MusGen
 				AP._graphType = 1;
 			else if (s == "Spectrogram type 2")
 				AP._graphType = 2;
+			else if (s == "Spectrogram type 4")
+				AP._graphType = 4;
+
+			if (WindowsManager._realtimeFFTWindow != null && WindowsManager._realtimeFFTWindow.IsLoaded)
+			{
+				if (s == "Spectrogram type 4")
+				{
+					WindowsManager._realtimeFFTWindow.piano.Visibility = Visibility.Hidden;
+					WindowsManager._realtimeFFTWindow.circular.Visibility = Visibility.Visible;
+				}
+				else
+				{
+					WindowsManager._realtimeFFTWindow.piano.Visibility = Visibility.Visible;
+					WindowsManager._realtimeFFTWindow.circular.Visibility = Visibility.Hidden;
+				}
+			}
 		}
 
 		private void Button_Click_3(object sender, RoutedEventArgs e)
