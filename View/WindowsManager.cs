@@ -12,11 +12,15 @@ namespace MusGen
 	public static class WindowsManager
 	{
 		public static LoggerWindow _logWindow;
-		public static AudioRecreationWindow _audioRecreationWindow;
 		public static ProgressWindow _progressWindow;
 		public static RealtimeFFTWindow _realtimeFFTWindow;
 		public static MainWindow _mainWindow;
 		public static AboutWindow _aboutWindow;
+
+		public static void Open(UIElement el)
+		{
+			_mainWindow.place.Child = el;
+		}
 
 		public static void OpenRealtimeFFTWindow()
 		{
@@ -63,22 +67,6 @@ namespace MusGen
 					_logWindow.Show();
 				});
 			}
-		}
-
-		public static void OpenAudioRecreationWindow()
-		{
-			if (_audioRecreationWindow == null || !_audioRecreationWindow.IsVisible)
-			{
-				Application.Current.Dispatcher.Invoke(() =>
-				{
-					_audioRecreationWindow = new AudioRecreationWindow();
-					_audioRecreationWindow.Show();
-				});
-			}
-			else if (_audioRecreationWindow.WindowState == WindowState.Minimized)
-				_audioRecreationWindow.WindowState = WindowState.Normal;
-
-			_audioRecreationWindow.Activate();
 		}
 	}
 }

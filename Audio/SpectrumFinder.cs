@@ -26,6 +26,8 @@ namespace MusGen
 		private static float[] _fadeLowMask;
 		private static float[] _antifadeLowMask;
 
+		public static float _max;
+
 		static SpectrumFinder()
 		{	
 		}	
@@ -208,8 +210,14 @@ namespace MusGen
 
 				_spectrumLowLogarithmic = ArrayE.RescaleArrayToLog(_spectrumLowLinear, AP._fftSize / AP._lc, (int)_spectrumLowEndIndex);
 
-				for (int i = 0; i < _spectrumLowLogarithmic.Length; i++)
-					_spectrumLogarithmic[i] = _spectrumLogarithmic[i] * _fadeLowMask[i] + _spectrumLowLogarithmic[i] * _antifadeLowMask[i];
+				for (int i = 0; i < _spectrumLogarithmic.Length; i++)
+				{
+					if (i < _spectrumLowLogarithmic.Length)
+						_spectrumLogarithmic[i] = _spectrumLogarithmic[i] * _fadeLowMask[i] + _spectrumLowLogarithmic[i] * _antifadeLowMask[i];
+
+					if (_max < _spectrumLogarithmic[i])
+						_max = _spectrumLogarithmic[i];
+				}
 			}
 		}
 	}

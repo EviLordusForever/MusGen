@@ -15,7 +15,7 @@ using System.Windows.Shapes;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace MusGen.View.Controls
+namespace MusGen
 {
 	public partial class TextBoxPro : UserControl, INotifyPropertyChanged
 	{

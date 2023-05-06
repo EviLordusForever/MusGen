@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.Windows;
+using System.Runtime.InteropServices;
 
 namespace MusGen
 {
@@ -29,6 +30,62 @@ namespace MusGen
             source.CopyPixels(new Int32Rect(sourceX, sourceY, width, height), buffer, stride, 0);
 
             destination.WritePixels(new Int32Rect(destinationX, destinationY, width, height), buffer, stride, 0);
+        }
+
+        public static void WriteByteArrayToColumn(WriteableBitmap wbmp, byte[] byteArray, int columnNumber)
+        {
+            int width = wbmp.PixelWidth;
+            int height = wbmp.PixelHeight;
+            int bytesPerPixel = (wbmp.Format.BitsPerPixel + 7) / 8;
+            int stride = bytesPerPixel * width;
+
+            byte[] pixels = new byte[byteArray.Length * bytesPerPixel];
+            for (int i = 0; i < byteArray.Length; i++)
+            {
+                pixels[i * bytesPerPixel] = byteArray[i];
+                pixels[i * bytesPerPixel + 1] = byteArray[i];
+                pixels[i * bytesPerPixel + 2] = byteArray[i];
+                pixels[i * bytesPerPixel + 3] = 255;
+            }
+
+            wbmp.Lock();
+            IntPtr buffer = wbmp.BackBuffer;
+
+            for (int row = height - 1; row >= 0; row--)
+            {
+                IntPtr pixelPointer = buffer + row * stride + columnNumber * bytesPerPixel;
+                int startIndex = (height - 1 - row) * bytesPerPixel;
+                Marshal.Copy(pixels, startIndex, pixelPointer, bytesPerPixel);
+            }
+
+            wbmp.AddDirtyRect(new Int32Rect(columnNumber, 0, 1, height));
+            wbmp.Unlock();
+        }
+
+        public static void WriteByteArrayToRow(WriteableBitmap wbmp, byte[] byteArray, int rowNumber)
+        {
+            int width = wbmp.PixelWidth;
+            int height = wbmp.PixelHeight;
+            int bytesPerPixel = (wbmp.Format.BitsPerPixel + 7) / 8;
+            int stride = bytesPerPixel * width;
+
+            byte[] pixels = new byte[byteArray.Length * bytesPerPixel];
+            for (int i = 0; i < byteArray.Length; i++)
+            {           
+                pixels[i * bytesPerPixel] = byteArray[i];
+                pixels[i * bytesPerPixel + 1] = byteArray[i];
+                pixels[i * bytesPerPixel + 2] = byteArray[i];
+                pixels[i * bytesPerPixel + 3] = 255;
+            }
+
+            wbmp.Lock();
+            IntPtr buffer = wbmp.BackBuffer;
+            IntPtr rowPointer = buffer + rowNumber * stride;
+
+            Marshal.Copy(pixels, 0, rowPointer, stride);
+
+            wbmp.AddDirtyRect(new Int32Rect(0, rowNumber, width, 1));
+            wbmp.Unlock();
         }
 
         public static void CopyPixels(BitmapImage source, WriteableBitmap destination,

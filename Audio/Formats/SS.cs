@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MusGen.Audio.Formats
+namespace MusGen
 {
 	public class SS
 	{

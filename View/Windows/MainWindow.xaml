@@ -5,27 +5,35 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MusGen"
         mc:Ignorable="d"
-        Title="MusGen" Height="450" Width="798">
+        Title="MusGen" Height="450" Width="800">
 	<Grid>
 		<Image Name ="image" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="UniformToFill"></Image>
-		<Grid Margin="20, 80, 20, 80">
+		<Grid>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="1*"/>
+				<ColumnDefinition Width="3*"/>
+				<ColumnDefinition Width="1*"/>
+			</Grid.ColumnDefinitions>
+
 			<Grid.RowDefinitions>
-				<RowDefinition/>
-				<RowDefinition/>
-				<RowDefinition/>
-				<RowDefinition/>
-				<RowDefinition/>
+				<RowDefinition Height="1*"/>
+				<RowDefinition Height="10*"/>
+				<RowDefinition Height="1*"/>
 			</Grid.RowDefinitions>
 
-			<Button FontSize="22" Width="400" Margin ="0,3,0,3" Content="Realtime spectrogram (system)"  Grid.Row="0" Click="Button_Click_2"></Button>
-			<Button FontSize="22" Width="400" Margin ="0,3,0,3" Content="Realtime spectrogram (microphone)" Grid.Row="1" Click="Button_Click_1"></Button>
-			<ComboBox FontSize="22" Width="400" Margin ="0,3,0,3" Name="combobox" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" SelectedIndex="0" Grid.Row="2" SelectionChanged="ComboBox_Selected">
-				<ComboBoxItem>Spectrogram type 1</ComboBoxItem>
-				<ComboBoxItem>Spectrogram type 2</ComboBoxItem>
-				<ComboBoxItem>Spectrogram type 4</ComboBoxItem>
-			</ComboBox>
-			<Button FontSize="22" Width="400" Margin ="0,3,0,3" Content="Audio Recreation"  Grid.Row="3" Click="Button_Click"></Button>
-			<Button FontSize="22" Width="400" Margin ="0,3,0,3" Content="About" Grid.Row="4" Click="Button_Click_3"></Button>
+
+			<Grid HorizontalAlignment="Center" Width="{Binding Source={x:Static SystemParameters.PrimaryScreenWidth}}">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="1*"/>
+					<ColumnDefinition Width="1*"/>
+					<ColumnDefinition Width="1*"/>
+				</Grid.ColumnDefinitions>
+
+				<Grid x:Name="gg" Grid.Column="1"></Grid>
+			</Grid>
+
+			<Viewbox Name="place" Grid.Column="1" Grid.Row="1" Stretch="Uniform" MaxWidth="{Binding ActualWidth, ElementName=gg}">
+			</Viewbox>
 		</Grid>
 	</Grid>
 </Window>

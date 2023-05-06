@@ -14,7 +14,7 @@ namespace MusGen
 		{
 			_waveInEvent = new WaveInEvent();
 			_waveInEvent.WaveFormat = new WaveFormat((int)sampleRate, bits, channels);
-			_waveInEvent.BufferMilliseconds = 1000 / AP._nadSamplesPerSecond;
+			_waveInEvent.BufferMilliseconds = 1000 / AP._sps;
 			_waveInEvent.DataAvailable += (sender, e) =>
 			{
 				for (int i = 0; i < e.Buffer.Length; i += 2)

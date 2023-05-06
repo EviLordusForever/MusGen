@@ -16,7 +16,7 @@ namespace MusGen
 		{
 			_lastSample = wav.Length;
 			Array.Resize(ref wav.L, wav.Length + AP._fftSize * AP._lc);
-			_step = wav._sampleRate / AP._nadSamplesPerSecond;
+			_step = wav._sampleRate / AP._sps;
 			int samplesCount = (int)Math.Ceiling(_lastSample / _step);
 			int duration = (int)Math.Ceiling(1f * wav.Length / wav._sampleRate);
 

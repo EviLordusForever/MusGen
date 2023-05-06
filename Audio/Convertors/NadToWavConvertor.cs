@@ -28,7 +28,7 @@ namespace MusGen
 			double[] t = new double[AP._channels];
 			double[] tOld = new double[AP._channels];
 			int fadeSamplesLeft = 0;
-			int samplesForFade = (int)(AP._fadeTime * AP.SampleRate / AP._nadSamplesPerSecond);
+			int samplesForFade = (int)(AP._fadeTime * AP.SampleRate / AP._sps);
 			float pi2 = MathF.PI * 2;
 			float buf = pi2 / AP.SampleRate;
 			int progressStep = (int)(length / 2000);

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -10,21 +10,19 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Win32;
-using System.Threading;
-using System.Runtime.CompilerServices;
-using System.ComponentModel;
 using Extensions;
 
-namespace MusGen.View.Windows
+namespace MusGen
 {
 	/// <summary>
-	/// Interaction logic for AudioRecreationWindow.xaml
+	/// Interaction logic for WnnwControl.xaml
 	/// </summary>
-	public partial class AudioRecreationWindow : Window
+	public partial class WnnwControl : UserControl
 	{
-		public AudioRecreationWindow()
+		public WnnwControl()
 		{
 			InitializeComponent();
 		}
@@ -62,15 +60,20 @@ namespace MusGen.View.Windows
 		private void ProcessBtn_Click(object sender, RoutedEventArgs e)
 		{
 			outName = outNameTb.Text;
-			this.Close();
+			WindowsManager.Open(ControlsManager._mainMenuControl);
 
 			Thread tr = new Thread(Tr);
 			tr.Start();
-			
+
 			void Tr()
 			{
 				WavNadNadWav.Make(path, outName);
 			}
+		}
+
+		private void Back_Click(object sender, RoutedEventArgs e)
+		{
+			WindowsManager.Open(ControlsManager._arControl);
 		}
 	}
 }

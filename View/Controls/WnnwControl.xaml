@@ -1,0 +1,22 @@
+﻿<UserControl x:Class="MusGen.WnnwControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MusGen"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+	<Grid Height="200" Width="390">
+		<Grid.RowDefinitions>
+			<RowDefinition/>
+			<RowDefinition/>
+			<RowDefinition/>
+			<RowDefinition/>
+		</Grid.RowDefinitions>
+
+		<Button FontSize="22" Margin ="0,3,0,3" Name ="SelBtn"  Content="Select .wav file" Click="SelBtn_Click"></Button>
+		<Button FontSize="22" Margin ="0,3,0,3" Name ="ProcessBtn"  Content="Process wav to nad to wav" Grid.Row="2" Click="ProcessBtn_Click"></Button>
+		<local:TextBoxPro FontSize="22" Margin ="0,3,0,3"  x:Name ="outNameTb" Placeholder="Out file name" Grid.Row="1"></local:TextBoxPro>
+		<Button FontSize="22" Margin ="0,3,0,3" Name ="Back" Content="Back"  Grid.Row="3" Click="Back_Click"></Button>
+	</Grid>
+</UserControl>

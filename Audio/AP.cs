@@ -9,7 +9,7 @@
 		public static int _fftSize = 1024;
 		public static int _lc = 16; //how much fftLow bigger than fft
 		public static int _channels = 10;
-		public static int _nadSamplesPerSecond = 100;
+		public static int _sps = 100;
 		public static float _peakSize = 70; //
 
 		public static int _wbmpResX = 256 * 2;

@@ -4,11 +4,17 @@ using Microsoft.VisualBasic;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
 using WPFFolderBrowser;
+using System.Diagnostics;
 
 namespace Extensions
 {
 	public static class DialogE
 	{
+		public static void ShowFolder(string path)
+		{
+			Process.Start("explorer.exe", "/select, \"" + path + "\"");
+		}
+
 		public static string AskFile(string ext)
 		{
 			OpenFileDialog dialog = new OpenFileDialog();
