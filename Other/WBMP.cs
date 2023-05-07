@@ -19,6 +19,14 @@ namespace MusGen
             return new WriteableBitmap(width, height, HardwareParams._dpiX, HardwareParams._dpiY, pf, null);
         }
 
+        public static WriteableBitmap Load(string fileName)
+        {
+            BitmapImage bitmapImage = new BitmapImage(new Uri(fileName));
+            WriteableBitmap writeableBitmap = new WriteableBitmap(bitmapImage);
+
+            return writeableBitmap;
+        }
+
         public static void CopyPixels(WriteableBitmap source, WriteableBitmap destination,
             int sourceX, int sourceY, int destinationX, int destinationY, int width, int height)
         {
@@ -86,6 +94,21 @@ namespace MusGen
 
             wbmp.AddDirtyRect(new Int32Rect(0, rowNumber, width, 1));
             wbmp.Unlock();
+        }
+
+        public static byte GetGreenValue(WriteableBitmap bitmap, int x, int y)
+        {
+            if (x < 0 || x >= bitmap.PixelWidth || y < 0 || y >= bitmap.PixelHeight)
+            {
+                throw new ArgumentOutOfRangeException("x or y is out of range");
+            }
+
+            int bytesPerPixel = (bitmap.Format.BitsPerPixel + 7) / 8;
+            byte[] pixelData = new byte[bytesPerPixel];
+
+            bitmap.CopyPixels(new Int32Rect(x, y, 1, 1), pixelData, bytesPerPixel, 0);
+
+            return pixelData[1];
         }
 
         public static void CopyPixels(BitmapImage source, WriteableBitmap destination,

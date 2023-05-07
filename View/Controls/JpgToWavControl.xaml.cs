@@ -20,9 +20,9 @@ namespace MusGen
 	/// <summary>
 	/// Interaction logic for WnnwControl.xaml
 	/// </summary>
-	public partial class WavToJpgControl : UserControl
+	public partial class JpgToWavControl : UserControl
 	{
-		public WavToJpgControl()
+		public JpgToWavControl()
 		{
 			InitializeComponent();
 		}
@@ -33,7 +33,7 @@ namespace MusGen
 		private void SelBtn_Click(object sender, RoutedEventArgs e)
 		{
 			OpenFileDialog dialog = new OpenFileDialog();
-			dialog.Filter = ".wav files | *.wav";
+			dialog.Filter = "Image Files (*.bmp, *.jpg, *.jpeg, *.png)|*.bmp;*.jpg;*.jpeg;*.png";
 			dialog.Title = "Please select wav file";
 			bool? success = dialog.ShowDialog();
 			if (success == true)
@@ -41,19 +41,8 @@ namespace MusGen
 				path = dialog.FileName;
 				string name = dialog.SafeFileName;
 
-				bool isGood = Wav.CheckWav(path);
-
-				if (isGood)
-				{
-					SelBtn.Content = name;
-					outNameTb.Text = TextE.StringBeforeLast(name, ".wav");
-				}
-				else
-				{
-					MessageBox.Show("Wrong wav file", "Sorry", MessageBoxButton.OK, MessageBoxImage.Error);
-					SelBtn.Content = "Select .wav file";
-					path = "";
-				}
+				SelBtn.Content = name;
+				outNameTb.Text = TextE.StringBeforeLast(name, ".");
 			}
 		}
 
@@ -67,7 +56,7 @@ namespace MusGen
 
 			void Tr()
 			{
-				WavToJpg.Make(path, outName);
+				JpgToWav.Make(path, outName);
 			}
 		}
 

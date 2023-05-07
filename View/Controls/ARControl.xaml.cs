@@ -41,7 +41,7 @@ namespace MusGen
 
 		private void Btn3_Click(object sender, RoutedEventArgs e)
 		{
-
+			WindowsManager.Open(ControlsManager._jpgToWavControl);
 		}
 
 		private void Back_Click(object sender, RoutedEventArgs e)
