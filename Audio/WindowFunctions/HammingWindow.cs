@@ -12,9 +12,14 @@ namespace MusGen
 
         static HammingWindow()
         {
-            _window = new float[AP._fftSize];
-            for (int i = 0; i < AP._fftSize; i++)
-                _window[i] = 0.54f - 0.46f * MathF.Cos(2f * MathF.PI * i / (AP._fftSize - 1f));
+            Init();
+        }
+
+        public static void Init()
+        {
+            _window = new float[AP.FftSize];
+            for (int i = 0; i < AP.FftSize; i++)
+                _window[i] = 0.54f - 0.46f * MathF.Cos(2f * MathF.PI * i / (AP.FftSize - 1f));
         }
 
         public static float F(int v)

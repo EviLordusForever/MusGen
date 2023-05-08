@@ -16,5 +16,21 @@ namespace MusGen
 			_sps = spectrumsPerSecond;
 			_s = new float[count][];
 		}
+
+		public int Width
+		{
+			get
+			{
+				return _s.Length;
+			}
+		}
+
+		public int Height
+		{
+			get
+			{
+				return _s[0].Length;
+			}
+		}
 	}
 }

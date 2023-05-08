@@ -6,15 +6,16 @@ using System.Threading.Tasks;
 
 namespace MusGen
 {
-	public static class WavToSSConvertor
+	public static class WavToSS
 	{
 		public static SS Make(Wav wav)
 		{
+			AP.SampleRate = (uint)wav._sampleRate;
 			int _lastSample = wav.Length;
-			Array.Resize(ref wav.L, wav.Length + AP._fftSize * AP._lc);
-			double _step = 1.0 * wav._sampleRate / AP._sps;
+			Array.Resize(ref wav.L, wav.Length + AP.FftSize * AP._lc);
+			double _step = 1.0 * AP.SampleRate / AP._sps;
 			int samplesCount = (int)Math.Ceiling(_lastSample / _step);
-			int duration = (int)Math.Ceiling(1f * wav.Length / wav._sampleRate);
+			int duration = (int)Math.Ceiling(1f * wav.Length / AP.SampleRate);
 
 			SS ss = new SS(samplesCount, AP._sps);
 
@@ -33,6 +34,7 @@ namespace MusGen
 			}
 
 			ProgressShower.Show("SS normalisation...");
+
 			float max = SpectrumFinder._max;
 
 			for (int s = 0; s < ss._s.Length; s++)

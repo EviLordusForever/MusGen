@@ -48,7 +48,14 @@ namespace MusGen
 
 		public static void OpenProgressWindow(string text)
 		{
-			if (_progressWindow == null || !_progressWindow.IsVisible)
+			if (_progressWindow == null)
+				_progressWindow = new ProgressWindow();
+
+			try
+			{
+				_progressWindow.Show();
+			}
+			catch
 			{
 				_progressWindow = new ProgressWindow();
 				_progressWindow.Show();

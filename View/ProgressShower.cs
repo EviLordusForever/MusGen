@@ -28,7 +28,7 @@ namespace MusGen
 		{
 			Application.Current.Dispatcher.Invoke(() =>
 			{
-				WindowsManager._progressWindow.Close();
+				WindowsManager._progressWindow.Visibility = Visibility.Collapsed;
 			});
 		}
 	}

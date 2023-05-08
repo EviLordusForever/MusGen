@@ -56,31 +56,25 @@ namespace MusGen
 				SpectrumDrawer.Init();
 
 				if (AP._captureType == "microphone")
-				{
-					AP.SampleRate = AP._sampleRateRTFFTMicrophone;
 					AudioCapturerMicrophone.Start(AP.SampleRate, 16, 1);
-				}
 				else if (AP._captureType == "system")
-				{
-					AP.SampleRate = AP._sampleRateRTFFTSystem;
-					AudioCapturerSystem.Start(AP.SampleRate, 16, 1);
-				}				
+					AudioCapturerSystem.Start(AP.SampleRate, 16, 1);			
 
 				Wav wav = new Wav();
 				wav._sampleRate = (int)AP.SampleRate;
-				wav.L = new float[AP._fftSize];
+				wav.L = new float[AP.SampleRate];
 
 				while (_started)
 				{
 					FPS();
 
 					if (AP._captureType == "microphone")
-						wav.L = AudioCapturerMicrophone.GetSamples(AP._fftSize * AP._lc);
+						wav.L = AudioCapturerMicrophone.GetSamples((int)AP.FftSize * AP._lc);
 					else if (AP._captureType == "system")
-						wav.L = AudioCapturerSystem.GetSamples(AP._fftSize * AP._lc);
+						wav.L = AudioCapturerSystem.GetSamples((int)AP.FftSize * AP._lc);
 
 					nadsOld = nads;
-					nads = WavToNadConvertor.MakeSample(wav, 0);
+					nads = WavToNad.MakeSample(wav, 0);
 
 					Octavisate();
 					AdaptiveCeiling();

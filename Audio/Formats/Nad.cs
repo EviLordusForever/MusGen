@@ -8,10 +8,7 @@ using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.Composing;
 using Melanchall.DryWetMidi.Interaction;
-using Melanchall.DryWetMidi.Multimedia;
-using mt = Melanchall.DryWetMidi.MusicTheory;
-using Melanchall.DryWetMidi.Standards;
-using Melanchall.DryWetMidi.Tools;
+using Extensions;
 
 namespace MusGen
 {
@@ -28,22 +25,45 @@ namespace MusGen
 			_duration = duration;
 		}
 
-		public MidiFile MakeMidi()
+		public static NadSample Compare(NadSample oldNad, NadSample newNad)
 		{
-			MidiFile midiFile = new MidiFile();
+			int c = AP._channels;
+			int[,] distances = new int[c, c];
+			float x = 0;
+			float y = 0;
 
-			var tempoMap = TempoMap.Create(Tempo.FromBeatsPerMinute(110));
-			midiFile.ReplaceTempoMap(tempoMap);
+			for (int idNew = 0; idNew < c; idNew++)
+				for (int idOld = 0; idOld < c; idOld++)
+				{
+					x = oldNad._indexes[idOld] - newNad._indexes[idNew];
+					x /= (SpectrumFinder._spectrumLinear.Length / 2);
+					x *= 4; //check
 
-			var trackChunk1 = Build(tempoMap);
-			midiFile.Chunks.Add(trackChunk1);
+					y = oldNad._amplitudes[idOld] - newNad._amplitudes[idNew];
 
-			var trackChunk2 = Build(tempoMap);
-			midiFile.Chunks.Add(trackChunk2);
+					distances[idOld, idNew] = (int)(1000 * Math.Sqrt(x * x + y * y));
+				}
 
-            // Write MIDI data to file. See https://github.com/melanchall/drywetmidi/wiki/Writing-a-MIDI-file
+			int[] compares = HungarianAlgorithm.Run(distances);
 
-            return midiFile;
+			int[] _indexesCompared = new int[AP._channels];
+			float[] _amplitudesCompared = new float[AP._channels];
+			float[] _frequenciesCompared = new float[AP._channels];
+
+			for (int id = 0; id < c; id++)
+			{
+				int idCompared = compares[id];
+
+				_indexesCompared[id] = newNad._indexes[idCompared];
+				_frequenciesCompared[id] = newNad._frequencies[idCompared];
+				_amplitudesCompared[id] = newNad._amplitudes[idCompared];
+			}
+
+			newNad._indexes = _indexesCompared;
+			newNad._amplitudes = _amplitudesCompared;
+			newNad._frequencies = _frequenciesCompared;
+
+			return newNad;
 		}
 
         private TrackChunk Build(TempoMap tempoMap)

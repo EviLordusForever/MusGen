@@ -17,5 +17,11 @@ namespace MusGen
 			else
 				throw new ArgumentException("Wrong window function name.");
 		}
+
+		public static void Init()
+		{
+			HammingWindow.Init();
+			Logger.Log("Window functions were initialized.");
+		}
 	}
 }

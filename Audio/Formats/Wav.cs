@@ -163,9 +163,12 @@ namespace MusGen
 			}
 		}
 
-		public void Export(string name)
+		public void Export(string name, bool show = true)
 		{
-			Save($"{DiskE._programFiles}\\Export\\{name}.wav");
+			string path = $"{DiskE._programFiles}Export\\{name}.wav";
+			Save(path);
+			if (show)
+				DialogE.ShowFile(path);
 		}
 
 		public void Save(string path)

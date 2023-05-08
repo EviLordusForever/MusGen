@@ -27,7 +27,7 @@ namespace MusGen
 
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
-			WindowsManager.Open(ControlsManager._arControl);
+			WindowsManager.Open(ControlsManager._audioControl);
 		}
 
 		private void Button_Click_1(object sender, RoutedEventArgs e)

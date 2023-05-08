@@ -315,7 +315,7 @@ namespace MusGen
 
 			void Method()
 			{
-				float spectrumSize = AP._fftSize / 2;
+				float spectrumSize = AP.FftSize / 2;
 
 				BitmapImage bitmap = new BitmapImage();
 				bitmap.BeginInit();
@@ -359,10 +359,8 @@ namespace MusGen
 
 		public static void SetPianoImages()
 		{
-			float spectrumSize = AP._fftSize / 2;
-
 			double l = SpectrumFinder._octavesIndexes[0];
-			double r = spectrumSize - SpectrumFinder._octavesIndexes[9];
+			double r = AP.FftSize / 2 - SpectrumFinder._octavesIndexes[9];
 			double w = SpectrumFinder._octavesIndexes[9] - SpectrumFinder._octavesIndexes[0];
 
 			if (WindowsManager._realtimeFFTWindow != null)
@@ -378,6 +376,8 @@ namespace MusGen
 					WindowsManager._realtimeFFTWindow.circular.Source = _circularWbmp;
 				}
 			}
+
+			Logger.Log("Piano images were set.");
 		}
 
 		public static void Init()

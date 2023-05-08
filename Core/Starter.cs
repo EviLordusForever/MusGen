@@ -32,6 +32,8 @@ namespace MusGen
 				Tests.GraphDrawerGradient();
 				Tests.SPL();
 				Tests.ArrayToLog();
+				Tests.SoftOctaveReverser();
+				Tests.FromLogTest();
 
 				Logger.Log("Tests are completed.");
 

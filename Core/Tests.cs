@@ -120,6 +120,39 @@ namespace MusGen
 			DiskE.WriteToProgramFiles("LogArrays", "csv", csv, false);
 		}
 
+		public static void SoftOctaveReverser()
+		{
+			SpectrumFinder.Init();
+			SpectrumDrawer.Init();
+			SsSoftOctaveReverser.Init(0, AP.FftSize / 2);
+
+			float[] array = ArrayE.OneToNFloat(AP.FftSize / 2);
+
+			for (int i = 0; i < array.Length; i++)
+			{
+				if (i < array.Length / 3)
+					array[i] = MathF.Sin(i / 2f);
+				else if (i < array.Length * 2 / 3f)
+					array[i] = MathF.Sin(i / 4f);
+				else
+					array[i] = MathF.Sin(i / 6f);
+			}
+
+			array = SsSoftOctaveReverser.MakeOne(array);
+			DiskE.WriteToProgramFiles("reverse", "csv", TextE.ToCsvString(array), false);
+		}
+
+		public static void FromLogTest()
+		{
+			float[] array = ArrayE.OneToNFloat(AP.FftSize / 2);
+
+			float[] array2 = ArrayE.RescaleArrayToLog(array, AP.FftSize, AP.FftSize / 2);
+
+			float[] array3 = ArrayE.RescaleArrayFromLog(array2, AP.FftSize, AP.FftSize / 2);
+
+			DiskE.WriteToProgramFiles("FromLogTest", "csv", TextE.ToCsvString(array, array2, array3), false);
+		}
+
 		public static void Logging()
 		{
 			var chars = new char[] { 'g', 'H', 'a', 'I', '2', 's', 'f', '7', '0', ' ' };

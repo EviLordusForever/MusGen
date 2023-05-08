@@ -1,5 +1,6 @@
 ﻿using System;
 using static Extensions.ArrayE;
+using System.Numerics;
 
 namespace Extensions
 {
@@ -12,19 +13,38 @@ namespace Extensions
 			Size = 0;
 		}
 
+		public static float[] Inverse(float[] input, float[] phases)
+		{
+			Complex[] complex = new Complex[input.Length * 2];
+
+			float[] output = new float[input.Length];
+
+			for (int i = 0; i < input.Length; i++)
+				complex[i] = new Complex(input[i], 0);
+
+			for (int i = input.Length * 2 - 1; i >= input.Length; i--)
+				complex[i] = new Complex(0, 0);
+
+			complex = Complex.AddRandomPhases(complex, phases);
+
+			complex = Inverse(complex);
+
+			for (int c = 0; c < output.Length; c++)
+				output[c] = complex[c].Real;
+
+			return output;
+		}
+
 		public static Complex[] Inverse(Complex[] input)
 		{
 			for (int i = 0; i < input.Length; i++)
-			{
 				input[i] = Complex.Conjugate(input[i]);
-			}
 
 			var transform = Forward(input, false);
 
 			for (int i = 0; i < input.Length; i++)
-			{
 				transform[i] = Complex.Conjugate(transform[i]);
-			}
+
 			return transform;
 		}
 

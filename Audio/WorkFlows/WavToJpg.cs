@@ -13,23 +13,17 @@ namespace MusGen
 	{
 		public static void Make(string wavInPath, string exportName)
 		{
-			Thread tr = new(Tr);
-			tr.Name = "WavToJpg";
-			tr.Start();
+			Logger.Log($"Wav to jpg started for ({wavInPath}).");
 
-			void Tr()
-			{
-				Logger.Log($"Wav to jpg started for ({wavInPath}).");
-				Wav wavIn = new Wav();
-				wavIn.Read(wavInPath);
-				SS ss = WavToSSConvertor.Make(wavIn);
-				WriteableBitmap img = SsToWbmpConvertor.Make(ss);
-				string path = $"{DiskE._programFiles}\\Spectrograms\\{exportName}.jpg";
-				GraphicsE.SaveJPG100(img, path);
-				DialogE.ShowFolder(path);
+			Wav wavIn = new Wav();
+			wavIn.Read(wavInPath);
+			SS ss = WavToSS.Make(wavIn);
+			WriteableBitmap img = SsToWbmp.Make(ss);
+			string path = $"{DiskE._programFiles}Spectrograms\\{exportName}.jpg";
+			GraphicsE.SaveJPG100(img, path);
+			DialogE.ShowFile(path);
 
-				Logger.Log($"Wav to jpg finished. Saved as ({exportName})");
-			}
+			Logger.Log($"Wav to jpg finished. Saved as ({exportName})");
 		}
 	}
 }

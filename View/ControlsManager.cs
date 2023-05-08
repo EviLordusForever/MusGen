@@ -8,10 +8,7 @@ namespace MusGen
 {
 	public static class ControlsManager
 	{
-		public static ARControl _arControl = new ARControl();
-		public static WnnwControl _wnnwControl = new WnnwControl();
 		public static MainMenuControl _mainMenuControl = new MainMenuControl();
-		public static WavToJpgControl _wavToJpgControl = new WavToJpgControl();
-		public static JpgToWavControl _jpgToWavControl = new JpgToWavControl();
+		public static AudioControl _audioControl = new AudioControl();
 	}
 }

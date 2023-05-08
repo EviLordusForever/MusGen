@@ -3,7 +3,7 @@ using Extensions;
 
 namespace MusGen
 {
-	public static class NadToWavConvertor
+	public static class NadToWav
 	{
 		public static Wav Make(Nad nad, string wavPath)
 		{
@@ -15,7 +15,7 @@ namespace MusGen
 
 		public static Wav Make(Nad nad)
 		{
-			int length = (int)AP._sampleRateNadToWav * nad._duration;
+			int length = (int)AP.SampleRate * nad._duration;
 			Wav wav = new Wav(length, 1);
 
 			return Make(nad, wav);
@@ -23,16 +23,17 @@ namespace MusGen
 
 		public static Wav Make(Nad nad, Wav wav)
 		{
-			AP.SampleRate = AP._sampleRateNadToWav;
+			int channels = nad._samples[0]._frequencies.Length;
 			int length = wav.Length;
-			double[] t = new double[AP._channels];
-			double[] tOld = new double[AP._channels];
+			double[] t = new double[channels];
+			double[] tOld = new double[channels];
 			int fadeSamplesLeft = 0;
 			int samplesForFade = (int)(AP._fadeTime * AP.SampleRate / AP._sps);
 			float pi2 = MathF.PI * 2;
 			float buf = pi2 / AP.SampleRate;
 			int progressStep = (int)(length / 2000);
 			float max = 0;
+
 
 			ProgressShower.Show("Making wav from nad...");
 
@@ -70,7 +71,7 @@ namespace MusGen
 					antifade = 1 - fade;
 				}
 
-				for (int c = 0; c < AP._channels; c++)
+				for (int c = 0; c < channels; c++)
 				{
 					if (nad._samples[ns]._frequencies[c] < 20f)
 						nad._samples[ns]._frequencies[c] = 20f;
@@ -85,7 +86,7 @@ namespace MusGen
 					signal += (float)F(t[c]) * nad._samples[ns]._amplitudes[c] * antifade;
 				}
 
-				wav.L[s] = signal / AP._channels;
+				wav.L[s] = signal / channels;
 
 				if (Math.Abs(wav.L[s]) > max)
 					max = Math.Abs(wav.L[s]);
@@ -93,7 +94,7 @@ namespace MusGen
 
 			void SetTimeOld()
 			{
-				for (int c = 0; c < AP._channels; c++)
+				for (int c = 0; c < channels; c++)
 					tOld[c] = t[c];
 			}
 

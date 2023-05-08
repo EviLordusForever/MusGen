@@ -15,6 +15,11 @@ namespace Extensions
 			Process.Start("explorer.exe", "/select, \"" + path + "\"");
 		}
 
+		public static void ShowFile(string path)
+		{
+			Process.Start("explorer.exe", "/select, \"" + path + "\"");
+		}
+
 		public static string AskFile(string ext)
 		{
 			OpenFileDialog dialog = new OpenFileDialog();

@@ -36,12 +36,62 @@ namespace Extensions
 
 					for (int i = indexA; i <= indexB; i++)
 						newArray[x] = MathF.Max(newArray[x], array[i]);
-					//newArray[x] /= indexB - indexA + 1;
 				}
 				indexA = indexB;			
 			}
 
 			return newArray;
+		}
+
+		public static float[] RescaleArrayFromLog(float[] array, float base_, int new_size)
+		{
+			int indexA = 0;
+			int indexB = 0;
+			int size = array.Count();
+
+			float[] newArray = new float[(int)new_size];
+
+			for (int x = 1; x < new_size; x++)
+			{
+				float index = (MathF.Log(1f * x / size, base_) + 1) * new_size;
+
+				indexB = (int)MathF.Floor(index);
+				if (indexB + 1 >= size)
+				{
+					newArray[x] = array[indexB];
+				}
+				else if (indexB - indexA < 1) //improve?
+				{
+					float power = index - indexB;
+					newArray[x] = array[indexB] * (1 - power) + array[indexB + 1] * power;
+				}
+				else
+				{
+					indexA++;
+
+					for (int i = indexA; i <= indexB; i++)
+						newArray[x] = MathF.Max(newArray[x], array[i]);
+				}
+				indexA = indexB;
+			}
+
+			return newArray;
+		}
+
+		public static int[] OneToN(int N)
+		{
+			int[] array = new int[N];
+			for (int i = 0; i < N; i++)
+				array[i] = i;
+			return array;
+		}
+
+		public static float[] OneToNFloat(int N)
+		{
+			float[] array = new float[N];
+			for (int i = 0; i < N; i++)
+				array[i] = i;
+			return array;
 		}
 
 		public static int[] RescaleIndexesToLog(int[] indexes, int arraySize)

@@ -58,7 +58,7 @@ namespace MusGen
 				t += Math.Sin(i / 8080.0) + 1;
 			}
 
-			wavOut.Export(outName);
+			wavOut.Export(outName, true);
 		}
 
 		public static void EffectSqrt(string originPath, string outName)
@@ -77,7 +77,7 @@ namespace MusGen
 				else
 					wavOut.R[i] = -(float)Math.Pow(-wavIn.R[(int)i], 0.5);
 
-			wavOut.Export(outName);
+			wavOut.Export(outName, true);
 		}
 	}
 }

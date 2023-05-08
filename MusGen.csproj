@@ -26,20 +26,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="View\Controls\JpgToWavControl.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="View\Controls\WnnwControl.xaml.cs">
+    <Compile Update="View\Controls\AudioControl.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
 
   <ItemGroup>
-    <Page Update="View\Controls\JpgToWavControl.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="View\Controls\WnnwControl.xaml">
+    <Page Update="View\Controls\AudioControl.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
