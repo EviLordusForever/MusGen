@@ -75,7 +75,7 @@ namespace MusGen
 
 					nadsOld = nads;
 					//nads = WavToNad.MakeSample(wav, 0);
-					nads = WavToNad.MakeSamplePlus(wav, 0);
+					nads = WavToFixedNad.MakeSamplePlus(wav, 0);
 
 					Octavisate();
 					AdaptiveCeiling();

@@ -35,13 +35,75 @@ namespace MusGen
 			float xScale;
 			float powerScale;
 
+			input_array[0] = input_array[1];
+
 			MoveDown();
 			FillBlack();
 			Scales();
 			DrawPartDown();
 			DrawPartUp();
 			DrawVerticalLines();
+			DrawMedianAndAverage();
+			DrawNadsCount();
 			return _wbmpL1;
+
+			void DrawNadsCount()
+			{
+				float power = (1f * verticalLines.Length / AP._peaksLimit);
+				int length = _wbmp.PixelWidth / 6;
+				int x = _wbmp.PixelWidth / 8;
+				int y = _wbmp.PixelWidth / 60;
+
+				_wbmpL1.DrawLineAa(x, y, x + length, y, Clr.FromRgb(0, 0, 255), 3);
+				_wbmpL1.DrawLineAa(x, y, (int)(x + length * power), y, Clr.FromRgb(255, 255, 0), 3);
+			}
+
+			void DrawMedianAndAverage()
+			{
+				float average = PeaksFinder._average;
+				float max = PeaksFinder._max;
+				float minAverage = PeaksFinder._minFromAverage;
+				float minMax = PeaksFinder._minFromMaximum;
+
+				minAverage /= max;
+				minMax /= max;
+				average /= max;
+				max /= max;
+
+				float x = (max / 2) / minMax;
+
+				float watchAverage = minAverage * x;
+				float watchMax = minMax * x;
+
+				float scale = input_array.Max() * yScale;
+
+				int yAs = (int)(minAverage * scale);
+				int yMs = (int)(minMax * scale);
+				int yA = (int)(average * scale);
+				int yM = (int)(max * scale);
+				int yAw = (int)(watchAverage * scale);
+				int yMw = (int)(watchMax * scale);
+
+				Draw(yA, Clr.FromArgb(200, 0, 255, 0));
+				Draw(yM, Clr.FromArgb(200, 255, 0, 0));
+				Draw(yAs, Clr.FromArgb(160, 0, 255, 0));
+				Draw(yMs, Clr.FromArgb(160, 255, 0, 0));
+
+				DrawWatch(yAw, Clr.FromArgb(160, 0, 255, 0));
+				DrawWatch(yMw, Clr.FromArgb(160, 255, 0, 0));
+
+				void Draw(int y, Clr clr)
+				{
+					if (y >= 1)
+						_wbmpL1.DrawLineAa(0, _yHalf - y, _resX, _yHalf - y, clr);
+				}
+
+				void DrawWatch(int y, Clr clr)
+				{
+					if (y >= 1)
+						_wbmpL1.DrawLineAa((int)(_resX * 0.9625), _yHalf - y, (int)(_resX * 0.9875), _yHalf - y, clr, 3);
+				}
+			}
 
 			void FillBlack()
 			{

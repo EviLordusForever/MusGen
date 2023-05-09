@@ -17,7 +17,7 @@ namespace MusGen
 
 			for (int s = 0; s < ssin.Width; s++)
 			{
-				ssout._s[s] = MathE.StupiedFilter(ssin._s[s]);
+				ssout._s[s] = MathE.StupiedFilter(ssin._s[s], true); //
 
 				if (s % step == 0)
 					ProgressShower.Set(1.0 * s / step);

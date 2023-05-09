@@ -9,13 +9,53 @@ namespace Extensions
 	{
 		public static Random rnd = new Random();
 
-		public static float[] StupiedFilter(float[] array)
+		public static float[] StupiedFilter(float[] array, bool soft)
 		{
 			float[] res = new float[array.Length];
 			for (int i = 1; i < array.Length - 2; i++)
-				if (array[i] > array[i - 1] && array[i] > array[i + 1])
-					res[i] = array[i];
+				if (!soft)
+				{
+					if (array[i] > array[i - 1] && array[i] > array[i + 1])
+						res[i] = array[i];
+				}
+				else
+				{
+					if (array[i] >= array[i - 1] && array[i] >= array[i + 1])
+						res[i] = array[i];
+				}
 			return res;
+		}
+
+		public static List<int> StupiedFilterMask(float[] array, bool soft)
+		{
+			List<int> mask = new List<int>();
+			for (int i = 1; i < array.Length - 2; i++)
+				if (!soft)
+				{
+					if (array[i] > array[i - 1] && array[i] > array[i + 1])
+						mask.Add(i);
+				}
+				else
+				{
+					if (array[i] >= array[i - 1] && array[i] >= array[i + 1])
+						mask.Add(i);
+				}
+			return mask;
+		}
+
+		public static double GeometricMean<T>(this T[] numbers) where T : struct, IConvertible
+		{
+			double product = 1.0;
+			int count = numbers.Length;
+
+			for (int i = 0; i < count; i++)
+			{
+				double value = Convert.ToDouble(numbers[i]);
+				product *= value;
+			}
+
+			double geometricMean = Math.Pow(product, 1.0 / count);
+			return geometricMean;
 		}
 
 		public static T[] GetValues<T>(T[] array, int[] indexes)

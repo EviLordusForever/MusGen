@@ -25,8 +25,6 @@ namespace Extensions
 			for (int i = input.Length * 2 - 1; i >= input.Length; i--)
 				complex[i] = new Complex(0, 0);
 
-			//complex = Complex.AddRandomPhases(complex, phases);
-
 			complex = Inverse(complex);
 
 			for (int c = 0; c < output.Length; c++)

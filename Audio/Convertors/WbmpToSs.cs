@@ -61,7 +61,7 @@ namespace MusGen
 					Logger.Log($"Cannot read \"samples per second\" from image. So it was set to {sps}", Brushes.Red);
 				}
 				else
-					Logger.Log($"\"Samples per second\" from image was read as {sps}", Brushes.Yellow);
+					Logger.Log($"\"Samples per second\" from image was read as {sps}", Brushes.Cyan);
 
 				return sps;
 			}

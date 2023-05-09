@@ -22,7 +22,7 @@
 			<ComboBoxItem>Spectrogram type 2</ComboBoxItem>
 			<ComboBoxItem>Spectrogram type 4</ComboBoxItem>
 		</ComboBox>
-		<Button FontSize="22" Margin ="0,3,0,3" Content="Audio Recreation"  Grid.Row="3" Click="Button_Click"></Button>
+		<Button FontSize="22" Margin ="0,3,0,3" Content="Audio Processing" Grid.Row="3" Click="Button_Click"></Button>
 		<Button FontSize="22" Margin ="0,3,0,3" Content="About" Grid.Row="4" Click="Button_Click_3"></Button>
 	</Grid>
 </UserControl>
