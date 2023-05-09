@@ -11,13 +11,13 @@ namespace MusGen
 	{
 		public static void Make(string wavInPath, string exportName)
 		{
-			Logger.Log($"Wav to nad to wav started for ({wavInPath}).");
+			Logger.Log($"Wav to wav (nad) started for\n{wavInPath}");
 			Wav wavIn = new Wav();
 			wavIn.Read(wavInPath);
 			Nad nad = WavToNad.Make(wavIn);
 			Wav wavOut = NadToWav.Make(nad);
 			wavOut.Export(exportName);
-			Logger.Log($"Wav to nad to wav finished. Saved as ({exportName})");
+			Logger.Log($"Wav to wav (nad) finished. Saved as ({exportName})");
 		}
 	}
 }

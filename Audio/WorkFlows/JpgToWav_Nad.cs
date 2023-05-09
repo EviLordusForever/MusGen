@@ -13,11 +13,11 @@ namespace MusGen
 	{
 		public static void Make(string jpgInPath, string exportName)
 		{
-			Logger.Log($"Jpg to wav (Nad) started for ({jpgInPath}).");
+			Logger.Log($"Jpg to wav (Nad) started for\n{jpgInPath}");
 
 			WriteableBitmap wbmp = WBMP.Load(jpgInPath);
 			SS ss = WbmpToSs.Make(wbmp);
-			Nad nad = SsToNad.Make(ss, true);
+			Nad nad = SsToNad_Multi.Make(ss);
 			Wav wav = NadToWav.Make(nad);
 			wav.Export(exportName);
 

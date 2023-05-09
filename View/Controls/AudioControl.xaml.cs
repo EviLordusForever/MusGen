@@ -77,6 +77,12 @@ namespace MusGen
 		private void ProcessBtn_Click(object sender, RoutedEventArgs e)
 		{
 			outName = outNameTb.Text;
+
+			if (outName == null || path == null)
+				return;
+			if (path == "" || outName == "")
+				return;
+
 			WindowsManager.Open(ControlsManager._mainMenuControl);
 			WindowsManager._mainWindow.Hide();
 
@@ -86,22 +92,26 @@ namespace MusGen
 
 			void Tr()
 			{
+				RealtimeFFT.Stop();
+
 				if (_s == "Octave reverse (soft, IFFT)")
 					OctaveReverse_Soft_IFFT.Make(path, outName);
-				else if (_s == "Octave reverse (soft, nad)")
+				else if (_s == "Octave reverse (soft, Nad)")
 					OctaveReverse_Soft_Nad.Make(path, outName);
-				else if (_s == "Vertical reverse (nad)")
+				else if (_s == "Vertical reverse (Nad)")
 					WavVerticalReverse_Nad.Make(path, outName);
-				else if (_s == "Wav to wav (nad)")
+				else if (_s == "Wav to wav (Nad)")
 					WavToWav_Nad.Make(path, outName);
 				else if (_s == "Wav to wav (IFFT)")
 					WavToWav_IFFT.Make(path, outName);
 				else if (_s == "Wav to jpg")
 					WavToJpg.Make(path, outName);
-				else if (_s == "Jpg to wav (nad)")
+				else if (_s == "Jpg to wav (Nad)")
 					JpgToWav_Nad.Make(path, outName);
 				else if (_s == "Jpg to wav (IFFT)")
 					JpgToWav_IFFT.Make(path, outName);
+				else if (_s == "Jpg to wav octave reverse (Nad)")
+					JpgOctaveReverse_Soft_Nad.Make(path, outName);
 				else
 					outNameTb.Text = "Wrong type in list";
 
@@ -124,9 +134,11 @@ namespace MusGen
 
 			if (SelAudioButton != null && SelImageButton != null)
 			{
-				if (_s == "Jpg to wav (nad)")
+				if (_s == "Jpg to wav (Nad)")
 					ImageSelection();
 				else if (_s == "Jpg to wav (IFFT)")
+					ImageSelection();
+				else if (_s == "Jpg to wav octave reverse (Nad)")
 					ImageSelection();
 				else
 					AudioSelection();

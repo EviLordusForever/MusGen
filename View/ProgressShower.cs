@@ -6,14 +6,18 @@ using System.Threading.Tasks;
 
 namespace MusGen
 {
-	internal class ProgressShower
+	public static class ProgressShower
 	{
+		private static string _text;
+
 		public static void Show(string text)
 		{
 			Application.Current.Dispatcher.Invoke(() =>
 			{
 				WindowsManager.OpenProgressWindow(text);
 			});
+			Logger.Log($"Started: {text}");
+			_text = text;
 		}
 
 		public static void Set(double value)
@@ -30,6 +34,7 @@ namespace MusGen
 			{
 				WindowsManager._progressWindow.Visibility = Visibility.Collapsed;
 			});
+			Logger.Log($"Done: {_text}");
 		}
 	}
 }

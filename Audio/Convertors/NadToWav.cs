@@ -23,17 +23,15 @@ namespace MusGen
 
 		public static Wav Make(Nad nad, Wav wav)
 		{
-			int channels = nad._samples[0]._frequencies.Length;
 			int length = wav.Length;
-			double[] t = new double[channels];
-			double[] tOld = new double[channels];
+			double[] t = new double[AP._peaksLimit];
+			double[] tOld = new double[AP._peaksLimit];
 			int fadeSamplesLeft = 0;
 			int samplesForFade = (int)(AP._fadeTime * AP.SampleRate / AP._sps);
 			float pi2 = MathF.PI * 2;
 			float buf = pi2 / AP.SampleRate;
 			int progressStep = (int)(length / 2000);
 			float max = 0;
-
 
 			ProgressShower.Show("Making wav from nad...");
 
@@ -60,7 +58,8 @@ namespace MusGen
 
 			void WriteSample(int s,int ns)
 			{
-				float signal = 0;
+				float newSignal = 0;
+				float oldSignal = 0;
 				float fade = 0;
 				float antifade = 1;
 
@@ -71,22 +70,29 @@ namespace MusGen
 					antifade = 1 - fade;
 				}
 
-				for (int c = 0; c < channels; c++)
+				for (int c = 0; c < nad._samples[ns].Width; c++)
 				{
 					if (nad._samples[ns]._frequencies[c] < 20f)
 						nad._samples[ns]._frequencies[c] = 20f;
 
-					if (fadeSamplesLeft > 0)
-					{
-						tOld[c] += buf * nad._samples[ns - 1]._frequencies[c];
-						signal += (float)F(tOld[c]) * nad._samples[ns - 1]._amplitudes[c] * fade;
-					}
-
 					t[c] += buf * nad._samples[ns]._frequencies[c];
-					signal += (float)F(t[c]) * nad._samples[ns]._amplitudes[c] * antifade;
+					newSignal += (float)F(t[c]) * nad._samples[ns]._amplitudes[c];
 				}
 
-				wav.L[s] = signal / channels;
+				newSignal *= antifade / nad._samples[ns].Width;
+
+				if (fadeSamplesLeft > 0)
+				{
+					for (int c = 0; c < nad._samples[ns - 1].Width; c++)
+					{
+						tOld[c] += buf * nad._samples[ns - 1]._frequencies[c];
+						oldSignal += (float)F(tOld[c]) * nad._samples[ns - 1]._amplitudes[c];
+					}
+
+					oldSignal *= fade / nad._samples[ns - 1].Width;
+				}
+
+				wav.L[s] = oldSignal + newSignal;
 
 				if (Math.Abs(wav.L[s]) > max)
 					max = Math.Abs(wav.L[s]);
@@ -94,7 +100,7 @@ namespace MusGen
 
 			void SetTimeOld()
 			{
-				for (int c = 0; c < channels; c++)
+				for (int c = 0; c < AP._peaksLimit; c++)
 					tOld[c] = t[c];
 			}
 

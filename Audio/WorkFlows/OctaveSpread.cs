@@ -11,7 +11,7 @@ namespace MusGen.Audio.WorkFlows
 	{
 		public static void Make(string wavInPath, string exportName)
 		{
-			Logger.Log($"Octave spread started for ({wavInPath}).");
+			Logger.Log($"Octave spread started for\n{wavInPath}");
 			Wav wavIn = new Wav();
 			wavIn.Read(wavInPath);
 			Nad nad = WavToNad.Make(wavIn);

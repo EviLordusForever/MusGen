@@ -52,7 +52,18 @@ namespace MusGen
 			ns._amplitudes = MathE.GetValues(SpectrumFinder._spectrumLogarithmic, ns._indexes);
 			ns._frequencies = MathE.GetValues(SpectrumFinder._frequenciesLogarithmic, ns._indexes);
 
+			return ns;
+		}
 
+		public static NadSample MakeSamplePlus(Wav wav, int s)
+		{
+			NadSample ns = new NadSample(AP._channels);
+
+			SpectrumFinder.Find(wav, s);
+
+			ns._indexes = PeaksFinder.FindEvery(SpectrumFinder._spectrumLogarithmic, AP._peakSize2, AP._lowestPeak, AP._peaksLimit).ToArray();
+			ns._amplitudes = MathE.GetValues(SpectrumFinder._spectrumLogarithmic, ns._indexes);
+			ns._frequencies = MathE.GetValues(SpectrumFinder._frequenciesLogarithmic, ns._indexes);
 
 			return ns;
 		}

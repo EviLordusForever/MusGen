@@ -148,6 +148,13 @@ namespace MusGen
 			}
 		}
 
+		public static float[] Find(float[] signal)
+		{
+			Wav wav = new Wav(signal.Length);
+			wav.L = signal;
+			return Find(wav, 0);
+		}
+
 		public static float[] Find(Wav wav, int start)
 		{
 			Complex[] complex;

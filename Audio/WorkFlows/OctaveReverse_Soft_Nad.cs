@@ -12,17 +12,17 @@ namespace MusGen
 	{
 		public static void Make(string wavInPath, string exportName)
 		{
-			Logger.Log($"Wav to soft ss octave reverse started for ({wavInPath}).");
+			Logger.Log($"Wav to octave reverse (soft, nad) started for\n{wavInPath}");
 
 			Wav wavIn = new Wav();
 			wavIn.Read(wavInPath);
 			SS ss = WavToSS.Make(wavIn);
 			ss = SsSoftOctaveReverser.Make(ss);
-			Nad nad = SsToNad.Make(ss, true);
+			Nad nad = SsToNad_Multi.Make(ss);
 			Wav wavOut = NadToWav.Make(nad);
 			wavOut.Export(exportName);
 
-			Logger.Log($"Wav to soft ss octave reverse finished. Saved as ({exportName})");
+			Logger.Log($"Wav to octave reverse (soft, nad) finished. Saved as ({exportName})");
 		}
 	}
 }

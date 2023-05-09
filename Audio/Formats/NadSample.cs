@@ -33,6 +33,14 @@ namespace MusGen
 			_indexes = new int[channels];
 		}
 
+		public int Width
+		{
+			get
+			{
+				return _indexes.Length;
+			}
+		}
+
 		public Note[] GetMidiNotes()
 		{
 			Note[] notes = new Note[_frequencies.Length];

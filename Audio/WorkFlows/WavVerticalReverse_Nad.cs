@@ -11,7 +11,7 @@ namespace MusGen
 	{
 		public static void Make(string wavInPath, string exportName)
 		{
-			Logger.Log($"Wav vertical reverse (nad) started for ({wavInPath}).");
+			Logger.Log($"Wav vertical reverse (nad) started for\n{wavInPath}");
 
 			Wav wavIn = new Wav();
 			wavIn.Read(wavInPath);

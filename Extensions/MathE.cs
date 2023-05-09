@@ -9,6 +9,15 @@ namespace Extensions
 	{
 		public static Random rnd = new Random();
 
+		public static float[] StupiedFilter(float[] array)
+		{
+			float[] res = new float[array.Length];
+			for (int i = 1; i < array.Length - 2; i++)
+				if (array[i] > array[i - 1] && array[i] > array[i + 1])
+					res[i] = array[i];
+			return res;
+		}
+
 		public static T[] GetValues<T>(T[] array, int[] indexes)
 		{
 			T[] values = new T[indexes.Length];

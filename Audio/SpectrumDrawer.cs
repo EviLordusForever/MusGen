@@ -159,6 +159,9 @@ namespace MusGen
 					int x = Convert.ToInt32(verticalLines[i] * xScale);
 					int y = Convert.ToInt32(power0_1 * yScaleUp * 0.95);
 
+					if (y < 1)
+						continue;
+
 					Clr clr = GraphicsE.RainbowM(i * 1f / verticalLines.Length);
 
 					_wbmpL1.DrawLineAa(x, _yHalf / 2 - y, x, _yHalf / 2 + y, clr, penWidth);

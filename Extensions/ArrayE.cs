@@ -8,6 +8,22 @@ namespace Extensions
 {
 	public static class ArrayE
 	{
+		public static float[] StupiedStretch(float[] array, int factor)
+		{
+			float[] newArray = new float[array.Length * factor];
+			for (int i = 0; i < array.Length; i++)
+				newArray[i * factor] = array[i];
+			return newArray;
+		}
+
+		public static float[] NormalStretch(float[] array, int factor)
+		{
+			float[] newArray = new float[array.Length * factor];
+			for (int i = 0; i < newArray.Length; i++)
+				newArray[i] = array[i / factor];
+			return newArray;
+		}
+
 		public static float[] RescaleArrayToLog(float[] array, float base_, int new_size)
 		{
 			int indexA = 0;

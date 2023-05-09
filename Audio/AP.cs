@@ -1,14 +1,22 @@
-﻿namespace MusGen
+﻿using System;
+
+namespace MusGen
 {
 	public static class AP
 	{
 		private static uint _sampleRate = 44100;
 
 		private static int _fftSize = 1024 * 1; //1024
+		public static int _ifftScale = 2;
 		public static int _lc = 16; //how much fftLow bigger than fft //16
 		public static int _channels = 20;
 		public static int _sps = (int)(_sampleRate / (_fftSize / 4));
+
 		public static float _peakSize = 70; //
+
+		public static float _peakSize2 = 15; //
+		public static float _lowestPeak = 0.005f;
+		public static int _peaksLimit = 50;
 
 		public static int _wbmpResX = 256 * 2;
 		public static int _wbmpResY = 16 * 9 * 2 * 2;
@@ -28,9 +36,16 @@
 
 		public static int _graphType = 1;
 
-		public static float _phasesShift = 0.2f; //for SsToWav //0.2f good
-		public static float _phasesShiftRandom = 0.3f; //0.3f good
+		//Phases for IFFT sound uniquification
+		//8 0.25f 0.015f
+		//6.71382f 0.25f 0.11f
+		//6.71382f 0.25f 0.00876f;
 
+		public static float _phasesFrequency = 6.71382f;
+		public static float _phasesHeight = 0.25f;
+		public static float _phasesMove = 0.00876f;
+		public static float _newSampleShift = 0.0f;
+		
 		public static uint SampleRate
 		{
 			get

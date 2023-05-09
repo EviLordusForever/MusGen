@@ -30,7 +30,7 @@ namespace MusGen
 				ss._s[ns] = SpectrumFinder.Find(wav, (int)s);
 
 				if (ns % progressStep == 0)
-					ProgressShower.Set(1.0 * ns / ss._s.Length);
+					ProgressShower.Set(1.0 * ns / ss.Width);
 			}
 
 			ProgressShower.Show("SS normalisation...");

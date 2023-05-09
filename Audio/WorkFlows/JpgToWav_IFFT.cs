@@ -13,10 +13,11 @@ namespace MusGen
 	{
 		public static void Make(string jpgInPath, string exportName)
 		{
-			Logger.Log($"Jpg to wav (IFFT) started for ({jpgInPath}).");
+			Logger.Log($"Jpg to wav (IFFT) started for\n{jpgInPath}");
 
 			WriteableBitmap wbmp = WBMP.Load(jpgInPath);
 			SS ss = WbmpToSs.Make(wbmp);
+			//ss = SsCleaner.Make(ss);
 			Wav wav = SsToWav.Make(ss);
 			wav.Export(exportName);
 

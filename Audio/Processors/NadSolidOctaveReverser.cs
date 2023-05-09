@@ -31,12 +31,13 @@ namespace MusGen
 
 						id = right - (id - left);
 						nad._samples[s]._indexes[c] = id;
+
+						nad._samples[s]._frequencies[c] = SpectrumFinder._frequenciesLogarithmic[id];
 					}
 					else
 					{
 						nad._samples[s]._amplitudes[c] = 0;
-					}
-					nad._samples[s]._frequencies[c] = SpectrumFinder._frequenciesLogarithmic[id];
+					}					
 				}
 
 				if (s % step == 0)

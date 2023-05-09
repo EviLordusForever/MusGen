@@ -74,7 +74,8 @@ namespace MusGen
 						wav.L = AudioCapturerSystem.GetSamples((int)AP.FftSize * AP._lc);
 
 					nadsOld = nads;
-					nads = WavToNad.MakeSample(wav, 0);
+					//nads = WavToNad.MakeSample(wav, 0);
+					nads = WavToNad.MakeSamplePlus(wav, 0);
 
 					Octavisate();
 					AdaptiveCeiling();

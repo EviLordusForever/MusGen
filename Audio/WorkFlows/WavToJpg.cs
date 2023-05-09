@@ -13,7 +13,7 @@ namespace MusGen
 	{
 		public static void Make(string wavInPath, string exportName)
 		{
-			Logger.Log($"Wav to jpg started for ({wavInPath}).");
+			Logger.Log($"Wav to jpg started fo\n{wavInPath}");
 
 			Wav wavIn = new Wav();
 			wavIn.Read(wavInPath);

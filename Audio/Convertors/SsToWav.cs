@@ -23,16 +23,14 @@ namespace MusGen
 			float max = 0;
 			float[] signal = new float[AP.FftSize];
 			float[] signalOld = new float[AP.FftSize];
+			int shiftSignalPoint = 0;
 			int signalPoint = 0;
 			int oldSignalPoint = 0;
 
 			ProgressShower.Show("Ss to wav...");
 
 			float[] phases = new float[ss.Height * 2];
-			float[] phasesChanges = new float[ss.Height * 2];
-
-			for (int p = 0; p < phasesChanges.Length; p++)
-				phasesChanges[p] = MathF.PI * (MathE.rnd.Next() * 2 - 1) * (AP._phasesShift + MathE.rnd.NextSingle() * AP._phasesShiftRandom);
+			float phasesMove = 0;
 
 			int ns = 0;
 			for (int s = 0; s < wavLength; s++, signalPoint++, oldSignalPoint++)
@@ -47,12 +45,36 @@ namespace MusGen
 					fadeSamplesLeft = samplesForFade;
 
 					signalOld = signal;
-					signal = FFT.Inverse(ss._s[ns], phases);
+
+					float[] stretched = ArrayE.NormalStretch(ss._s[ns], AP._ifftScale);
+					float[] phasesStretched = ArrayE.NormalStretch(phases, AP._ifftScale);
+
+/*					int length = stretched.Length / 4;
+					for (int i = 0; i < length; i++)
+						stretched[i] *= 1 - MathE.Fade(1f * i / length);*/
+
+					signal = FFT.Inverse(stretched, phasesStretched);
+					//signal = FFT.Inverse(ss._s[ns], phases);
+
+/*					int length = signal.Length;
+					for (int i = 0; i < length; i++)
+						signal[i] *= MathF.Sqrt(i);*/
+
+					if (newNs == 160)
+						DiskE.WriteToProgramFiles("delme", "csv", TextE.ToCsvString(signal, signalOld), false);
 
 					Phases();
 
 					oldSignalPoint = signalPoint;
-					signalPoint = 0;
+
+
+					signalPoint = MathE.rnd.Next((int)(ss.Height * (AP._newSampleShift * 0.75f + 0.25f)));
+
+/*					shiftSignalPoint += 5;
+					if (shiftSignalPoint > ss.Height)
+						shiftSignalPoint = 0;
+					signalPoint = shiftSignalPoint;*/
+
 				}
 				else
 					fadeSamplesLeft--;
@@ -71,13 +93,11 @@ namespace MusGen
 
 			void Phases()
 			{
-				for (int p = 0; p < ss.Height; p++)
-				{
-					phases[p] += phasesChanges[p];
+				phasesMove += AP._phasesMove;
 
-					if (Math.Abs(phases[p]) > 1000000)
-						phases[p] = 0;
-				}
+				float pi2 = 2 * MathF.PI;
+				for (int x = 0; x < ss.Height; x++)
+					phases[x] = MathF.Sin((x + ss.Height / AP._phasesFrequency * phasesMove) * pi2 / ss.Height * AP._phasesFrequency) * pi2 * AP._phasesHeight;
 			}
 
 			void WriteSample(int s, int ns)

@@ -15,20 +15,21 @@
 			<RowDefinition/>
 		</Grid.RowDefinitions>
 
-		<ComboBox FontSize="22" Margin ="0,3,0,3" Name="combobox" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" SelectedIndex="0" Grid.Row="0" SelectionChanged="combobox_SelectionChanged">
-			<ComboBoxItem>Octave reverse (soft, IFFT)</ComboBoxItem>
-			<ComboBoxItem>Octave reverse (soft, nad)</ComboBoxItem>
-			<ComboBoxItem>Vertical reverse (nad)</ComboBoxItem>
-			<ComboBoxItem>Wav to wav (nad)</ComboBoxItem>
-			<ComboBoxItem>Wav to wav (IFFT)</ComboBoxItem>
+		<ComboBox FontSize="20" Margin ="0,3,0,3" Name="combobox" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" SelectedIndex="0" Grid.Row="0" SelectionChanged="combobox_SelectionChanged">
+			<ComboBoxItem>Octave reverse (soft, Nad)</ComboBoxItem>
+			<ComboBoxItem>Jpg to wav octave reverse (Nad)</ComboBoxItem>
 			<ComboBoxItem>Wav to jpg</ComboBoxItem>
-			<ComboBoxItem>Jpg to wav (nad)</ComboBoxItem>
+			<ComboBoxItem>Jpg to wav (Nad)</ComboBoxItem>
 			<ComboBoxItem>Jpg to wav (IFFT)</ComboBoxItem>
+			<ComboBoxItem>Octave reverse (soft, IFFT)</ComboBoxItem>
+			<ComboBoxItem>Wav to wav (Nad)</ComboBoxItem>
+			<ComboBoxItem>Wav to wav (IFFT)</ComboBoxItem>
+			<ComboBoxItem>Vertical reverse (Nad)</ComboBoxItem>
 		</ComboBox>
-		<Button Name="SelAudioButton" FontSize="22" Margin ="0,3,0,3" Content="Select .wav file" Grid.Row="1" Click="SelBtn_Click"></Button>
+		<Button Name="SelAudioButton" FontSize="20" Margin ="0,3,0,3" Content="Select .wav file" Grid.Row="1" Click="SelBtn_Click"></Button>
 		<Button Name="SelImageButton" Visibility="Collapsed" FontSize="22" Margin ="0,3,0,3" Content="Select image file" Grid.Row="1" Click="SelImageButton_Click"></Button>
-		<local:TextBoxPro FontSize="22" Margin ="0,3,0,3"  x:Name ="outNameTb" Placeholder="Out file name" Grid.Row="2"></local:TextBoxPro>
-		<Button FontSize="22" Margin ="0,3,0,3" Name ="ProcessBtn"  Content="Process" Grid.Row="3" Click="ProcessBtn_Click"></Button>
-		<Button FontSize="22" Margin ="0,3,0,3" Name ="Back" Content="Back"  Grid.Row="4" Click="Back_Click"></Button>
+		<local:TextBoxPro FontSize="20" Margin ="0,3,0,3"  x:Name ="outNameTb" Placeholder="Out file name" Grid.Row="2"></local:TextBoxPro>
+		<Button FontSize="20" Margin ="0,3,0,3" Name ="ProcessBtn"  Content="Process" Grid.Row="3" Click="ProcessBtn_Click"></Button>
+		<Button FontSize="20" Margin ="0,3,0,3" Name ="Back" Content="Back"  Grid.Row="4" Click="Back_Click"></Button>
 	</Grid>
 </UserControl>

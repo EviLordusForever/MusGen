@@ -12,18 +12,18 @@ namespace MusGen
 {
 	public static class WbmpToSs
 	{
-		public static int _lastSample;
+		public static int width;
 
 		public static SS Make(WriteableBitmap wbmp)
 		{
-			_lastSample = wbmp.PixelWidth;
+			width = wbmp.PixelWidth - 2;
 
-			SS ss = new SS(wbmp.PixelWidth, ReadSps());
+			SS ss = new SS(width, ReadSps());
 
 			int progressStep = wbmp.PixelWidth / 1000;
 			ProgressShower.Show("Image to ss...");
 
-			for (int x = 0; x < _lastSample; x++)
+			for (int x = 0; x < width; x++)
 			{
 				ss._s[x] = new float[wbmp.PixelHeight];
 				for (int y = 0; y < wbmp.PixelHeight; y++)
