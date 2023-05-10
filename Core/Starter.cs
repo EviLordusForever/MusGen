@@ -25,7 +25,7 @@ namespace MusGen
 				SpectrumFinder.Init();
 				SpectrumDrawer.Init();
 
-				Logger.Log("Tests are started...");
+/*				Logger.Log("Tests are started...");
 
 				Tests.HungarianAlgorithm();
 				Tests.GradientDithering();
@@ -34,8 +34,9 @@ namespace MusGen
 				Tests.ArrayToLog();
 				Tests.SoftOctaveReverser();
 				Tests.FromLogTest();
+				Tests.Ceiling();
 
-				Logger.Log("Tests are completed.");
+				Logger.Log("Tests are completed.");*/
 
 				while (Logger._updated)
 					Thread.Sleep(100);

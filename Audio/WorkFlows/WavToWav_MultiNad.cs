@@ -15,6 +15,7 @@ namespace MusGen
 			Wav wavIn = new Wav();
 			wavIn.Read(wavInPath);
 			SS ss = WavToSS.Make(wavIn);
+			ss = SsLowPhaseSmoother.Make(ss);
 			Nad nad = SsToMultiNad.Make(ss);
 			Wav wavOut = EveryNadToWav.Make(nad);
 			wavOut.Export(exportName);

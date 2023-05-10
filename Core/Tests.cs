@@ -62,6 +62,26 @@ namespace MusGen
 			DiskE.SaveImagePng(testBmp, $"{DiskE._programFiles}\\Grafics\\SpectrumGraident.bmp");
 		}
 
+		public static void Ceiling()
+		{
+			Check(59, 120);
+			Check(59.9f, 120);
+			Check(60, 120);
+			Check(61, 120);
+			Check(90, 120);
+			Check(89, 120);
+			Check(91, 120);
+			Check(119, 120);
+			Check(120, 120.1f);
+			Check(119.999f, 120);
+			Check(120, 120);
+
+			void Check(float a, float b)
+			{
+				Logger.Log($"{b} / {a} = {MathF.Ceiling(b / a)}");
+			}
+		}
+
 		public static void ArrayToLog()
 		{
 			float[] array1 = new float[1024];

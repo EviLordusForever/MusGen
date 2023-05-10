@@ -15,7 +15,9 @@ namespace MusGen
 
 			WriteableBitmap wbmp = WBMP.Load(jpgInPath);
 			SS ss = WbmpToSs.Make(wbmp);
+			ss = SsLowPhaseSmoother.Make(ss);
 			ss = SsSoftOctaveReverser.Make(ss);
+			ss = SsLowPhaseSmoother.Make(ss);
 			Nad nad = SsToMultiNad.Make(ss);
 			Wav wav = EveryNadToWav.Make(nad);
 			wav.Export(exportName);

@@ -16,6 +16,7 @@ namespace MusGen
 			Wav wavIn = new Wav();
 			wavIn.Read(wavInPath);
 			SS ss = WavToSS.Make(wavIn);
+			ss = SsLowPhaseSmoother.Make(ss);
 			Nad nad = SsToFixedNad.Make(ss, true);
 			int left = (int)SpectrumFinder._octavesIndexes[0];
 			int right = (int)SpectrumFinder._octavesIndexes[9];
