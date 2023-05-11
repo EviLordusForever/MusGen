@@ -15,14 +15,23 @@ namespace MusGen
 			for (int c = 0; frequency < ss._sps; c++)
 			{
 				frequency = SpectrumFinder._frequenciesLogarithmic[c];
-				int frames = (int)MathF.Ceiling(ss._sps / frequency);
+				int n = (int)MathF.Ceiling(ss._sps / frequency);
 
-				float current = ss._s[0][c];
-				for (int s = 0; s < ss.Width; s++)
-					if (s % frames == 0)
-						current = ss._s[s][c];
+				float summ = 0;
+
+				for (int s = 0; s < ss.Width + n; s++)
+				{
+					if (s < ss.Width)
+						summ += ss._s[s][c];
 					else
-						ss._s[s][c] = current;
+						summ += ss._s[ss.Width - 1][c];
+
+					if (s >= n)
+					{
+						ss._s[s - n][c] = summ / n;
+						summ -= ss._s[s - n][c];
+					}
+				}
 			}
 
 			ProgressShower.Close();

@@ -57,7 +57,7 @@ namespace MusGen
 
 				if (wbmp.GetPixel(wbmp.PixelWidth - 1, wbmp.PixelHeight - 1 - 16 - 1).G < 245)
 				{
-					sps = (ushort)(AP.SampleRate / (wbmp.PixelHeight * 2 / 4));
+					sps = AP._sps;//(ushort)(AP.SampleRate / (wbmp.PixelHeight * 2 / 4));
 					Logger.Log($"Cannot read \"samples per second\" from image. So it was set to {sps}", Brushes.Red);
 				}
 				else

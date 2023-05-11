@@ -73,9 +73,11 @@ namespace MusGen
 					else if (AP._captureType == "system")
 						wav.L = AudioCapturerSystem.GetSamples((int)AP.FftSize * AP._lc);
 
+					Wav wavLow = WavLowPass.FillWavLow(wav, AP._kaiserFilterLength_ForRealtime);
+
 					nadsOld = nads;
 					//nads = WavToNad.MakeSample(wav, 0);
-					nads = WavToFixedNad.MakeSamplePlus(wav, 0);
+					nads = WavToFixedNad.MakeSamplePlus(wav, wavLow, 0);
 
 					Octavisate();
 					AdaptiveCeiling();

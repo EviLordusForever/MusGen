@@ -27,7 +27,8 @@ namespace MusGen
 			double[] t = new double[AP._peaksLimit];
 			double[] tOld = new double[AP._peaksLimit];
 			int fadeSamplesLeft = 0;
-			int samplesForFade = (int)(AP._fadeTime * AP.SampleRate / AP._sps);
+			int sps = wav.Length / nad.Width;
+			int samplesForFade = (int)(AP._fadeTime * AP.SampleRate / sps);
 			float pi2 = MathF.PI * 2;
 			float buf = pi2 / AP.SampleRate;
 			int progressStep = (int)(length / 2000);
@@ -66,7 +67,7 @@ namespace MusGen
 				if (fadeSamplesLeft > 0)
 				{
 					float status = 1 - 1f * fadeSamplesLeft / samplesForFade;
-					fade = MathE.Fade(status);
+					fade = MathE.FadeOut(status);
 					antifade = 1 - fade;
 				}
 

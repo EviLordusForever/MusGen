@@ -8,15 +8,15 @@ namespace MusGen
 
 		private static int _fftSize = 1024 * 1; //1024
 		public static int _ifftScale = 2;
-		public static int _lc = 16; //how much fftLow bigger than fft //16
+		public const int _lc = 16; //how much fftLow bigger than fft //16
 		public static int _channels = 20;
-		public static int _sps = 120;
+		public const int _sps = 120;
 
 		public static float _peakWidth_ForFixedNad = 70; //70
 
-		public static float _peakWidth_ForMultiNad = 0.025f; //25
-		public static float _lowestPeak_FromAverage = 0.125f / 32; //0.125f / 32
-		public static float _lowestPeak_FromMaximum = 0.01f / 32; //0.01f / 32
+		public static float _peakWidth_ForMultiNad = 0.025f;
+		public static float _lowestPeak_FromAverage = 0.125f / 8; //0.125f / 32
+		public static float _lowestPeak_FromMaximum = 0.01f / 8; //0.01f / 32
 		public static int _peaksLimit = 150; //150 or less
 
 		public static int _wbmpResX = 256 * 2;
@@ -27,6 +27,10 @@ namespace MusGen
 
 		public static string _captureType = "system";
 		public static string _windowFunction = "hamming";
+
+		public static int _kaiserFilterLength_ForProcessing = 100;
+		public static int _kaiserFilterLength_ForRealtime = 50;
+		public static float _kaiserFilterBeta = 5f;
 
 		public static int _circularPianoImageDiameter = 500;
 

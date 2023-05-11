@@ -11,6 +11,7 @@ namespace MusGen
 		public static float _max;
 		public static float _minFromAverage;
 		public static float _minFromMaximum;
+		public static float _stupiedPeaksCount;
 
 		public static int[] Find(float[] array, int count, float peakSize)
 		{
@@ -42,6 +43,7 @@ namespace MusGen
 			List<int> peakIndexes = new List<int>();
 
 			List<int> mask = MathE.StupiedFilterMask(array1, true);
+			_stupiedPeaksCount = mask.Count;
 
 			float[] array2 = new float[array1.Length];
 			for (int i = 0; i < mask.Count; i++)

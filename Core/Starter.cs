@@ -35,6 +35,7 @@ namespace MusGen
 				Tests.SoftOctaveReverser();
 				Tests.FromLogTest();
 				Tests.Ceiling();
+				Tests.Smoothing();
 
 				Logger.Log("Tests are completed.");*/
 

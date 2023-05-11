@@ -50,11 +50,14 @@ namespace MusGen
 			void DrawNadsCount()
 			{
 				float power = (1f * verticalLines.Length / AP._peaksLimit);
+				float power2 = (1f * PeaksFinder._stupiedPeaksCount / AP._peaksLimit);
+				power2 = MathF.Min(power2, 1);
 				int length = _wbmp.PixelWidth / 6;
 				int x = _wbmp.PixelWidth / 8;
 				int y = _wbmp.PixelWidth / 60;
 
 				_wbmpL1.DrawLineAa(x, y, x + length, y, Clr.FromRgb(0, 0, 255), 3);
+				_wbmpL1.DrawLineAa(x, y, (int)(x + length * power2), y, Clr.FromRgb(255, 50, 0), 3);
 				_wbmpL1.DrawLineAa(x, y, (int)(x + length * power), y, Clr.FromRgb(255, 255, 0), 3);
 			}
 

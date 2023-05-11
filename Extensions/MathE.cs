@@ -79,9 +79,21 @@ namespace Extensions
 			return s / 32768.0;
 		}
 
-		public static float Fade(float count)
+		public static float FadeOut(float Zt1)
 		{
-			return (MathF.Cos(count * MathF.PI) + 1) / 2;
+			return (MathF.Cos(Zt1 * MathF.PI) + 1) / 2;
+		}
+
+		public static float FadeOutCubic(float Zt1)
+		{
+			//Fall faster
+			return MathF.Pow(FadeOut(Zt1), 3);
+		}
+
+		public static float FadeOutCentered(float count)
+		{
+			//Fall faster but symmetric
+			return (MathF.Pow(MathF.Cos(count * MathF.PI), 1f/3f) + 1) / 2;
 		}
 
 		public static float LogPro(float x, float base_)

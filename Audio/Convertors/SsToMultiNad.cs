@@ -14,7 +14,7 @@ namespace MusGen
 			AP.FftSize = ss.Height * 2;
 
 			ProgressShower.Show("Ss to MultiNad...");
-			int progressStep = ss._s.Length / 1000;
+			int progressStep = (int)MathF.Ceiling(ss.Width / 1000f);
 
 			AP.FftSize = ss.Height * 2;
 

@@ -25,6 +25,14 @@ namespace MusGen
 			_duration = duration;
 		}
 
+		public int Width
+		{
+			get
+			{
+				return _samples.Length;
+			}
+		}
+
 		public static NadSample Compare(NadSample oldNad, NadSample newNad)
 		{
 			int c = AP._channels;

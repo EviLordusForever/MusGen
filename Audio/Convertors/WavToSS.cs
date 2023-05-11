@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Extensions;
 
 namespace MusGen
 {
@@ -20,19 +21,22 @@ namespace MusGen
 			SS ss = new SS(samplesCount, AP._sps);
 
 			ProgressShower.Show("Making ss from wav...");
-			int progressStep = ss._s.Length / 1000;
+			int progressStep = (int)MathF.Ceiling(ss._s.Length / 1000f);
 
 			SpectrumFinder._max = 0;
+
+			Wav wavLow = WavLowPass.FillWavLow(wav,AP._kaiserFilterLength_ForProcessing);
 
 			int ns = 0;
 			for (double s = 0; s < _lastSample; s += _step, ns++)
 			{
-				ss._s[ns] = SpectrumFinder.Find(wav, (int)s);
+				ss._s[ns] = SpectrumFinder.Find(wav, wavLow, (int)s);
 
 				if (ns % progressStep == 0)
 					ProgressShower.Set(1.0 * ns / ss.Width);
 			}
 
+			ProgressShower.Close();
 			ProgressShower.Show("SS normalisation...");
 
 			float max = SpectrumFinder._max;

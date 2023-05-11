@@ -82,23 +82,37 @@ namespace MusGen
 			}
 		}
 
+		public static void Smoothing()
+		{
+			float[] array = new float[100];
+			for (int i = 0; i < array.Length; i++)
+				array[i] = MathE.rnd.NextSingle();
+
+			float[] array2 = (float[])array.Clone();
+			float[] array3 = (float[])array.Clone();
+			ArrayE.SmoothArray(array2, 5);
+			ArrayE.SmoothArray(array3, 15);
+
+			DiskE.WriteToProgramFiles("ArraySmoothingTest", "csv", TextE.ToCsvString(array, array2, array3), false);
+		}
+
 		public static void ArrayToLog()
 		{
 			float[] array1 = new float[1024];
 			for (int i = 0; i < 1024; i++)
 				array1[i] = i;
-			array1 = ArrayE.RescaleArrayToLog(array1, 1024, 2048);
+			array1 = ArrayE.RescaleArrayToLog(array1, 1024, 2048, false);
 
 
 			float[] array2 = new float[1024];
 			for (int i = 0; i < 1024; i++)
 				array2[i] = i;
-			array2 = ArrayE.RescaleArrayToLog(array2, 2, 2048);
+			array2 = ArrayE.RescaleArrayToLog(array2, 2, 2048, false);
 
 			float[] array3 = new float[1024];
 			for (int i = 0; i < 1024; i++)
 				array3[i] = (i % 32 > 16 ? 1 : -1);
-			float[] array3_2 = ArrayE.RescaleArrayToLog(array3, 1024, 2048);
+			float[] array3_2 = ArrayE.RescaleArrayToLog(array3, 1024, 2048, false);
 
 			float[] array4 = new float[1024];
 			int m = 1;
@@ -110,7 +124,7 @@ namespace MusGen
 					m = i;
 				}
 			}
-			float[] array4_2 = ArrayE.RescaleArrayToLog(array4, 1024, 1024);
+			float[] array4_2 = ArrayE.RescaleArrayToLog(array4, 1024, 1024, false);
 
 			float[] array5 = new float[1024];
 			m = 1;
@@ -122,7 +136,7 @@ namespace MusGen
 					m = i;
 				}
 			}
-			float[] array5_2 = ArrayE.RescaleArrayToLog(array5, 1024, 1024);
+			float[] array5_2 = ArrayE.RescaleArrayToLog(array5, 1024, 1024, false);
 
 			string csv = "";
 			for (int i = 0; i < 2048; i++)
@@ -166,7 +180,7 @@ namespace MusGen
 		{
 			float[] array = ArrayE.OneToNFloat(AP.FftSize / 2);
 
-			float[] array2 = ArrayE.RescaleArrayToLog(array, AP.FftSize, AP.FftSize / 2);
+			float[] array2 = ArrayE.RescaleArrayToLog(array, AP.FftSize, AP.FftSize / 2, false);
 
 			float[] array3 = ArrayE.RescaleArrayFromLog(array2, AP.FftSize, AP.FftSize / 2);
 

@@ -24,7 +24,7 @@ namespace Extensions
 			return newArray;
 		}
 
-		public static float[] RescaleArrayToLog(float[] array, float base_, int new_size)
+		public static float[] RescaleArrayToLog(float[] array, float base_, int new_size, bool byMax)
 		{
 			int indexA = 0;
 			int indexB = 0;
@@ -48,15 +48,48 @@ namespace Extensions
 				}
 				else
 				{
-					indexA++;
+					if (byMax)
+					{
+						indexA++;
 
-					for (int i = indexA; i <= indexB; i++)
-						newArray[x] = MathF.Max(newArray[x], array[i]);
+						for (int i = indexA; i <= indexB; i++)
+							newArray[x] = MathF.Max(newArray[x], array[i]);
+					}
+					else
+					{
+						for (int i = indexA + 1; i <= indexB; i++)
+							newArray[x] += array[i];
+
+						newArray[x] /= (indexB - indexA);
+
+						indexA++;
+					}
 				}
 				indexA = indexB;			
 			}
 
 			return newArray;
+		}
+
+		public static float[] SmoothArray(float[] array, int n)
+		{
+			float summ = 0;
+
+			for (int s = 0; s < array.Length + n; s++)
+			{
+				if (s < array.Length)
+					summ += array[s];
+				else
+					summ += array[array.Length - 1];
+
+				if (s >= n)
+				{
+					array[s - n] = summ / n;
+					summ -= array[s - n];
+				}
+			}
+
+			return array;
 		}
 
 		public static float[] RescaleArrayFromLog(float[] array, float base_, int new_size)

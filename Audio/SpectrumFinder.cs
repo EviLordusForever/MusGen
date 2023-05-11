@@ -36,9 +36,10 @@ namespace MusGen
 			_spectrumLowLinear = new float[AP.FftSize / 2];
 			_spectrumLowLogarithmic = new float[AP.FftSize / 2];
 
-			FindFrequencies();
-			SetOctaves();
+			FindFrequenciesLinear();
 			FindLowIndex();
+			FindFrequenciesLogarithmic();
+			SetOctaves();
 			FillFadeLowMask();
 			Logger.Log("Spectrum Finder was initialized.");
 
@@ -48,7 +49,7 @@ namespace MusGen
 				int L0 = AP.FftSize;
 				int L = AP.FftSize / 2;
 				_spectrumLowEndIndex = (int)(MathE.ToLogScale(lastIndex / L, L0) * L) - 1;
-				_spectrumLowEndIndex -= 1;
+				//
 			}
 
 			void FillFadeLowMask()
@@ -68,13 +69,13 @@ namespace MusGen
 					}
 					else
 					{
-						_fadeLowMask[i] = 1 - MathE.Fade((i - start) / count);
+						_fadeLowMask[i] = 1 - MathE.FadeOut((i - start) / count);
 						_antifadeLowMask[i] = 1 - _fadeLowMask[i];
 					}
 				}
 			}
 
-			void FindFrequencies()
+			void FindFrequenciesLinear()
 			{
 				_frequenciesLinear = new float[AP.FftSize / 2];
 				_frequenciesLowLinear = new float[AP.FftSize / 2];
@@ -84,14 +85,21 @@ namespace MusGen
 
 				for (int index = 0; index < AP.FftSize / 2; index++)
 					_frequenciesLowLinear[index] = (1f * index / AP.FftSize) * AP.SampleRate / AP._lc;
+			}
 
-				_frequenciesLogarithmic = ArrayE.RescaleArrayToLog(_frequenciesLinear, AP.FftSize, AP.FftSize / 2);
-				_frequenciesLowLogarithmic = ArrayE.RescaleArrayToLog(_frequenciesLowLinear, AP.FftSize / AP._lc, (int)_spectrumLowEndIndex);
-
-				DiskE.WriteToProgramFiles("frqs", "csv", TextE.ToCsvString(_frequenciesLinear, _frequenciesLogarithmic, _frequenciesLowLinear, _frequenciesLowLogarithmic), false);
+			void FindFrequenciesLogarithmic()
+			{
+				_frequenciesLogarithmic = ArrayE.RescaleArrayToLog(_frequenciesLinear, AP.FftSize, AP.FftSize / 2, false);
+				_frequenciesLowLogarithmic = ArrayE.RescaleArrayToLog(_frequenciesLowLinear, AP.FftSize / AP._lc, (int)_spectrumLowEndIndex, false);
+				float[] copy = new float[_frequenciesLogarithmic.Length];
+				_frequenciesLogarithmic.CopyTo(copy, 0);				
 
 				for (int i = 0; i < _frequenciesLowLogarithmic.Length; i++)
 					_frequenciesLogarithmic[i] = _frequenciesLowLogarithmic[i];
+
+				float[] empty = new float[0];
+
+				DiskE.WriteToProgramFiles("frqs", "csv", TextE.ToCsvString(_frequenciesLinear, copy, _frequenciesLowLinear, _frequenciesLowLogarithmic, empty, copy, _frequenciesLogarithmic), false);
 			}
 
 			void SetOctaves()
@@ -148,14 +156,16 @@ namespace MusGen
 			}
 		}
 
-		public static float[] Find(float[] signal)
+		public static float[] Find(float[] signal, float[] signalLow)
 		{
 			Wav wav = new Wav(signal.Length);
 			wav.L = signal;
-			return Find(wav, 0);
+			Wav wavLow = new Wav(signalLow.Length);
+			wavLow.L = signalLow;
+			return Find(wav, wavLow, 0);
 		}
 
-		public static float[] Find(Wav wav, int start)
+		public static float[] Find(Wav wav, Wav wavLow, int start)
 		{
 			Complex[] complex;
 
@@ -173,8 +183,9 @@ namespace MusGen
 			void FillComplexFromWav()
 			{
 				complex = new Complex[AP.FftSize];
+				complex[0] = new Complex(0, 0);
 				int offset = AP.FftSize * (AP._lc - 1);
-				for (int i = 0; i < AP.FftSize; i++)
+				for (int i = 1; i < AP.FftSize; i++)
 				{
 					float wf = WindowFunction.F(i);					
 					complex[i] = new Complex(wav.L[start + offset + i] * wf, 0);
@@ -185,13 +196,15 @@ namespace MusGen
 			{
 				complex = new Complex[AP.FftSize];
 				complex[0] = new Complex(0, 0);
+				complex[complex.Length - 1] = new Complex(0, 0);
+
 				for (int i = 1; i < AP.FftSize; i++)
 				{
 					float wf = WindowFunction.F((int)(i));
 
-					float v = wav.L[start + i * AP._lc];
+					int newIndex = start + i * AP._lc; //
 
-					complex[i] = new Complex(v * wf, 0);
+					complex[i] = new Complex(wavLow.L[newIndex] * wf, 0);
 				}
 			}
 
@@ -209,9 +222,9 @@ namespace MusGen
 
 			void Logarithmise()
 			{
-				_spectrumLogarithmic = ArrayE.RescaleArrayToLog(_spectrumLinear, AP.FftSize, AP.FftSize / 2);
+				_spectrumLogarithmic = ArrayE.RescaleArrayToLog(_spectrumLinear, AP.FftSize, AP.FftSize / 2, true);
 
-				_spectrumLowLogarithmic = ArrayE.RescaleArrayToLog(_spectrumLowLinear, AP.FftSize / AP._lc, (int)_spectrumLowEndIndex);
+				_spectrumLowLogarithmic = ArrayE.RescaleArrayToLog(_spectrumLowLinear, AP.FftSize / AP._lc, (int)_spectrumLowEndIndex, true);
 
 				for (int i = 0; i < _spectrumLogarithmic.Length; i++)
 				{
