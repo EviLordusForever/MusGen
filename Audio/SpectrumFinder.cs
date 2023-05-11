@@ -15,16 +15,18 @@ namespace MusGen
 
 		public static float[] _frequenciesLinear;
 		public static float[] _frequenciesLogarithmic;
+		public static float[] _logarithmicDeltas;
 
 		public static float[] _frequenciesLowLinear;
 		public static float[] _frequenciesLowLogarithmic;
 
 		public static float[] _octaves;
 		public static float[] _octavesIndexes;
+		public static float _octaveSize;
 
 		private static int _spectrumLowEndIndex;
-		private static float[] _fadeLowMask;
-		private static float[] _antifadeLowMask;
+		public static float[] _fadeInLowMask;
+		public static float[] _fadeOutLowMask;
 
 		public static float _max;
 
@@ -39,6 +41,7 @@ namespace MusGen
 			FindFrequenciesLinear();
 			FindLowIndex();
 			FindFrequenciesLogarithmic();
+			FindLogDeltas();
 			SetOctaves();
 			FillFadeLowMask();
 			Logger.Log("Spectrum Finder was initialized.");
@@ -55,22 +58,28 @@ namespace MusGen
 			void FillFadeLowMask()
 			{
 				float start = _spectrumLowEndIndex / 2f;
-				float count = _spectrumLowEndIndex - start;
+				float end = _spectrumLowEndIndex;
+				float count = end - start;
 
-				_fadeLowMask = new float[_spectrumLowEndIndex];
-				_antifadeLowMask = new float[_spectrumLowEndIndex];
+				_fadeInLowMask = new float[AP.FftSize / 2];
+				_fadeOutLowMask = new float[AP.FftSize / 2];
 
-				for (int i = 0; i < _spectrumLowEndIndex; i++)
+				for (int i = 0; i < _fadeInLowMask.Length; i++)
 				{
 					if (i < (int)start)
 					{
-						_fadeLowMask[i] = 0;
-						_antifadeLowMask[i] = 1;
+						_fadeInLowMask[i] = 0;
+						_fadeOutLowMask[i] = 1;
+					}
+					else if (i < (int)end)
+					{
+						_fadeInLowMask[i] = 1 - MathE.FadeOut((i - start) / count);
+						_fadeOutLowMask[i] = 1 - _fadeInLowMask[i];
 					}
 					else
 					{
-						_fadeLowMask[i] = 1 - MathE.FadeOut((i - start) / count);
-						_antifadeLowMask[i] = 1 - _fadeLowMask[i];
+						_fadeInLowMask[i] = 1;
+						_fadeOutLowMask[i] = 0;
 					}
 				}
 			}
@@ -100,6 +109,22 @@ namespace MusGen
 				float[] empty = new float[0];
 
 				DiskE.WriteToProgramFiles("frqs", "csv", TextE.ToCsvString(_frequenciesLinear, copy, _frequenciesLowLinear, _frequenciesLowLogarithmic, empty, copy, _frequenciesLogarithmic), false);
+			}
+
+			void FindLogDeltas()
+			{
+				_frequenciesLogarithmic[0] = _frequenciesLogarithmic[1] - (_frequenciesLogarithmic[2] - _frequenciesLogarithmic[1]);
+
+				_logarithmicDeltas = new float[_frequenciesLogarithmic.Length];
+				for (int i = 0; i < _logarithmicDeltas.Length; i++)
+				{
+					int left = Math.Max(0, i - 3);
+					int right = Math.Min(_frequenciesLogarithmic.Length - 1, i + 3);
+					_logarithmicDeltas[i] = _frequenciesLogarithmic[right] - _frequenciesLogarithmic[left];
+					_logarithmicDeltas[i] /= right - left + 1;
+				}
+
+				DiskE.WriteToProgramFiles("deltas", "csv", TextE.ToCsvString(_frequenciesLogarithmic, _logarithmicDeltas), false);
 			}
 
 			void SetOctaves()
@@ -138,6 +163,8 @@ namespace MusGen
 
 				for (int i = 0; i < 10; i++)
 					_octavesIndexes[i] = FindIndex(_octaves[i]);
+
+				_octaveSize = (_octavesIndexes[9] - _octavesIndexes[0]) / 9;
 
 				float FindIndex(float f)
 				{
@@ -229,7 +256,7 @@ namespace MusGen
 				for (int i = 0; i < _spectrumLogarithmic.Length; i++)
 				{
 					if (i < _spectrumLowLogarithmic.Length)
-						_spectrumLogarithmic[i] = _spectrumLogarithmic[i] * _fadeLowMask[i] + _spectrumLowLogarithmic[i] * _antifadeLowMask[i];
+						_spectrumLogarithmic[i] = _spectrumLogarithmic[i] * _fadeInLowMask[i] + _spectrumLowLogarithmic[i] * _fadeOutLowMask[i];
 
 					if (_max < _spectrumLogarithmic[i])
 						_max = _spectrumLogarithmic[i];

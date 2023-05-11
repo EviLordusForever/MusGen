@@ -9,7 +9,7 @@ namespace MusGen
 {
 	public static class WavToWav_MultiNad
 	{
-		public static void Make(string wavInPath, string exportName)
+		public static void Make(string wavInPath, string exportName, float speed, float pitch)
 		{
 			Logger.Log($"Wav to wav (MultiNad) started for\n{wavInPath}");
 			Wav wavIn = new Wav();
@@ -17,6 +17,8 @@ namespace MusGen
 			SS ss = WavToSS.Make(wavIn);
 			ss = SsLowPhaseSmoother.Make(ss);
 			Nad nad = SsToMultiNad.Make(ss);
+			nad = NadModifySpeedAndPitch.Make(nad, speed, pitch);
+			nad = NadLimitsFilter.Make(nad);
 			Wav wavOut = EveryNadToWav.Make(nad);
 			wavOut.Export(exportName);
 			Logger.Log($"Wav to wav (MultiNad) finished. Saved as ({exportName})");

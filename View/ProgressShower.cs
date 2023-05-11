@@ -16,6 +16,7 @@ namespace MusGen
 			{
 				WindowsManager.OpenProgressWindow(text);
 			});
+			Set(0);
 			Logger.Log($"Started: {text}");
 			_text = text;
 		}

@@ -19,14 +19,14 @@ namespace MusGen
 			Array.Resize(ref wav.L, wav.Length + AP.FftSize * AP._lc);
 			_step = wav._sampleRate / AP._sps;
 			int samplesCount = (int)Math.Ceiling(_lastSample / _step);
-			int duration = (int)Math.Ceiling(1f * wav.Length / wav._sampleRate);
+			float duration = MathF.Ceiling(1f * wav.Length / wav._sampleRate);
 
 			Nad nad = new Nad(AP._channels, samplesCount, duration);
 
 			ProgressShower.Show("Making nad from wav...");
 			int progressStep = nad._samples.Length / 1000;
 
-			Wav wavLow = WavLowPass.FillWavLow(wav,AP._kaiserFilterLength_ForProcessing);
+			Wav wavLow = WavLowPass.FillWavLow(wav, AP._kaiserFilterLength_ForProcessing, true);
 
 			int ns = 0;
 			for (double s = 0; s < _lastSample; s += _step, ns++)
@@ -51,19 +51,6 @@ namespace MusGen
 			SpectrumFinder.Find(wav, wavLow, s);
 
 			ns._indexes = PeaksFinder.Find(SpectrumFinder._spectrumLogarithmic, AP._channels, AP._peakWidth_ForFixedNad);
-			ns._amplitudes = MathE.GetValues(SpectrumFinder._spectrumLogarithmic, ns._indexes);
-			ns._frequencies = MathE.GetValues(SpectrumFinder._frequenciesLogarithmic, ns._indexes);
-
-			return ns;
-		}
-
-		public static NadSample MakeSamplePlus(Wav wav, Wav wavLow, int s)
-		{
-			NadSample ns = new NadSample(AP._channels);
-
-			SpectrumFinder.Find(wav, wavLow, s);
-
-			ns._indexes = PeaksFinder.FindEvery(SpectrumFinder._spectrumLogarithmic).ToArray();
 			ns._amplitudes = MathE.GetValues(SpectrumFinder._spectrumLogarithmic, ns._indexes);
 			ns._frequencies = MathE.GetValues(SpectrumFinder._frequenciesLogarithmic, ns._indexes);
 

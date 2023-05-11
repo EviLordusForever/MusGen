@@ -14,7 +14,7 @@ namespace MusGen
 
 		public static float _peakWidth_ForFixedNad = 70; //70
 
-		public static float _peakWidth_ForMultiNad = 0.025f;
+		public static float _peakWidth_ForMultiNad = 20000f;
 		public static float _lowestPeak_FromAverage = 0.125f / 8; //0.125f / 32
 		public static float _lowestPeak_FromMaximum = 0.01f / 8; //0.01f / 32
 		public static int _peaksLimit = 150; //150 or less

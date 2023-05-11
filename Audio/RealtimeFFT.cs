@@ -73,11 +73,11 @@ namespace MusGen
 					else if (AP._captureType == "system")
 						wav.L = AudioCapturerSystem.GetSamples((int)AP.FftSize * AP._lc);
 
-					Wav wavLow = WavLowPass.FillWavLow(wav, AP._kaiserFilterLength_ForRealtime);
+					Wav wavLow = WavLowPass.FillWavLow(wav, AP._kaiserFilterLength_ForRealtime, false);
 
 					nadsOld = nads;
-					//nads = WavToNad.MakeSample(wav, 0);
-					nads = WavToFixedNad.MakeSamplePlus(wav, wavLow, 0);
+					var sp = SpectrumFinder.Find(wav, wavLow, 0);
+					nads = SsToMultiNad.MakeSamplePlus(sp);
 
 					Octavisate();
 					AdaptiveCeiling();
@@ -153,15 +153,18 @@ namespace MusGen
 
 				void AdaptiveCeiling()
 				{
-					if (AP._graphType == 4)
+					if (nads.Height > 0)
 					{
-						adaptiveCeiling *= AP._adaptiveCeilingFallSpeedCircular;
-						adaptiveCeiling = Math.Max(adaptiveCeiling, MathE.Max(_octave));
-					}
-					else
-					{
-						adaptiveCeiling *= AP._adaptiveCeilingFallSpeed;
-						adaptiveCeiling = Math.Max(adaptiveCeiling, nads._amplitudes[0]);
+						if (AP._graphType == 4)
+						{
+							adaptiveCeiling *= AP._adaptiveCeilingFallSpeedCircular;
+							adaptiveCeiling = Math.Max(adaptiveCeiling, MathE.Max(_octave));
+						}
+						else
+						{
+							adaptiveCeiling *= AP._adaptiveCeilingFallSpeed;
+							adaptiveCeiling = Math.Max(adaptiveCeiling, nads._amplitudes[0]);
+						}
 					}
 
 					adaptiveCeiling = Math.Max(adaptiveCeiling, 0.0001f);

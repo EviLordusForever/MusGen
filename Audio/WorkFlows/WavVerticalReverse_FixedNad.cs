@@ -9,7 +9,7 @@ namespace MusGen
 {
 	public static class WavVerticalReverse_FixedNad
 	{
-		public static void Make(string wavInPath, string exportName)
+		public static void Make(string wavInPath, string exportName, float speed, float pitch)
 		{
 			Logger.Log($"Wav vertical reverse (FixedNad) started for\n{wavInPath}");
 
@@ -23,6 +23,8 @@ namespace MusGen
 			nad = NadReverser.Make(nad, left, right);
 			ss = SSVerticalSmoother.Make(ss, 5);
 			nad = NadExampleEq.Make(nad, ss);
+			nad = NadModifySpeedAndPitch.Make(nad, speed, pitch);
+			nad = NadLimitsFilter.Make(nad);
 			Wav wavOut = EveryNadToWav.Make(nad);
 			wavOut.Export(exportName);
 

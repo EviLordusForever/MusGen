@@ -11,7 +11,7 @@ namespace MusGen
 {
 	public static class WavToJpg
 	{
-		public static void Make(string wavInPath, string exportName)
+		public static void Make(string wavInPath, string exportName, float speed, float pitch)
 		{
 			Logger.Log($"Wav to jpg started for\n{wavInPath}");
 

@@ -13,7 +13,7 @@ using mt = Melanchall.DryWetMidi.MusicTheory;
 using Melanchall.DryWetMidi.Standards;
 using Melanchall.DryWetMidi.Tools;
 using Newtonsoft.Json;
-
+using System.Collections;
 
 namespace MusGen
 {
@@ -26,6 +26,35 @@ namespace MusGen
 
 		public float[] _amplitudes;
 
+		public void RaisePitch(float pitch)
+		{
+			for (int c = 0; c < Height; c++)
+			{
+				_frequencies[c] *= pitch;
+				_indexes[c] += (int)(SpectrumFinder._octaveSize * MathF.Log2(pitch));
+				//check mb ^
+			}
+		}
+
+		public void Filter(float sps)
+		{
+			List<float> newFrequencies = new List<float>();
+			List<int> newIndexes = new List<int>();
+			List<float> newAmplitudes = new List<float>();
+
+			for (int c = 0; c < Height; c++)
+				if (_frequencies[c] < AP.SampleRate / 2 && _frequencies[c] > sps)
+				{
+					newFrequencies.Add(_frequencies[c]);
+					newIndexes.Add(_indexes[c]);
+					newAmplitudes.Add(_amplitudes[c]);
+				}
+
+			_frequencies = newFrequencies.ToArray();
+			_indexes = newIndexes.ToArray();
+			_amplitudes = newAmplitudes.ToArray();
+		}
+
 		public NadSample(int channels)
 		{
 			_frequencies = new float[channels];
@@ -33,7 +62,7 @@ namespace MusGen
 			_indexes = new int[channels];
 		}
 
-		public int Width
+		public int Height
 		{
 			get
 			{
@@ -57,6 +86,6 @@ namespace MusGen
 			}
 
 			return notes;
-		}		
+		}
 	}
 }

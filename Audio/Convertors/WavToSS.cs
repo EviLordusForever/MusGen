@@ -20,12 +20,13 @@ namespace MusGen
 
 			SS ss = new SS(samplesCount, AP._sps);
 
+			SpectrumFinder._max = 0;
+
+			Wav wavLow = WavLowPass.FillWavLow(wav, AP._kaiserFilterLength_ForProcessing, true);
+
 			ProgressShower.Show("Making ss from wav...");
 			int progressStep = (int)MathF.Ceiling(ss._s.Length / 1000f);
 
-			SpectrumFinder._max = 0;
-
-			Wav wavLow = WavLowPass.FillWavLow(wav,AP._kaiserFilterLength_ForProcessing);
 
 			int ns = 0;
 			for (double s = 0; s < _lastSample; s += _step, ns++)

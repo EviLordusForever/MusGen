@@ -11,7 +11,6 @@ namespace MusGen
 		public static float _max;
 		public static float _minFromAverage;
 		public static float _minFromMaximum;
-		public static float _stupiedPeaksCount;
 
 		public static int[] Find(float[] array, int count, float peakSize)
 		{
@@ -38,74 +37,71 @@ namespace MusGen
 			}
 		}
 
-		public static List<int> FindEvery(float[] array1)
+		public static List<int> FindEvery(float[] array1, out List<float> amps)
 		{
 			List<int> peakIndexes = new List<int>();
-
-			List<int> mask = MathE.StupiedFilterMask(array1, true);
-			_stupiedPeaksCount = mask.Count;
+			amps = new List<float>();
 
 			float[] array2 = new float[array1.Length];
-			for (int i = 0; i < mask.Count; i++)
-				array2[mask[i]] = array1[mask[i]];
+			for (int i = 0; i < array1.Length; i++)
+				array2[i] = array1[i];
 
-			if (mask.Count == 0)
-			{
-				peakIndexes.Add(array1.Length / 2);
-				return peakIndexes;
-			}
+			float amp = 0;
+			int index = 0;
 
-			float max1 = 0;
-			float max2 = 0;
-			int maskIndex = 0;
+			_max = array1.Max();
+			_average = array1.Average();
 
-			_average = Average();
-			FindPeak();
-			_max = max1;
-
-			_minFromAverage = _average * AP._lowestPeak_FromAverage;
 			_minFromMaximum = _max * AP._lowestPeak_FromMaximum;
+			_minFromAverage = _average * AP._lowestPeak_FromAverage;
 
 			float minimum = Math.Min(_minFromMaximum, _minFromAverage);
 
-			for (int i = 0; i < AP._peaksLimit && max2 > minimum && mask.Count > 0; i++)
+			FindPeak();
+
+			for (int i = 0; i < AP._peaksLimit && amp > minimum; i++)
 			{
 				FindPeak();
-				peakIndexes.Add(mask[maskIndex]);
+				peakIndexes.Add(index);
+				amps.Add(amp);
 				RemovePeak();
 			}
 
 			if (peakIndexes.Count == 0)
+			{
 				peakIndexes.Add(array1.Length / 2);
+				amps.Add(0);
+			}
 
 			return peakIndexes;
 
 			void RemovePeak()
 			{
-				float localPeakSize = AP._peakWidth_ForMultiNad * (max1 / minimum); //
-				int point = mask[maskIndex];
-				mask.RemoveAt(maskIndex);
+				float widthN = AP._peakWidth_ForMultiNad;
+				widthN *= 1 / SpectrumFinder._frequenciesLogarithmic[index];
+				float heighN = amp * SpectrumFinder._fadeInLowMask[index];
 
-				for (int i = 0; i < mask.Count; i++)
-					array2[mask[i]] *= MathF.Abs(MathF.Tanh((mask[i] - point) / localPeakSize));
+				float widthL = AP._peakWidth_ForMultiNad / AP._lc;
+				widthL *= 1 / SpectrumFinder._frequenciesLogarithmic[index];
+				float heighL = amp * SpectrumFinder._fadeOutLowMask[index];
+
+				for (int x = 0; x < array2.Length; x++)
+				{
+					array2[x] -= MathE.Gauss(x, index, widthL, heighL);
+					array2[x] -= MathE.Gauss(x, index, widthN, heighN);
+				}
 			}
 
 			void FindPeak()
 			{
-				max2 = 0;
-				maskIndex = 0;
-				for (int i = 0; i < mask.Count; i++)
-					if (array2[mask[i]] > max2)
+				amp = 0;
+				index = 0;
+				for (int i = 0; i < array2.Length; i++)
+					if (array2[i] > amp)
 					{
-						max1 = array1[mask[i]];
-						max2 = array2[mask[i]];
-						maskIndex = i;
+						amp = array2[i];
+						index = i;
 					}
-			}
-
-			float Average()
-			{
-				return array1.Average();
 			}
 		}
 	}

@@ -111,6 +111,11 @@ namespace Extensions
 			return MathF.Log(x * (base_ - 1) + 1, base_);
 		}
 
+		public static float Gauss(float x, float center, float width, float heigh)
+		{
+			return heigh * width / (MathF.Pow(x - center, 2) + width);
+		}
+
 		public static float ToLogScaleReverse(float y, float base_)
 		{
 			return (MathF.Pow(base_, y) - 1) / (base_ - 1);

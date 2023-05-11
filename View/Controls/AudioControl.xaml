@@ -6,8 +6,10 @@
              xmlns:local="clr-namespace:MusGen"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-	<Grid Height="250" Width="390">
+	<Grid Height="350" Width="390">
 		<Grid.RowDefinitions>
+			<RowDefinition/>
+			<RowDefinition/>
 			<RowDefinition/>
 			<RowDefinition/>
 			<RowDefinition/>
@@ -26,8 +28,10 @@
 		</ComboBox>
 		<Button Name="SelAudioButton" FontSize="20" Margin ="0,3,0,3" Content="Select .wav file" Grid.Row="1" Click="SelBtn_Click"></Button>
 		<Button Name="SelImageButton" Visibility="Collapsed" FontSize="22" Margin ="0,3,0,3" Content="Select image file" Grid.Row="1" Click="SelImageButton_Click"></Button>
-		<local:TextBoxPro FontSize="20" Margin ="0,3,0,3"  x:Name ="outNameTb" Placeholder="Out file name" Grid.Row="2"></local:TextBoxPro>
-		<Button FontSize="20" Margin ="0,3,0,3" Name ="ProcessBtn"  Content="Process" Grid.Row="3" Click="ProcessBtn_Click"></Button>
-		<Button FontSize="20" Margin ="0,3,0,3" Name ="Back" Content="Back"  Grid.Row="4" Click="Back_Click"></Button>
+		<local:TextBoxPro FontSize="20" Margin ="0,3,0,3" x:Name ="outNameTb" Placeholder="Out file name" Grid.Row="2"></local:TextBoxPro>
+		<local:TextBoxPro FontSize="20" Margin ="0,3,0,3" x:Name ="speedTb" Placeholder="Speed" Grid.Row="3"></local:TextBoxPro>
+		<local:TextBoxPro FontSize="20" Margin ="0,3,0,3" x:Name ="pitchTb" Placeholder="Pitch" Grid.Row="4"></local:TextBoxPro>
+		<Button FontSize="20" Margin ="0,3,0,3" Name ="ProcessBtn"  Content="Process" Grid.Row="5" Click="ProcessBtn_Click"></Button>
+		<Button FontSize="20" Margin ="0,3,0,3" Name ="Back" Content="Back"  Grid.Row="6" Click="Back_Click"></Button>
 	</Grid>
 </UserControl>

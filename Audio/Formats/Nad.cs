@@ -16,9 +16,9 @@ namespace MusGen
 	{
 		public int _channelsCount;
 		public NadSample[] _samples;
-		public int _duration;
+		public float _duration;
 
-		public Nad(int channelsCount, int samplesCount, int duration)
+		public Nad(int channelsCount, int samplesCount, float duration)
 		{
 			_channelsCount = channelsCount;
 			_samples = new NadSample[samplesCount];

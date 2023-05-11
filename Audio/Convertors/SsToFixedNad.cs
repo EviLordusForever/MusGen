@@ -16,7 +16,7 @@ namespace MusGen
 
 			AP.FftSize = ss.Height * 2;
 
-			Nad nad = new Nad(AP._channels, ss._s.Length, ss._s.Length / ss._sps);
+			Nad nad = new Nad(AP._channels, ss._s.Length, 1f * ss._s.Length / ss._sps);
 
 			for (int s = 0; s < ss._s.Length; s++)
 			{

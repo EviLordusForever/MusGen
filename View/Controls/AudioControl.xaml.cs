@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Win32;
 using Extensions;
+using System.Globalization;
 
 namespace MusGen
 {
@@ -27,8 +28,10 @@ namespace MusGen
 			InitializeComponent();
 		}
 
-		public string path;
-		private string outName;
+		public string _path;
+		private string _outName;
+		private float _pitch;
+		private float _speed;
 		public string _s;
 
 		private void SelBtn_Click(object sender, RoutedEventArgs e)
@@ -39,10 +42,10 @@ namespace MusGen
 			bool? success = dialog.ShowDialog();
 			if (success == true)
 			{
-				path = dialog.FileName;
+				_path = dialog.FileName;
 				string name = dialog.SafeFileName;
 
-				bool isGood = Wav.CheckWav(path);
+				bool isGood = Wav.CheckWav(_path);
 
 				if (isGood)
 				{
@@ -53,7 +56,7 @@ namespace MusGen
 				{
 					MessageBox.Show("Wrong wav file", "Sorry", MessageBoxButton.OK, MessageBoxImage.Error);
 					SelAudioButton.Content = "Select .wav file";
-					path = "";
+					_path = "";
 				}
 			}
 		}
@@ -66,7 +69,7 @@ namespace MusGen
 			bool? success = dialog.ShowDialog();
 			if (success == true)
 			{
-				path = dialog.FileName;
+				_path = dialog.FileName;
 				string name = dialog.SafeFileName;
 
 				SelImageButton.Content = name;
@@ -76,11 +79,15 @@ namespace MusGen
 
 		private void ProcessBtn_Click(object sender, RoutedEventArgs e)
 		{
-			outName = outNameTb.Text;
+			_outName = outNameTb.Text;
 
-			if (outName == null || path == null)
+			if (_outName == null || _path == null)
 				return;
-			if (path == "" || outName == "")
+			if (_path == "" || _outName == "")
+				return;
+			if (!GetPitch())
+				return;
+			if (!GetSpeed())
 				return;
 
 			WindowsManager.Open(ControlsManager._mainMenuControl);
@@ -95,19 +102,19 @@ namespace MusGen
 				RealtimeFFT.Stop();
 
 				if (_s == "Octave reverse (soft, MultiNad)")
-					OctaveReverse_Soft_MultiNad.Make(path, outName);
+					OctaveReverse_Soft_MultiNad.Make(_path, _outName, _speed, _pitch);
 				else if (_s == "Vertical reverse (FixedNad)")
-					WavVerticalReverse_FixedNad.Make(path, outName);
+					WavVerticalReverse_FixedNad.Make(_path, _outName, _speed, _pitch);
 				else if (_s == "Wav to wav (FixedNad)")
-					WavToWav_FixedNad.Make(path, outName);
+					WavToWav_FixedNad.Make(_path, _outName, _speed, _pitch);
 				else if (_s == "Wav to jpg")
-					WavToJpg.Make(path, outName);
+					WavToJpg.Make(_path, _outName, _speed, _pitch);
 				else if (_s == "Jpg to wav (MultiNad)")
-					JpgToWav_MultiNad.Make(path, outName);
+					JpgToWav_MultiNad.Make(_path, _outName, _speed, _pitch);
 				else if (_s == "Jpg to wav octave reverse (soft, MultiNad)")
-					JpgOctaveReverse_Soft_MultiNad.Make(path, outName);
+					JpgOctaveReverse_Soft_MultiNad.Make(_path, _outName, _speed, _pitch);
 				else if (_s == "Wav to wav (MultiNad)")
-					WavToWav_MultiNad.Make(path, outName);
+					WavToWav_MultiNad.Make(_path, _outName, _speed, _pitch);
 				else
 					outNameTb.Text = "Wrong type in list";
 
@@ -115,6 +122,38 @@ namespace MusGen
 				{
 					WindowsManager._mainWindow.Show();
 				});
+			}
+
+			bool GetPitch()
+			{
+				if (pitchTb.Text == "" || pitchTb.Text == null)
+				{
+					_pitch = 1;
+					return true;
+				}
+				else
+				{
+					if (float.TryParse(pitchTb.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out _pitch))
+						return _pitch > 0;
+					else
+						return false;
+				}
+			}
+
+			bool GetSpeed()
+			{
+				if (speedTb.Text == "" || speedTb.Text == null)
+				{
+					_speed = 1;
+					return true;
+				}
+				else
+				{
+					if (float.TryParse(speedTb.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out _speed))
+						return _speed > 0;
+					else
+						return false;
+				}
 			}
 		}
 
@@ -134,6 +173,14 @@ namespace MusGen
 					ImageSelection();
 				else
 					AudioSelection();
+			}
+
+			if (pitchTb != null && speedTb != null)
+			{
+				if (pitchTb.Text == "" || pitchTb.Text == null)
+					pitchTb.Text = "1";
+				if (speedTb.Text == "" || speedTb.Text == null)
+					speedTb.Text = "1";
 			}
 
 			void ImageSelection()

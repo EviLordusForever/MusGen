@@ -9,7 +9,7 @@ namespace MusGen
 {
 	public static class JpgOctaveReverse_Soft_MultiNad
 	{
-		public static void Make(string jpgInPath, string exportName)
+		public static void Make(string jpgInPath, string exportName, float speed, float pitch)
 		{
 			Logger.Log($"Image to octave reverse (soft, MultiNad) started for\n{jpgInPath}");
 
@@ -19,6 +19,8 @@ namespace MusGen
 			ss = SsSoftOctaveReverser.Make(ss);
 			ss = SsLowPhaseSmoother.Make(ss);
 			Nad nad = SsToMultiNad.Make(ss);
+			nad = NadModifySpeedAndPitch.Make(nad, speed, pitch);
+			nad = NadLimitsFilter.Make(nad);
 			Wav wav = EveryNadToWav.Make(nad);
 			wav.Export(exportName);
 

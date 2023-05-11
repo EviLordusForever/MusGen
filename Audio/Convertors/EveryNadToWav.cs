@@ -15,7 +15,7 @@ namespace MusGen
 
 		public static Wav Make(Nad nad)
 		{
-			int length = (int)AP.SampleRate * nad._duration;
+			int length = (int)(AP.SampleRate * nad._duration);
 			Wav wav = new Wav(length, 1);
 
 			return Make(nad, wav);
@@ -27,7 +27,7 @@ namespace MusGen
 			double[] t = new double[AP._peaksLimit];
 			double[] tOld = new double[AP._peaksLimit];
 			int fadeSamplesLeft = 0;
-			int sps = wav.Length / nad.Width;
+			float sps = 1f * wav.Length / nad.Width;
 			int samplesForFade = (int)(AP._fadeTime * AP.SampleRate / sps);
 			float pi2 = MathF.PI * 2;
 			float buf = pi2 / AP.SampleRate;
@@ -57,7 +57,7 @@ namespace MusGen
 			ProgressShower.Close();
 			return wav;
 
-			void WriteSample(int s,int ns)
+			void WriteSample(int s, int ns)
 			{
 				float newSignal = 0;
 				float oldSignal = 0;
@@ -71,27 +71,31 @@ namespace MusGen
 					antifade = 1 - fade;
 				}
 
-				for (int c = 0; c < nad._samples[ns].Width; c++)
+				if (nad._samples[ns].Height > 0)
 				{
-					if (nad._samples[ns]._frequencies[c] < 20f)
-						nad._samples[ns]._frequencies[c] = 20f;
-
-					t[c] += buf * nad._samples[ns]._frequencies[c];
-					newSignal += (float)F(t[c]) * nad._samples[ns]._amplitudes[c];
-				}
-
-				newSignal *= antifade / nad._samples[ns].Width;
-
-				if (fadeSamplesLeft > 0)
-				{
-					for (int c = 0; c < nad._samples[ns - 1].Width; c++)
+					for (int c = 0; c < nad._samples[ns].Height; c++)
 					{
-						tOld[c] += buf * nad._samples[ns - 1]._frequencies[c];
-						oldSignal += (float)F(tOld[c]) * nad._samples[ns - 1]._amplitudes[c];
+						if (nad._samples[ns]._frequencies[c] < 20f)
+							nad._samples[ns]._frequencies[c] = 20f;
+
+						t[c] += buf * nad._samples[ns]._frequencies[c];
+						newSignal += (float)F(t[c]) * nad._samples[ns]._amplitudes[c];
 					}
 
-					oldSignal *= fade / nad._samples[ns - 1].Width;
+					newSignal *= antifade / nad._samples[ns].Height;
 				}
+
+				if (fadeSamplesLeft > 0)
+					if (nad._samples[ns - 1].Height > 0)
+					{
+						for (int c = 0; c < nad._samples[ns - 1].Height; c++)
+						{
+							tOld[c] += buf * nad._samples[ns - 1]._frequencies[c];
+							oldSignal += (float)F(tOld[c]) * nad._samples[ns - 1]._amplitudes[c];
+						}
+
+						oldSignal *= fade / nad._samples[ns - 1].Height;
+					}
 
 				wav.L[s] = oldSignal + newSignal;
 

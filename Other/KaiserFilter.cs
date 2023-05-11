@@ -5,8 +5,13 @@ namespace Extensions
 {
 	public static class KaiserFilter
 	{
-        public static float[] Make(float[] input, float samplingRate, float cutoffFrequency, int filterLength, float beta)
+        public static float[] Make(float[] input, float samplingRate, float cutoffFrequency, int filterLength, float beta, bool showProgress)
         {
+            int step = input.Length / 1000;
+
+            if (showProgress)
+                MusGen.ProgressShower.Show("Kaiser filter for wav low...");
+
             float[] output = new float[input.Length];
             float wc = 2 * (float)Math.PI * cutoffFrequency / samplingRate;
             float[] h = new float[filterLength];
@@ -27,7 +32,14 @@ namespace Extensions
                 for (int j = 0; j < filterLength; j++)
                     if (i - j >= 0)
                         output[i] += h[j] * input[i - j];
+
+                if (showProgress)
+                    if (i % step == 0)
+                        MusGen.ProgressShower.Set(1.0 * i / input.Length);
             }
+
+            if (showProgress)
+                MusGen.ProgressShower.Close();
 
             return output;
         }
