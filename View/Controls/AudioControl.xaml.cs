@@ -115,6 +115,8 @@ namespace MusGen
 					JpgOctaveReverse_Soft_MultiNad.Make(_path, _outName, _speed, _pitch);
 				else if (_s == "Wav to wav (MultiNad)")
 					WavToWav_MultiNad.Make(_path, _outName, _speed, _pitch);
+				else if (_s == "Jpg to clean jpg")
+					JpegSpectrumClean.Make(_path, _outName, _speed, _pitch);
 				else
 					outNameTb.Text = "Wrong type in list";
 

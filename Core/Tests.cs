@@ -23,6 +23,52 @@ namespace MusGen
 			DiskE.WriteToProgramFiles("SPL", "csv", str, false);
 		}
 
+		public static void FrequenciesResolution()
+		{
+			SpectrumFinder.Init();
+
+			int sec = 60;
+			int samples = (int)AP.SampleRate * sec;
+
+			Wav wav = new Wav(samples, 1);
+
+			for (int x = 0; x < samples; x++)
+			{
+				float buf = (1f * x / samples) * (AP.FftSize / 2);
+				int index0 = (int)Math.Floor(buf);
+				int index1 = (int)Math.Ceiling(buf);
+				index1 = Math.Min(index1, AP.FftSize / 2 - 1);
+				float frequency0 = SpectrumFinder._frequenciesLogarithmic[index0];
+				float frequency1 = SpectrumFinder._frequenciesLogarithmic[index1];
+				float fade = MathE.FadeOutCentered(buf - index0, 7);
+				float signal0 = fade * MathF.Sin(2 * MathF.PI * frequency0 * x / AP.SampleRate + 0);
+				float signal1 = (1 - fade) * MathF.Sin(2 * MathF.PI * frequency1 * x / AP.SampleRate + 0);
+				wav.L[x] = signal0 + signal1;
+			}
+
+			wav.Export("Frequencies test", true);
+
+			float t = 0;
+
+			for (int x = 0; x < samples; x++)
+			{
+				float buf = (1f * x / samples) * (AP.FftSize / 2);
+				int index0 = (int)Math.Floor(buf);
+				int index1 = (int)Math.Ceiling(buf);
+				index1 = Math.Min(index1, AP.FftSize / 2 - 1);
+				float frequency0 = SpectrumFinder._frequenciesLogarithmic[index0];
+				float frequency1 = SpectrumFinder._frequenciesLogarithmic[index1];
+				float fade = MathE.FadeOutCentered(buf - index0, 7);
+				float frequency = (frequency0 * fade + frequency1 * (1 - fade)) / 2;
+				frequency /= AP.SampleRate;
+				float period = 1f / frequency;
+				t += 1 / period;
+				wav.L[x] = MathF.Sin(2 * MathF.PI * t);
+			}
+
+			wav.Export("Frequencies test 2", true);
+		}
+
 		public static void HungarianAlgorithm()
 		{
 			int[,] costMatrix = new int[,] {
@@ -60,6 +106,22 @@ namespace MusGen
 				testBmp.DrawLine(i, 0, i, 255, SpectrumDrawer._gradient[i]);
 
 			DiskE.SaveImagePng(testBmp, $"{DiskE._programFiles}\\Grafics\\SpectrumGraident.bmp");
+		}
+
+		public static void FftRecognitionModelTest()
+		{
+			SpectrumFinder.Init();
+			FftRecognitionModel.Init(1024, 44100, 16);
+			WriteableBitmap sg = WBMP.Create(512, 512);
+			for (int row = 0; row < 512; row++)
+				for (int column = 0; column < 512; column++)
+				{
+					float v = FftRecognitionModel._model[row, column];
+					float vl = MathE.ToLogScale(v, 10);
+					byte b = (byte)(vl * 255);
+					sg.SetPixel(row, column, Clr.FromRgb(b, b, b));
+				}
+			sg.SaveJPG100($"{DiskE._programFiles}fft.jpg");
 		}
 
 		public static void Ceiling()

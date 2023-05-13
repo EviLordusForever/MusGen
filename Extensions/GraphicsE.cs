@@ -145,12 +145,12 @@ namespace Extensions
 			bitmap.Unlock();
 		}
 
-		public static void SaveJPG100(this WriteableBitmap bitmap, string fileName)
+		public static void SaveJPG100(this WriteableBitmap bitmap, string path)
 		{
 			JpegBitmapEncoder encoder = new JpegBitmapEncoder();
 			encoder.QualityLevel = 100;
 			encoder.Frames.Add(BitmapFrame.Create(bitmap));
-			using (var fileStream = new FileStream(fileName, FileMode.Create))
+			using (var fileStream = new FileStream(path, FileMode.Create))
 			{
 				encoder.Save(fileStream);
 			}

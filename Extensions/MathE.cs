@@ -90,10 +90,11 @@ namespace Extensions
 			return MathF.Pow(FadeOut(Zt1), 3);
 		}
 
-		public static float FadeOutCentered(float count)
+		public static float FadeOutCentered(float count, int n)
 		{
 			//Fall faster but symmetric
-			return (MathF.Pow(MathF.Cos(count * MathF.PI), 1f/3f) + 1) / 2;
+			float cos = MathF.Cos(count * MathF.PI);
+			return (MathF.Pow(MathF.Abs(cos), 1f/n) * Math.Sign(cos) + 1) / 2;
 		}
 
 		public static float LogPro(float x, float base_)

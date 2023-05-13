@@ -11,7 +11,7 @@ namespace MusGen
 		public static Nad Make(Nad nad)
 		{
 			ProgressShower.Show("Nad filtering by limits...");
-			int step = (int)(nad.Width / 1000f);
+			int step = (int)(Math.Max(1, nad.Width / 1000f));
 
 			float sps = nad.Width / nad._duration;
 

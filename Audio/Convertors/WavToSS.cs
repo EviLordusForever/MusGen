@@ -38,7 +38,7 @@ namespace MusGen
 			}
 
 			ProgressShower.Close();
-			ProgressShower.Show("SS normalisation...");
+			ProgressShower.Show("Ss normalisation...");
 
 			float max = SpectrumFinder._max;
 

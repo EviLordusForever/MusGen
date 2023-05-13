@@ -1,11 +1,13 @@
-﻿namespace MusGen
+﻿using System;
+
+namespace MusGen
 {
 	public static class NadModifySpeedAndPitch
 	{
 		public static Nad Make(Nad nad, float speed, float pitch)
 		{
 			ProgressShower.Show("Modifying speed and pitch...");
-			int progressStep = (int)(nad.Width / 1000f);
+			int progressStep = (int)(Math.Max(1, nad.Width / 1000f));
 
 			nad._duration /= speed;
 

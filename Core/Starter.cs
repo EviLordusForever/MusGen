@@ -24,20 +24,25 @@ namespace MusGen
 
 				SpectrumFinder.Init();
 				SpectrumDrawer.Init();
+				FftRecognitionModel.Init(AP.FftSize, (int)AP.SampleRate, AP._lc);
 
-/*				Logger.Log("Tests are started...");
+				/*				Logger.Log("Tests are started...");
 
-				Tests.HungarianAlgorithm();
-				Tests.GradientDithering();
-				Tests.GraphDrawerGradient();
-				Tests.SPL();
-				Tests.ArrayToLog();
-				Tests.SoftOctaveReverser();
-				Tests.FromLogTest();
-				Tests.Ceiling();
-				Tests.Smoothing();
+								Tests.HungarianAlgorithm();
+								Tests.GradientDithering();
+								Tests.GraphDrawerGradient();
+								Tests.SPL();
+								Tests.ArrayToLog();
+								Tests.SoftOctaveReverser();
+								Tests.FromLogTest();
+								Tests.Ceiling();
+								Tests.Smoothing();
+								Tests.FrequenciesResolution();
+				Tests.FftRecognitionModelTest();
 
-				Logger.Log("Tests are completed.");*/
+								Logger.Log("Tests are completed.");
+
+				*/
 
 				while (Logger._updated)
 					Thread.Sleep(100);

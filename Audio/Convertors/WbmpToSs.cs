@@ -19,9 +19,9 @@ namespace MusGen
 			width = wbmp.PixelWidth - 2;
 
 			SS ss = new SS(width, ReadSps());
-
-			int progressStep = wbmp.PixelWidth / 1000;
+			
 			ProgressShower.Show("Image to ss...");
+			int step = (int)Math.Max(wbmp.PixelWidth / 1000f, 1);
 
 			for (int x = 0; x < width; x++)
 			{
@@ -31,7 +31,7 @@ namespace MusGen
 					byte b = WBMP.GetGreenValue(wbmp, x, wbmp.PixelHeight - 1 - y);
 					ss._s[x][y] = MathE.ToLogScaleReverse(b / 255f, 10);
 				}
-				if (x % progressStep == 0)
+				if (x % step == 0)
 					ProgressShower.Set(1.0 * x / ss.Width);
 			}
 
@@ -58,10 +58,10 @@ namespace MusGen
 				if (wbmp.GetPixel(wbmp.PixelWidth - 1, wbmp.PixelHeight - 1 - 16 - 1).G < 245)
 				{
 					sps = AP._sps;//(ushort)(AP.SampleRate / (wbmp.PixelHeight * 2 / 4));
-					Logger.Log($"Cannot read \"samples per second\" from image. So it was set to {sps}", Brushes.Red);
+					Logger.Log($"Cannot read \"spectrums per second\" from image. So it was set to {sps}", Brushes.Red);
 				}
 				else
-					Logger.Log($"\"Samples per second\" from image was read as {sps}", Brushes.Cyan);
+					Logger.Log($"\"Spectrums per second\" from image was read as {sps}", Brushes.Cyan);
 
 				return sps;
 			}

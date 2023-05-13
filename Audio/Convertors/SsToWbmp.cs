@@ -21,7 +21,7 @@ namespace MusGen
 
 			ProgressShower.Show("Making image from ss...");
 
-			int progressStep = ss._s.Length / 1000;
+			int progressStep = (int)Math.Max(1, ss._s.Length / 1000f);
 
 			byte[] bytes = new byte[ss._s[0].Length];
 

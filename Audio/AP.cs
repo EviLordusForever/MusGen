@@ -12,12 +12,15 @@ namespace MusGen
 		public static int _channels = 20;
 		public const int _sps = 120;
 
+		public static float _lcFadeStart = 0.5f;
+
 		public static float _peakWidth_ForFixedNad = 70; //70
 
-		public static float _peakWidth_ForMultiNad = 20000f;
-		public static float _lowestPeak_FromAverage = 0.125f / 8; //0.125f / 32
-		public static float _lowestPeak_FromMaximum = 0.01f / 8; //0.01f / 32
-		public static int _peaksLimit = 150; //150 or less
+		public static float _peakBig = 3f;
+		public static float _peakWidth_ForMultiNad = 30000f;
+		public static float _lowestPeak_FromAverage = 0.25f / 1; //0.125f / 32
+		public static float _lowestPeak_FromMaximum = 0.02f / 1; //0.01f / 32
+		public static int _peaksLimit = 300; //150 or less
 
 		public static int _wbmpResX = 256 * 2;
 		public static int _wbmpResY = 16 * 9 * 2 * 2;
@@ -49,10 +52,14 @@ namespace MusGen
 			}
 			set
 			{
-				_sampleRate = value;
-				Logger.Log($"Sample rate was set to {_sampleRate}");
-				SpectrumFinder.Init();
-				SpectrumDrawer.SetPianoImages();
+				if (_sampleRate != value)
+				{
+					_sampleRate = value;
+					Logger.Log($"Sample rate was changed to {_sampleRate}");
+					SpectrumFinder.Init();
+					SpectrumDrawer.SetPianoImages();
+					FftRecognitionModel.Init(_fftSize, (int)_sampleRate, _lc);
+				}
 			}
 		}
 
@@ -64,11 +71,15 @@ namespace MusGen
 			}
 			set
 			{
-				_fftSize = value;
-				Logger.Log($"FftSize was set to {value}");
-				SpectrumDrawer.Init();
-				SpectrumFinder.Init();
-				WindowFunction.Init();
+				if (_fftSize != value)
+				{
+					_fftSize = value;
+					Logger.Log($"FftSize was changed to {value}");
+					SpectrumDrawer.Init();
+					SpectrumFinder.Init();
+					WindowFunction.Init();
+					FftRecognitionModel.Init(_fftSize, (int)_sampleRate, _lc);
+				}
 			}
 		}
 	}
