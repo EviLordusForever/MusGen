@@ -82,5 +82,13 @@ namespace MusGen
 				}
 			}
 		}
+
+		public static int SpectrumSize
+		{
+			get
+			{
+				return _fftSize / 2;
+			}
+		}
 	}
 }
