@@ -1,23 +1,56 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Extensions;
 using MusGen;
+using Newtonsoft.Json;
 
 namespace PeaksFinding
 {
 	public static class TestsFiller
 	{
-		public static void Fill(out InputData[] inputData)
+		public static InputData Fill()
 		{
-			inputData = new InputData[Params._testsCount];			
-
-			for (int test = 0; test < Params._testsCount; test++)
+			string path = $"{DiskE._programFiles}\\PeksFinderMLTests.json";
+			if (File.Exists(path))
 			{
-				inputData[test].amplitudes = CreateActualAnswer();
-				inputData[test].spectrum = CreateActualQuestion(inputData[test].amplitudes);
+				Logger.Log("Reading PFML tests from json...");
+				string json = File.ReadAllText(path);
+				InputData inputData = JsonConvert.DeserializeObject<InputData>(json);
+				Logger.Log("Reading PFML tests from json is Done!");
+				return inputData;
+			}
+			else
+			{
+				ProgressShower.Show("Generating new PFML tests...");
+
+				InputData inputData = new InputData();
+
+				inputData.questions = new float[Params._testsCount][];
+				inputData.answers = new float[Params._testsCount][];
+
+				for (int test = 0; test < Params._testsCount; test++)
+				{
+					inputData.answers[test] = new float[AP.SpectrumSize];
+					inputData.questions[test] = new float[AP.SpectrumSize];
+
+					inputData.answers[test] = CreateActualAnswer();
+					inputData.questions[test] = CreateActualQuestion(inputData.answers[test]);
+
+					ProgressShower.Set(1.0 * test / Params._testsCount);
+				}
+
+				JsonSerializerSettings jss = new JsonSerializerSettings();
+				jss.Formatting = Formatting.Indented;
+
+				File.WriteAllText(path, JsonConvert.SerializeObject(inputData, jss));
+				Logger.Log("PFML tests were saved!");
+
+				ProgressShower.Close();
+				return inputData;
 			}
 		}
 

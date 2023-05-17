@@ -4,34 +4,38 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MusGen;
-using Microsoft.ML;
+using Tensorflow;
+using Tensorflow.Keras.Engine;
+using Tensorflow.Keras.Layers;
+using Tensorflow.Keras.Models;
+using Tensorflow.Keras.ArgsDefinition;
+using static Tensorflow.Binding;
 
 namespace PeaksFinding
 {
 	public static class Workflow
 	{
-		public static void Make()
+		public static void Make2()
 		{
-			InputData[] inputDatas;
-			TestsFiller.Fill(out inputDatas);
+			InputData data = TestsFiller.Fill();
 
-            MLContext context = new MLContext();
-			IDataView data = context.Data.LoadFromEnumerable<InputData>(inputDatas);
-			var trainTestSplit = context.Data.TrainTestSplit(data, testFraction: 0.2);
+			var model = KerasApi.keras.Sequential();
 
-            var pipeline = context.Transforms.NormalizeMinMax("Features", "spectrum");
-			//pipeline.AddLa
-            pipeline.Append(context.Transforms.NormalizeMinMax("Label", "amplitudes"));
+			var args = new InputLayerArgs();
+			args.InputShape = new Shape(AP.SpectrumSize);
 
-			var trainer = context.MulticlassClassification.Trainers.LbfgsMaximumEntropy();
-			pipeline.Append(trainer);
-			//что здесь?
+			model.add(new InputLayer(args));
 
-            // Обучение модели
-            var model = trainer.Fit(trainTestSplit.TrainSet);
+			LayerNormalizationArgs args2 = new LayerNormalizationArgs();
+			args2.Name = "gg";
+			
+			model.add(new LayerNormalization(args2));
 
-            // Получение прогнозов модели
-            IDataView predictions = model.Transform(trainTestSplit.TestSet);
-        }
+			DenseArgs denseArgs = new DenseArgs();
+			denseArgs.Activation = new Tensorflow.Keras.Activation();
+			Dense layer1 = new Dense(denseArgs);
+
+			model.add(layer1);
+		}
 	}
 }
