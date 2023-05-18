@@ -8,7 +8,30 @@ namespace PeaksFinding
 {
 	public class InputData
 	{
-		public float[][] questions { get; set; }
-		public float[][] answers { get; set; }
+		public float[][][] _data;
+
+		public float[][] questions
+		{
+			get
+			{
+				return _data[0];
+			}
+			set
+			{
+				_data[0] = value;
+			}
+		}
+
+		public float[][] answers
+		{
+			get
+			{
+				return _data[1];
+			}
+			set
+			{
+				_data[1] = value;
+			}
+		}
 	}
 }

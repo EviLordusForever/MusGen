@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Extensions;
 using MusGen;
 using Newtonsoft.Json;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace PeaksFinding
 {
@@ -14,13 +15,19 @@ namespace PeaksFinding
 	{
 		public static InputData Fill()
 		{
-			string path = $"{DiskE._programFiles}\\PeksFinderMLTests.json";
+			string path = $"{DiskE._programFiles}\\PeaksFinderKerasTests.bin";
 			if (File.Exists(path))
 			{
-				Logger.Log("Reading PFML tests from json...");
-				string json = File.ReadAllText(path);
-				InputData inputData = JsonConvert.DeserializeObject<InputData>(json);
-				Logger.Log("Reading PFML tests from json is Done!");
+				Logger.Log("Reading PFML tests from bin...");
+				InputData inputData = new InputData();
+
+				using (FileStream stream = new FileStream(path, FileMode.Open))
+				{
+					BinaryFormatter formatter = new BinaryFormatter();
+					inputData._data = (float[][][])formatter.Deserialize(stream);
+				}
+
+				Logger.Log("Reading PFML tests from bin is Done!");
 				return inputData;
 			}
 			else
@@ -43,13 +50,17 @@ namespace PeaksFinding
 					ProgressShower.Set(1.0 * test / Params._testsCount);
 				}
 
-				JsonSerializerSettings jss = new JsonSerializerSettings();
-				jss.Formatting = Formatting.Indented;
+				ProgressShower.Close();
+				Logger.Log("PFML tests were filled! Now saving...");
 
-				File.WriteAllText(path, JsonConvert.SerializeObject(inputData, jss));
+				using (FileStream stream = new FileStream(path, FileMode.Create))
+				{
+					BinaryFormatter formatter = new BinaryFormatter();
+					formatter.Serialize(stream, inputData._data);
+				}
+
 				Logger.Log("PFML tests were saved!");
 
-				ProgressShower.Close();
 				return inputData;
 			}
 		}
@@ -94,7 +105,9 @@ namespace PeaksFinding
 		public static float[] CreateActualAnswer()
 		{
 			float[] answer = new float[AP.SpectrumSize];
-			int sinusoidsCount = MathE.rnd.Next(Params._maxSinusoidsCount);
+			float x = MathE.rnd.NextSingle();
+			float y = (1 - MathF.Pow(x, Params._sinusoidsCountP));
+			int sinusoidsCount = (int)(y * Params._maxSinusoidsCount + 1);
 
 			for (int i = 0; i < sinusoidsCount; i++)
 			{

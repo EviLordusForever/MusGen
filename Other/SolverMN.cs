@@ -11,7 +11,6 @@ namespace Extensions
     {
         public static float[] Solve(float[,] a, float[] b)
         {
-            // создаем матрицу и вектор из переданных параметров
             Matrix<float> A = Matrix<float>.Build.DenseOfArray(a);
             Vector<float> B = Vector<float>.Build.Dense(b);
 
@@ -20,11 +19,8 @@ namespace Extensions
 
             float[] result = new float[x.Count];
             for (int i = 0; i < x.Count; i++)
-            {
                 result[i] = x[i];
-            }
 
-            // возвращаем результат
             return result;
         }
     }

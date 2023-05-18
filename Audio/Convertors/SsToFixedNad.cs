@@ -38,7 +38,7 @@ namespace MusGen
 		{
 			NadSample ns = new NadSample(AP._channels);
 
-			ns._indexes = PeaksFinder.Find(spectrum, AP._channels, AP._peakWidth_ForFixedNad);
+			ns._indexes = PeaksFinding.PeaksFinder.Find(spectrum, AP._channels, AP._peakWidth_ForFixedNad);
 			ns._amplitudes = MathE.GetValues(spectrum, ns._indexes);
 			ns._frequencies = MathE.GetValues(SpectrumFinder._frequenciesLogarithmic, ns._indexes);
 

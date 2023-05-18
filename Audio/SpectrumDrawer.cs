@@ -326,10 +326,10 @@ namespace MusGen
 
 		public static void DrawMedianAndAverage(float arMax, float yScale)
 		{
-			float average = PeaksFinder._average;
-			float max = PeaksFinder._max;
-			float minAverage = PeaksFinder._minFromAverage;
-			float minMax = PeaksFinder._minFromMaximum;
+			float average = PeaksFinding.PeaksFinder._average;
+			float max = PeaksFinding.PeaksFinder._max;
+			float minAverage = PeaksFinding.PeaksFinder._minFromAverage;
+			float minMax = PeaksFinding.PeaksFinder._minFromMaximum;
 
 			minAverage /= max;
 			minMax /= max;

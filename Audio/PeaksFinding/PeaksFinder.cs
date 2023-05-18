@@ -2,8 +2,12 @@
 using Extensions;
 using System.Collections.Generic;
 using System.Linq;
+using Tensorflow.Keras.Engine;
+using Tensorflow;
+using MusGen;
+using Tensorflow.NumPy;
 
-namespace MusGen
+namespace PeaksFinding
 {
 	public static class PeaksFinder
 	{
@@ -11,6 +15,12 @@ namespace MusGen
 		public static float _max;
 		public static float _minFromAverage;
 		public static float _minFromMaximum;
+		public static IModel _model;
+
+		static PeaksFinder()
+		{
+			_model = ModelManager.GetModel();
+		}
 
 		public static int[] Find(float[] array, int count, float peakSize)
 		{
@@ -92,6 +102,43 @@ namespace MusGen
 						index = i;
 					}
 			}
+		}
+
+		public static List<int> FindEvery_Keras(float[] array, out List<float> amps)
+		{
+			List<int> ids = new List<int>();
+			amps = new List<float>();
+
+			float[] answer = ProcessSpectrum(array);
+
+			float average = answer.Average();
+
+			for (int i = 0; i < AP.SpectrumSize; i++)
+				if (answer[i] > average)
+				{
+					ids.Add(i);
+					amps.Add(answer[i]);
+				}
+
+			return ids;
+		}
+
+		public static float[] ProcessSpectrum(float[] array)
+		{
+			Shape shape = new Shape(1, array.Length);
+			Tensor tensor = constant_op.constant(array, shape: shape);
+			tensor.shape = shape;
+
+			Tensor ts = _model.predict(tensor);
+			float[] answer = ts.ToArray<float>();
+
+			for (int i = 0; i < answer.Length; i++)
+			{
+				answer[i] = Math.Min(answer[i], 1);
+				answer[i] = Math.Max(answer[i], 0);
+			}
+
+			return answer;
 		}
 	}
 }

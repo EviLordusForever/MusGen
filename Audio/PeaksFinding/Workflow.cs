@@ -14,6 +14,10 @@ using Tensorflow.Keras;
 using Tensorflow.Operations.Activation;
 using Tensorflow.Keras.Optimizers;
 using Tensorflow.NumPy;
+using Newtonsoft.Json;
+using Extensions;
+using System.Windows.Media;
+using System.IO;
 
 namespace PeaksFinding
 {
@@ -31,28 +35,23 @@ namespace PeaksFinding
 			NDArray yTrain = np.array(data.answers.SelectMany(x => x).ToArray());
 			yTrain = yTrain.reshape(newShape);
 
-			var model = KerasApi.keras.Sequential();
-
-			var shape = new Shape(AP.SpectrumSize);
-			var layer0 = KerasApi.keras.layers.InputLayer(shape);
-			model.add(layer0);
-
-			var layer1 = KerasApi.keras.layers.Dense(AP.SpectrumSize, activation: "tanh");
-			model.add(layer1);
-
-			var layer2 = KerasApi.keras.layers.Dense(AP.SpectrumSize, activation: "sigmoid");
-			model.add(layer2);
-
-			var loss = "mean_squared_error";
-			var optimizer = "adam";
-			var metrics = new[] { "accuracy" };
-
-			model.compile(optimizer, loss, metrics);
+			IModel model = ModelManager.GetModel();
 
 			for (int i = 0; i < Params._epochs; i++)
 			{
 				var history = model.fit(xTrain, yTrain, Params._batchSize, 1);
-				Logger.Log($"Epoch {i} done. Accuracy {history.history["accuracy"][0]}");
+				float mae = history.history["mean_absolute_error"][0];
+				float loss = history.history["loss"][0];
+				Logger.Log($"Epoch {i} done. Mae {mae}. Loss {loss}");
+
+				DiskE.WriteToProgramFiles("history", "csv", $"\n{mae};{loss}", true);
+
+				if ((i + 1) % Params._savingEvery == 0)
+				{
+					model.save_weights(Params._modelPath);
+					Logger.Log($"Model was saved!", Brushes.Blue);
+				}
+				//512 * 2 * 30000
 			}
 		}
 	}

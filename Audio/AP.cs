@@ -7,7 +7,6 @@ namespace MusGen
 		private static uint _sampleRate = 44100;
 
 		private static int _fftSize = 1024 * 1; //1024
-		public static int _ifftScale = 2;
 		public const int _lc = 16; //how much fftLow bigger than fft //16
 		public static int _channels = 20;
 		public const int _sps = 120;

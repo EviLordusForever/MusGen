@@ -36,7 +36,7 @@ namespace MusGen
 		public static NadSample MakeSamplePlus(float[] spectrum)
 		{
 			List<float> amps;
-			int[] indexes = PeaksFinder.FindEvery(spectrum, out amps).ToArray();
+			int[] indexes = PeaksFinding.PeaksFinder.FindEvery_Keras(spectrum, out amps).ToArray();
 			var ns = new NadSample(indexes.Length);
 			ns._indexes = indexes;
 			ns._amplitudes = amps.ToArray();

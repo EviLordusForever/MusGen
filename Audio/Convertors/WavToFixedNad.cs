@@ -50,7 +50,7 @@ namespace MusGen
 
 			SpectrumFinder.Find(wav, wavLow, s);
 
-			ns._indexes = PeaksFinder.Find(SpectrumFinder._spectrumLogarithmic, AP._channels, AP._peakWidth_ForFixedNad);
+			ns._indexes = PeaksFinding.PeaksFinder.Find(SpectrumFinder._spectrumLogarithmic, AP._channels, AP._peakWidth_ForFixedNad);
 			ns._amplitudes = MathE.GetValues(SpectrumFinder._spectrumLogarithmic, ns._indexes);
 			ns._frequencies = MathE.GetValues(SpectrumFinder._frequenciesLogarithmic, ns._indexes);
 
