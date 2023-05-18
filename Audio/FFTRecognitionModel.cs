@@ -1,6 +1,9 @@
 ﻿using Extensions;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,47 +22,60 @@ namespace MusGen
 
 		public static void Init(int fftSize, int sampleRate, int lc)
 		{
-			_size = fftSize / 2;
-			_model = new float[_size, _size];
-			_maxesForColumns = new float[_size];
-
-			ProgressShower.Show("Initialising fft recognition model.");
-
-			for (int fi = 0; fi < _size; fi++)
+			string path = $"{DiskE._programFiles}\\FftRecognitionModel.json";
+			if (File.Exists(path))
 			{
-				float frequency = SpectrumFinder._frequenciesLogarithmic[fi];
-				float[] signal = new float[fftSize * lc];
-				float[] signalLow = new float[fftSize * lc];
-
-				for (int x = 0; x < fftSize * lc; x++)
-				{
-					float t = 1f * x / sampleRate; //time in seconds
-					signal[x] = MathF.Sin(2f * MathF.PI * frequency * t);
-					signalLow[x] = signal[x];
-				}
-
-				float cutOff = 0.5f * (sampleRate / lc);
-
-				signalLow = KaiserFilter.Make(signalLow, sampleRate, cutOff, AP._kaiserFilterLength_ForProcessing, AP._kaiserFilterBeta, false);
-
-				float[] spectrum = SpectrumFinder.Find(signal, signalLow);
-
-				int column = fi;
-
-				for (int row = 0; row < _size; row++)
-				{
-					_model[row, column] = spectrum[row];
-					_maxesForColumns[column] = Math.Max(_maxesForColumns[column], spectrum[row]);
-				}
-
-				_max = Math.Max(_max, _maxesForColumns[column]);
-
-				ProgressShower.Set(1.0 * fi / _size);
+				string str = File.ReadAllText(path);
+				_model = JsonConvert.DeserializeObject<float[,]>(str);
+				Logger.Log("Fft recognition model was loaded.", System.Windows.Media.Brushes.Cyan);
 			}
+			else
+			{
+				_size = fftSize / 2;
+				_model = new float[_size, _size];
+				_maxesForColumns = new float[_size];
 
-			Normalize();
-			ProgressShower.Close();
-			Logger.Log("Fft recognition model was initialized.");
+				ProgressShower.Show("Initialising fft recognition model.");
+
+				for (int fi = 0; fi < _size; fi++)
+				{
+					float frequency = SpectrumFinder._frequenciesLogarithmic[fi];
+					float[] signal = new float[fftSize * lc];
+					float[] signalLow = new float[fftSize * lc];
+
+					for (int x = 0; x < fftSize * lc; x++)
+					{
+						float t = 1f * x / sampleRate; //time in seconds
+						signal[x] = MathF.Sin(2f * MathF.PI * frequency * t);
+						signalLow[x] = signal[x];
+					}
+
+					float cutOff = 0.5f * (sampleRate / lc);
+
+					signalLow = KaiserFilter.Make(signalLow, sampleRate, cutOff, AP._kaiserFilterLength_ForProcessing, AP._kaiserFilterBeta, false);
+
+					float[] spectrum = SpectrumFinder.Find(signal, signalLow);
+
+					int column = fi;
+
+					for (int row = 0; row < _size; row++)
+					{
+						_model[row, column] = spectrum[row];
+						_maxesForColumns[column] = Math.Max(_maxesForColumns[column], spectrum[row]);
+					}
+
+					_max = Math.Max(_max, _maxesForColumns[column]);
+
+					ProgressShower.Set(1.0 * fi / _size);
+				}
+
+				Normalize();
+				ProgressShower.Close();
+				Logger.Log("Fft recognition model was initialized.");
+				string str = JsonConvert.SerializeObject(_model);
+				File.WriteAllText(path, str);
+				Logger.Log("Fft recognition model was saved.");				
+			}
 		}
 
 		private static void Normalize()

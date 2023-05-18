@@ -18,12 +18,12 @@ namespace MusGen
 
 			void Tr()
 			{
-				string py1 = $"{DiskE._programFiles}Python\\38\\python38.dll";
+/*				string py1 = $"{DiskE._programFiles}Python\\38\\python38.dll";
 				string py2 = $"{DiskE._programFiles}Python\\38\\";
 				Environment.SetEnvironmentVariable("PATH", py2, EnvironmentVariableTarget.Process);
 				Environment.SetEnvironmentVariable("PYTHONHOME", py2, EnvironmentVariableTarget.Process);
 				Environment.SetEnvironmentVariable("PYTHONPATH", py2, EnvironmentVariableTarget.Process);
-				Environment.SetEnvironmentVariable("PYTHONNET_PYDLL", py1);
+				Environment.SetEnvironmentVariable("PYTHONNET_PYDLL", py1);*/
 
 				Application.Current.Dispatcher.Invoke(new Action(() =>
 				{
@@ -52,7 +52,7 @@ namespace MusGen
 
 				*/
 
-				//PeaksFinding.Workflow.Make2();
+				PeaksFinding.Workflow.Make();
 
 				while (Logger._updated)
 					Thread.Sleep(100);
