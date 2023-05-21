@@ -15,7 +15,8 @@ namespace MusGen
 
 			WriteableBitmap wbmp = WBMP.Load(jpgInPath);
 			SS ssO = WbmpToSs.Make(wbmp);
-			SS ssR = SsSoftOctaveReverser.Make(ssO);
+			float octaveShift = OctaveShifter.FindShift(ssO);
+			SS ssR = SsSoftOctaveReverser.Make(ssO, octaveShift, AP._octavesForReverse);
 			ssR = SuperEqualiser.Make(ssO, ssR);
 			Nad nad = SsToMultiNad.Make(ssR);
 			nad = NadModifySpeedAndPitch.Make(nad, speed, pitch);

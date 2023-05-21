@@ -13,11 +13,12 @@ namespace MusGen
 		{
 			Logger.Log($"Image to nad octave reverse (soft, MultiNad) started for\n{jpgInPath}");
 
-			WriteableBitmap wbmp = WBMP.Load(jpgInPath);
+			WriteableBitmap wbmp = WBMP.Load(jpgInPath);	
 			SS ssO = WbmpToSs.Make(wbmp);
-			SS ssR = SsSoftOctaveReverser.Make(ssO);
+			float octaveShift = OctaveShifter.FindShift(ssO);
+			SS ssR = SsSoftOctaveReverser.Make(ssO, octaveShift, AP._octavesForReverse);
 			Nad nad = SsToMultiNad.Make(ssO);
-			nad = MultiNadSoftOctaveReverser.Make(nad);
+			nad = MultiNadSoftOctaveReverser.Make(nad, octaveShift, AP._octavesForReverse);
 			nad = SuperEqualiser.Make(nad, ssO, ssR);
 			nad = NadModifySpeedAndPitch.Make(nad, speed, pitch);
 			nad = NadLimitsFilter.Make(nad);

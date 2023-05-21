@@ -18,9 +18,10 @@ namespace MusGen
 			Wav wavIn = new Wav();
 			wavIn.Read(wavInPath);
 			SS ssO = WavToSS.Make(wavIn);
-			SS ssR = SsSoftOctaveReverser.Make(ssO);
+			float octaveShift = OctaveShifter.FindShift(ssO);
+			SS ssR = SsSoftOctaveReverser.Make(ssO, octaveShift, AP._octavesForReverse);
 			Nad nad = SsToMultiNad.Make(ssO);
-			nad = MultiNadSoftOctaveReverser.Make(nad);
+			nad = MultiNadSoftOctaveReverser.Make(nad, octaveShift, AP._octavesForReverse);
 			nad = SuperEqualiser.Make(nad, ssO, ssR);
 			nad = NadModifySpeedAndPitch.Make(nad, speed, pitch);
 			nad = NadLimitsFilter.Make(nad);

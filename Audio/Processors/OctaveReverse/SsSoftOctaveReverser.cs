@@ -12,7 +12,7 @@ namespace MusGen
 		private static int _width;
 		private static int _height;
 
-		public static SS Make(SS ss)
+		public static SS Make(SS ss, float octaveShift, bool[] octaves)
 		{
 			ProgressShower.Show("Ss soft octave reversing...");
 			int step = (int)(MathF.Max(1, ss.Width / 1000f));
@@ -23,10 +23,10 @@ namespace MusGen
 
 			for (int s = 0; s < _width; s++)
 			{
-				ssout._s[s] = MakeOne(ss._s[s]);
+				ssout._s[s] = MakeOne(ss._s[s], octaveShift, octaves);
 
 				if (s % step == 0)
-					ProgressShower.Set(1.0 * s / step);
+					ProgressShower.Set(1.0 * s / _width);
 			}
 
 			ProgressShower.Close();
@@ -34,20 +34,20 @@ namespace MusGen
 			return ssout;
 		}		
 
-		public static float[] MakeOne(float[] spectrum)
+		public static float[] MakeOne(float[] spectrum, float octaveShift, bool[] octaves)
 		{
 			float[] newone = new float[spectrum.Length];
 
 			for (int octave = 0; octave < 9; octave++)
 			{
-				int from = (int)(SpectrumFinder._octavesIndexes[octave] - _octaveSize / 2);
-				int to = (int)(SpectrumFinder._octavesIndexes[octave + 1] + _octaveSize / 2);
+				int from = (int)(SpectrumFinder._octavesIndexes[octave] - _octaveSize / 2 + octaveShift);
+				int to = (int)(SpectrumFinder._octavesIndexes[octave + 1] + _octaveSize / 2 + octaveShift);
 				int count = to - from;
 
 				for (int i = from; i < to; i++)
 				{
 					int rev = to - 1 - (i - from);
-					if (octave == 8)
+					if (!octaves[octave])
 						rev = i;
 					if (i >= 0 && rev >= 0 && i < _height && rev < _height)
 					{

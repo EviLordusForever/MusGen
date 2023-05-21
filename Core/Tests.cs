@@ -233,7 +233,7 @@ namespace MusGen
 					array[i] = MathF.Sin(i / 6f);
 			}
 
-			array = SsSoftOctaveReverser.MakeOne(array);
+			array = SsSoftOctaveReverser.MakeOne(array, 0, AP._octavesForReverse);
 			DiskE.WriteToProgramFiles("reverse", "csv", TextE.ToCsvString(array), false);
 		}
 

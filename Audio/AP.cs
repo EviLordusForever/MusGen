@@ -4,6 +4,8 @@ namespace MusGen
 {
 	public static class AP
 	{
+		public static bool[] _octavesForReverse = new bool[] { true, true, true, true, true, true, true, true, false };
+
 		private static uint _sampleRate = 44100;
 
 		private static int _fftSize = 1024 * 1; //1024

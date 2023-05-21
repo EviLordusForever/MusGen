@@ -17,6 +17,28 @@ namespace Extensions
 			return str.Split(str.Replace(separator, "~"));
 		}
 
+		public static string ToCsv(float[][] array)
+		{
+			var sb = new StringBuilder();
+
+			for (int i = 0; i < array.Length; i++)
+			{
+				for (int j = 0; j < array[i].Length; j++)
+				{
+					sb.Append(array[i][j]);
+
+					if (j != array[i].Length - 1)
+					{
+						sb.Append(";");
+					}
+				}
+
+				sb.AppendLine();
+			}
+
+			return sb.ToString();
+		}
+
 		public static string[] SuperSplit(string str, string after, string before)
 		{
 			//blablabla(this)blabla(this)bla(this)blablabla

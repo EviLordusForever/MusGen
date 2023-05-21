@@ -83,8 +83,8 @@ namespace MusGen
 						newSignal += value;
 					}
 
-					newSignal *= antifade / nad._samples[ns].Height;
-				}
+					newSignal *= antifade / MathF.Sqrt(nad._samples[ns].Height);
+				} //
 
 				if (fadeSamplesLeft > 0)
 					if (nad._samples[ns - 1].Height > 0)
@@ -97,7 +97,7 @@ namespace MusGen
 							oldSignal += value;
 						}
 
-						oldSignal *= fade / nad._samples[ns - 1].Height;
+						oldSignal *= fade / MathF.Sqrt(nad._samples[ns - 1].Height);
 					}
 
 				wav.L[s] = oldSignal + newSignal;
