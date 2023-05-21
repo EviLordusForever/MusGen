@@ -6,8 +6,8 @@ namespace PeaksFinding
 	{
 		public static string _modelPath = $"{DiskE._programFiles}PeaksFindingModel";
 		public static int _batchSize = 3000;
-		public static int _epochs = 1000;
-		public static int _savingEvery = 10;
+		public static int _epochs = 100000;
+		public static int _savingEvery = 30;
 		public static int _testsCount = 30000;
 
 		public static int _maxSinusoidsCount = 100;

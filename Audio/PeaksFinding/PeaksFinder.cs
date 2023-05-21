@@ -22,7 +22,7 @@ namespace PeaksFinding
 			_model = ModelManager.GetModel();
 		}
 
-		public static int[] Find(float[] array, int count, float peakSize)
+		public static int[] Find_FixedCount(float[] array, int count, float peakSize)
 		{
 			float[] array2 = (float[])array.Clone();
 
@@ -47,7 +47,7 @@ namespace PeaksFinding
 			}
 		}
 
-		public static List<int> FindEvery(float[] array1, out List<float> amps)
+		public static List<int> FindEvery_By_Gauss(float[] array1, out List<float> amps)
 		{
 			List<int> peakIndexes = new List<int>();
 			amps = new List<float>();
@@ -62,14 +62,82 @@ namespace PeaksFinding
 			_max = array1.Max();
 			_average = array1.Average();
 
-			_minFromMaximum = _max * AP._lowestPeak_FromMaximum;
-			_minFromAverage = _average * AP._lowestPeak_FromAverage;
+			_minFromMaximum = _max * AP._lowestPeak_FromMaximum_Gauss;
+			_minFromAverage = _average * AP._lowestPeak_FromAverage_Gauss;
 
 			float minimum = Math.Min(_minFromMaximum, _minFromAverage);
 
 			FindPeak();
 
-			for (int i = 0; i < AP._peaksLimit && amp > minimum; i++)
+			for (int i = 0; i < AP._peaksLimit_FRM && amp > minimum; i++)
+			{
+				FindPeak();
+				peakIndexes.Add(index);
+				amps.Add(amp);
+				RemovePeak();
+			}
+
+			if (peakIndexes.Count == 0)
+			{
+				peakIndexes.Add(array1.Length / 2);
+				amps.Add(0);
+			}
+
+			return peakIndexes;
+
+			void RemovePeak()
+			{
+				float widthN = AP._peakWidth_ForMultiNad_Gauss;
+				widthN *= 1 / SpectrumFinder._frequenciesLogarithmic[index];
+				float heighN = amp * SpectrumFinder._fadeInLowMask[index];
+
+				float widthL = AP._peakWidth_ForMultiNad_Gauss / AP._lc;
+				widthL *= 1 / SpectrumFinder._frequenciesLogarithmic[index];
+				float heighL = amp * SpectrumFinder._fadeOutLowMask[index];
+
+				for (int x = 0; x < array2.Length; x++)
+				{
+					array2[x] -= MathE.Gauss(x, index, widthL, heighL);
+					array2[x] -= MathE.Gauss(x, index, widthN, heighN);
+				}
+			}
+
+			void FindPeak()
+			{
+				amp = 0;
+				index = 0;
+				for (int i = 0; i < array2.Length; i++)
+					if (array2[i] > amp)
+					{
+						amp = array2[i];
+						index = i;
+					}
+			}
+		}
+
+		public static List<int> FindEvery_By_FftRecModel(float[] array1, out List<float> amps)
+		{
+			List<int> peakIndexes = new List<int>();
+			amps = new List<float>();
+
+			float[] array2 = new float[array1.Length];
+			for (int i = 0; i < array1.Length; i++)
+				array2[i] = array1[i];
+
+			float amp = 0;
+			int index = 0;
+
+			_max = array1.Max();
+			_average = array1.Average();
+
+			_minFromMaximum = _max * AP._lowestPeak_FromMaximum_FRM;
+			_minFromAverage = _average * AP._lowestPeak_FromAverage_FRM;
+
+			float minimum = Math.Min(_minFromMaximum, _minFromAverage);
+
+			FindPeak();
+
+			for (int i = 0; i < AP._peaksLimit_FRM && amp > minimum; i++)
 			{
 				FindPeak();
 				peakIndexes.Add(index);
@@ -104,7 +172,7 @@ namespace PeaksFinding
 			}
 		}
 
-		public static List<int> FindEvery_Keras(float[] array, out List<float> amps)
+		public static List<int> FindEvery_By_Keras(float[] array, out List<float> amps)
 		{
 			List<int> ids = new List<int>();
 			amps = new List<float>();

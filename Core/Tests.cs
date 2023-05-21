@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MusGen.Voice;
 using Extensions;
 using Clr = System.Windows.Media.Color;
 using Clr0 = System.Drawing.Color;

@@ -16,7 +16,6 @@ namespace MusGen
 			Wav wavIn = new Wav();
 			wavIn.Read(wavInPath);
 			SS ss = WavToSS.Make(wavIn);
-			ss = SsLowPhaseSmoother.Make(ss);
 			Nad nad = SsToFixedNad.Make(ss, true);
 			int left = (int)SpectrumFinder._octavesIndexes[0];
 			int right = (int)SpectrumFinder._octavesIndexes[9];
@@ -25,6 +24,7 @@ namespace MusGen
 			nad = NadExampleEq.Make(nad, ss);
 			nad = NadModifySpeedAndPitch.Make(nad, speed, pitch);
 			nad = NadLimitsFilter.Make(nad);
+			nad = NadLowSmoother.Make(nad);
 			Wav wavOut = EveryNadToWav.Make(nad);
 			wavOut.Export(exportName);
 

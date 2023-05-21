@@ -77,7 +77,7 @@ namespace MusGen
 
 					nadsOld = nads;
 					var sp = SpectrumFinder.Find(wav, wavLow, 0);
-					nads = SsToMultiNad.MakeSamplePlus(sp);
+					nads = SsToMultiNad.MakeSample_Multi(sp);
 
 					Octavisate();
 					AdaptiveCeiling();

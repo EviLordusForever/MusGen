@@ -43,7 +43,7 @@ namespace MusGen
 			List<float> newAmplitudes = new List<float>();
 
 			for (int c = 0; c < Height; c++)
-				if (_frequencies[c] < AP.SampleRate / 2 && _frequencies[c] > sps)
+				if (_frequencies[c] < AP.SampleRate / 2 && _frequencies[c] > SpectrumFinder._frequenciesLogarithmic[1])
 				{
 					newFrequencies.Add(_frequencies[c]);
 					newIndexes.Add(_indexes[c]);
@@ -53,6 +53,26 @@ namespace MusGen
 			_frequencies = newFrequencies.ToArray();
 			_indexes = newIndexes.ToArray();
 			_amplitudes = newAmplitudes.ToArray();
+		}
+
+		public void Add(int index, float amp, float frq)
+		{
+			if (!_frequencies.Contains(frq))
+			{
+				Array.Resize(ref _indexes, _indexes.Length + 1);
+				Array.Resize(ref _amplitudes, _amplitudes.Length + 1);
+				Array.Resize(ref _frequencies, _frequencies.Length + 1);
+
+				_indexes[_indexes.Length - 1] = index;
+				_amplitudes[_amplitudes.Length - 1] = amp;
+				_frequencies[_frequencies.Length - 1] = frq;
+			}
+			else
+			{
+				int i = Array.IndexOf(_indexes, index);
+				_amplitudes[i] = amp * 0.5f + _amplitudes[i] * 0.5f;
+				_frequencies[i] = frq * 0.5f + _frequencies[i] * 0.5f;
+			}
 		}
 
 		public NadSample(int channels)

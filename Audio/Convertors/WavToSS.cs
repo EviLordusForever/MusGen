@@ -13,7 +13,9 @@ namespace MusGen
 		{
 			AP.SampleRate = (uint)wav._sampleRate;
 			int _lastSample = wav.Length;
-			Array.Resize(ref wav.L, wav.Length + AP.FftSize * AP._lc);
+
+			EnlargeWav();
+
 			double _step = 1.0 * AP.SampleRate / AP._sps;
 			int samplesCount = (int)Math.Ceiling(_lastSample / _step);
 			int duration = (int)Math.Ceiling(1f * wav.Length / AP.SampleRate);
@@ -47,12 +49,20 @@ namespace MusGen
 				for (int c = 0; c < ss._s[0].Length; c++)
 					ss._s[s][c] /= max;
 
-				ProgressShower.Set(1.0 * ns / ss._s.Length);
+				ProgressShower.Set(1.0 * s / ss._s.Length);
 			}
 
 			ProgressShower.Close();
 
 			return ss;
+
+			void EnlargeWav()
+			{
+				int n = 2 * AP.FftSize * AP._lc;
+				float[] newArray = new float[wav.Length + n];
+				Array.Copy(wav.L, 0, newArray, n, wav.L.Length);
+				wav.L = newArray;
+			}
 		}
 	}
 }

@@ -18,7 +18,6 @@ namespace MusGen
 			Wav wavIn = new Wav();
 			wavIn.Read(wavInPath);
 			SS ss = WavToSS.Make(wavIn);
-			ss = SsLowPhaseSmoother.Make(ss);
 			WriteableBitmap img = SsToWbmp.Make(ss);
 			string path = $"{DiskE._programFiles}Spectrograms\\{exportName}.jpg";
 			GraphicsE.SaveJPG100(img, path);

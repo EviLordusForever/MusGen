@@ -6,7 +6,6 @@ using System.Threading;
 using System.Windows.Media.Imaging;
 using Extensions;
 
-
 namespace MusGen
 {
 	public static class JpgToWav_MultiNad
@@ -17,10 +16,10 @@ namespace MusGen
 
 			WriteableBitmap wbmp = WBMP.Load(jpgInPath);
 			SS ss = WbmpToSs.Make(wbmp);
-			ss = SsLowPhaseSmoother.Make(ss);
 			Nad nad = SsToMultiNad.Make(ss);
 			nad = NadModifySpeedAndPitch.Make(nad, speed, pitch);
 			nad = NadLimitsFilter.Make(nad);
+			nad = NadLowSmoother.Make(nad);
 			Wav wav = EveryNadToWav.Make(nad);
 			wav.Export(exportName);
 

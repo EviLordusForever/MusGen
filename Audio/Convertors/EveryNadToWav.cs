@@ -24,8 +24,6 @@ namespace MusGen
 		public static Wav Make(Nad nad, Wav wav)
 		{
 			int length = wav.Length;
-			double[] t = new double[AP._peaksLimit];
-			double[] tOld = new double[AP._peaksLimit];
 			int fadeSamplesLeft = 0;
 			float sps = 1f * wav.Length / nad.Width;
 			int samplesForFade = (int)(AP._fadeTime * AP.SampleRate / sps);
@@ -44,7 +42,6 @@ namespace MusGen
 				{
 					ns = newNs;
 					fadeSamplesLeft = samplesForFade;
-					SetTimeOld();
 				}
 				else
 					fadeSamplesLeft--;
@@ -52,6 +49,8 @@ namespace MusGen
 				WriteSample(s, ns);
 				Progress(s);
 			}
+
+			ProgressShower.Close();
 
 			Normalize();
 			ProgressShower.Close();
@@ -78,8 +77,10 @@ namespace MusGen
 						if (nad._samples[ns]._frequencies[c] < 20f)
 							nad._samples[ns]._frequencies[c] = 20f;
 
-						t[c] += buf * nad._samples[ns]._frequencies[c];
-						newSignal += (float)F(t[c]) * nad._samples[ns]._amplitudes[c];
+						float frq = nad._samples[ns]._frequencies[c];
+						float amp = nad._samples[ns]._amplitudes[c];
+						float value = amp * MathF.Sin(pi2 * frq * s / AP.SampleRate);
+						newSignal += value;
 					}
 
 					newSignal *= antifade / nad._samples[ns].Height;
@@ -90,8 +91,10 @@ namespace MusGen
 					{
 						for (int c = 0; c < nad._samples[ns - 1].Height; c++)
 						{
-							tOld[c] += buf * nad._samples[ns - 1]._frequencies[c];
-							oldSignal += (float)F(tOld[c]) * nad._samples[ns - 1]._amplitudes[c];
+							float frq = nad._samples[ns - 1]._frequencies[c];
+							float amp = nad._samples[ns - 1]._amplitudes[c];
+							float value = amp * MathF.Sin(pi2 * frq * s / AP.SampleRate);
+							oldSignal += value;
 						}
 
 						oldSignal *= fade / nad._samples[ns - 1].Height;
@@ -103,12 +106,6 @@ namespace MusGen
 					max = Math.Abs(wav.L[s]);
 			}
 
-			void SetTimeOld()
-			{
-				for (int c = 0; c < AP._peaksLimit; c++)
-					tOld[c] = t[c];
-			}
-
 			void Progress(int s)
 			{
 				if (s % progressStep == 0)
@@ -118,7 +115,6 @@ namespace MusGen
 			void Normalize()
 			{
 				ProgressShower.Show("Normalization");
-				ProgressShower.Set(0);
 				for (int s = 0; s < length; s++)
 				{
 					wav.L[s] /= max;

@@ -315,7 +315,7 @@ namespace MusGen
 
 		public static void DrawNadsCount(int nadsCount)
 		{
-			float power = (1f * nadsCount / AP._peaksLimit);
+			float power = (1f * nadsCount / AP._peaksLimit_FRM);
 			int length = _wbmp.PixelWidth / 6;
 			int x = _wbmp.PixelWidth / 8;
 			int y = _wbmp.PixelWidth / 60;

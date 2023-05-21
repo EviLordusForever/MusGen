@@ -15,11 +15,22 @@ namespace MusGen
 
 		public static float _peakWidth_ForFixedNad = 70; //70
 
+		//Peaks
+
+		//For peaks finding by gauss model
+		public static float _peakWidth_ForMultiNad_Gauss = 20000f;
+		public static float _lowestPeak_FromAverage_Gauss = 0.125f / 8; //0.125f / 32
+		public static float _lowestPeak_FromMaximum_Gauss = 0.01f / 8; //0.01f / 32
+		public static int _peaksLimit_Gauss = 150; //150 or less
+
+		//For peaks finding by FFT Recognition model
 		public static float _peakBig = 3f;
-		public static float _peakWidth_ForMultiNad = 30000f;
-		public static float _lowestPeak_FromAverage = 0.25f / 1; //0.125f / 32
-		public static float _lowestPeak_FromMaximum = 0.02f / 1; //0.01f / 32
-		public static int _peaksLimit = 300; //150 or less
+		public static float _peakWidth_ForMultiNad_FRM = 30000f;
+		public static float _lowestPeak_FromAverage_FRM = 0.25f / 1;
+		public static float _lowestPeak_FromMaximum_FRM = 0.02f / 1;
+		public static int _peaksLimit_FRM = 300;
+
+		//
 
 		public static int _wbmpResX = 256 * 2;
 		public static int _wbmpResY = 16 * 9 * 2 * 2;

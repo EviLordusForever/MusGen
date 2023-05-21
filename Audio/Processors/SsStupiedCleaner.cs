@@ -10,8 +10,8 @@ namespace MusGen
 	{
 		public static SS Make(SS ssin)
 		{
-			ProgressShower.Show("Ss cleaning...");
-			int step = (int)(ssin._s.Length / 1000f);
+			ProgressShower.Show("Ss stupied cleaning...");
+			int step = (int)(MathF.Max(1, ssin.Width / 1000f));
 
 			SS ssout = new SS(ssin.Width, ssin._sps);
 

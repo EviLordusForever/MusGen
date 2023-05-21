@@ -18,8 +18,10 @@
 		</Grid.RowDefinitions>
 
 		<ComboBox FontSize="20" Margin ="0,3,0,3" Name="combobox" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" SelectedIndex="0" Grid.Row="0" SelectionChanged="combobox_SelectionChanged">
-			<ComboBoxItem>Octave reverse (soft, MultiNad)</ComboBoxItem>
-			<ComboBoxItem>Jpg to wav octave reverse (soft, MultiNad)</ComboBoxItem>
+			<ComboBoxItem>Ss octave reverse (soft, MultiNad)</ComboBoxItem>
+			<ComboBoxItem>Jpg to wav ss octave reverse (soft, MultiNad)</ComboBoxItem>
+			<ComboBoxItem>Nad octave reverse (soft, MultiNad)</ComboBoxItem>
+			<ComboBoxItem>Jpg to wav nad octave reverse (soft, MultiNad)</ComboBoxItem>
 			<ComboBoxItem>Wav to jpg</ComboBoxItem>
 			<ComboBoxItem>Jpg to wav (MultiNad)</ComboBoxItem>
 			<ComboBoxItem>Jpg to clean jpg</ComboBoxItem>

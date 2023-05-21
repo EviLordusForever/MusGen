@@ -15,10 +15,11 @@ namespace MusGen
 			Application.Current.Dispatcher.Invoke(() =>
 			{
 				WindowsManager.OpenProgressWindow(text);
+				Set(0);
+				WindowsManager._progressWindow.UpdateLayout();
 			});
-			Set(0);
-			Logger.Log($"Started: {text}");
 			_text = text;
+			Logger.Log($"Started: {text}");
 		}
 
 		public static void Set(double value)
