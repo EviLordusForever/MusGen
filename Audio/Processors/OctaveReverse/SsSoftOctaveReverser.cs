@@ -34,7 +34,7 @@ namespace MusGen
 			return ssout;
 		}		
 
-		public static float[] MakeOne(float[] spectrum, float octaveShift, bool[] octaves)
+		public static float[] MakeOne(float[] spectrum, float octaveShift, bool[] octaves, bool useRev2 = false)
 		{
 			float[] newone = new float[spectrum.Length];
 
@@ -47,12 +47,24 @@ namespace MusGen
 				for (int i = from; i < to; i++)
 				{
 					int rev = to - 1 - (i - from);
+					int rev2 = rev;
 					if (!octaves[octave])
 						rev = i;
-					if (i >= 0 && rev >= 0 && i < _height && rev < _height)
+					if (useRev2)
 					{
-						float power = F(1f * (i - from) / count);
-						newone[i] += spectrum[rev] * power;
+						if (i >= 0 && rev2 >= 0 && i < _height && rev2 < _height)
+						{
+							float power = F(1f * (i - from) / count);
+							newone[i] += spectrum[rev] * power;
+						}
+					}
+					else
+					{
+						if (i >= 0 && rev >= 0 && i < _height && rev < _height)
+						{
+							float power = F(1f * (i - from) / count);
+							newone[i] += spectrum[rev] * power;
+						}
 					}
 				}
 			}
