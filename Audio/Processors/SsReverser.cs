@@ -13,7 +13,7 @@ namespace MusGen
 			ProgressShower.Show("Ss reversing...");
 			int step = (int)(ssin._s.Length / 1000f);
 
-			SS ssout = new SS(ssin._s.Length, ssin._sps);
+			SS ssout = new SS(ssin._s.Length, ssin._sps, ssin._cs);
 
 			int y = ssin._s[0].Length;
 

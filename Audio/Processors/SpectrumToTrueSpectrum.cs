@@ -11,7 +11,7 @@ namespace MusGen
 	{
 		public static float[] Make(float[] spectrum)
 		{
-			return PeaksFinding.PeaksFinder.ProcessSpectrum(spectrum);
+			return PeaksFinding.PeaksFinder.ProcessSpectrumSolver(spectrum);
 		}
 	}
 }

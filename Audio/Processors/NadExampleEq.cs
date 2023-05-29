@@ -8,12 +8,13 @@ namespace MusGen
 {
 	public static class NadExampleEq
 	{
+		//delme??
 		public static Nad Make(Nad nad, SS ex)
 		{
 			ProgressShower.Show("Nad equalising...");
 			int step = (int)(nad._samples.Length / 1000f);
 
-			int channels = nad._samples[0]._frequencies.Length;
+			int channels = nad._samples[0]._indexes.Length;
 
 			for (int s = 0; s < nad._samples.Length; s++)
 			{

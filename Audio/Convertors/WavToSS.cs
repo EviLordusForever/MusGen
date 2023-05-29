@@ -16,19 +16,18 @@ namespace MusGen
 
 			EnlargeWav();
 
-			double _step = 1.0 * AP.SampleRate / AP._sps;
+			double _step = 1.0 * AP.SampleRate / (AP._sps * AP._cs);
 			int samplesCount = (int)Math.Ceiling(_lastSample / _step);
 			int duration = (int)Math.Ceiling(1f * wav.Length / AP.SampleRate);
 
-			SS ss = new SS(samplesCount, AP._sps);
+			SS ss = new SS(samplesCount, (ushort)(AP._sps * AP._cs), AP._cs); ///
 
 			SpectrumFinder._max = 0;
 
 			Wav wavLow = WavLowPass.FillWavLow(wav, AP._kaiserFilterLength_ForProcessing, true);
 
-			ProgressShower.Show("Making ss from wav...");
+			ProgressShower.Show($"Making ss from wav... (cs {AP._cs})");
 			int progressStep = (int)MathF.Ceiling(ss._s.Length / 1000f);
-
 
 			int ns = 0;
 			for (double s = 0; s < _lastSample; s += _step, ns++)

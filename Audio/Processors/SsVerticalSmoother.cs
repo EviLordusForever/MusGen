@@ -6,7 +6,7 @@ namespace MusGen
 	{
 		public static SS Make(SS ss, int factor)
 		{
-			SS ssout = new SS(ss._s.Length, ss._sps);
+			SS ssout = new SS(ss._s.Length, ss._sps, ss._cs);
 
 			int y = ss._s[0].Length;
 

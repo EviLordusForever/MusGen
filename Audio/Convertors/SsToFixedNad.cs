@@ -16,7 +16,7 @@ namespace MusGen
 
 			AP.FftSize = ss.Height * 2;
 
-			Nad nad = new Nad(AP._channels, ss._s.Length, 1f * ss._s.Length / ss._sps);
+			Nad nad = new Nad(AP._channels, ss._s.Length, 1f * ss._s.Length / ss._sps, ss._cs, (ushort)ss.Height);
 
 			for (int s = 0; s < ss._s.Length; s++)
 			{
@@ -40,7 +40,6 @@ namespace MusGen
 
 			ns._indexes = PeaksFinding.PeaksFinder.Find_FixedCount(spectrum, AP._channels, AP._peakWidth_ForFixedNad);
 			ns._amplitudes = MathE.GetValues(spectrum, ns._indexes);
-			ns._frequencies = MathE.GetValues(SpectrumFinder._frequenciesLogarithmic, ns._indexes);
 
 			return ns;
 		}

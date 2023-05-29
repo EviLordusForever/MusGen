@@ -18,7 +18,7 @@ namespace MusGen
 
 			AP.FftSize = ss.Height * 2;
 
-			Nad nad = new Nad(ss.Width, 1f * ss.Width / ss._sps);
+			Nad nad = new Nad(ss.Width, 1f * ss.Width / ss._sps, ss._cs, (ushort)ss.Height);
 
 			for (int s = 0; s < ss._s.Length; s++)
 			{
@@ -36,11 +36,10 @@ namespace MusGen
 		public static NadSample MakeSample_Multi(float[] spectrum)
 		{
 			List<float> amps;
-			int[] indexes = PeaksFinding.PeaksFinder.FindEvery_By_Gauss(spectrum, out amps).ToArray();
+			ushort[] indexes = PeaksFinding.PeaksFinder.FindEvery_By_Solver(spectrum, out amps).ToArray();
 			var ns = new NadSample(indexes.Length);
 			ns._indexes = indexes;
 			ns._amplitudes = amps.ToArray();
-			ns._frequencies = MathE.GetValues(SpectrumFinder._frequenciesLogarithmic, ns._indexes);
 
 			return ns;
 		}

@@ -5,7 +5,7 @@ using System.Linq;
 using Tensorflow.Keras.Engine;
 using Tensorflow;
 using MusGen;
-using Tensorflow.NumPy;
+using MathNet.Numerics.Statistics;
 
 namespace PeaksFinding
 {
@@ -22,11 +22,11 @@ namespace PeaksFinding
 			_model = ModelManager.GetModel();
 		}
 
-		public static int[] Find_FixedCount(float[] array, int count, float peakSize)
+		public static ushort[] Find_FixedCount(float[] array, int count, float peakSize)
 		{
 			float[] array2 = (float[])array.Clone();
 
-		    int[] peakIndexes = new int[count];
+		    ushort[] peakIndexes = new ushort[count];
 			peakIndexes[0] = FindPeak();
 			for (int i = 1; i < count; i++)
 			{
@@ -35,9 +35,9 @@ namespace PeaksFinding
 			}
 			return peakIndexes;
 
-			int FindPeak()
+			ushort FindPeak()
 			{
-				return MathE.IndexOfMax(array2);
+				return MathE.IndexOfMax_short(array2);
 			}
 
 			void RemovePeak(int point)
@@ -45,6 +45,59 @@ namespace PeaksFinding
 				for (int i = 0; i < array2.Length; i++)
 					array2[i] = array2[i] * MathF.Abs(MathF.Tanh((i - point) / peakSize));
 			}
+		}
+
+		public static List<ushort> FindEvery_By_Solver(float[] array1, out List<float> amps)
+		{
+			float[] array2 = new float[array1.Length];
+			array1.CopyTo(array2, 0);
+
+			amps = new List<float>();
+			List<ushort> ids;
+
+			ids = MathE.StupiedFilterMask(array2, true);
+
+			for (int i = 0; i < ids.Count; i++)
+				amps.Add(array1[ids[i]]);
+
+			int equationsCount = ids.Count();
+			int coefficientsCount = ids.Count();
+
+			float[][] eqs = new float[equationsCount][];
+
+			for (int equation = 0; equation < equationsCount; equation++)
+			{
+				eqs[equation] = new float[coefficientsCount];
+				for (int coefficient = 0; coefficient < coefficientsCount; coefficient++)
+				{
+					int in_spm = ids[equation];
+					int in_frq = ids[coefficient];
+					eqs[equation][coefficient] = SMM._model._modelN3[in_spm][in_frq];
+				}
+			}
+
+			float[] b = amps.ToArray();
+
+			var ampsSolved = Solver.Solve(eqs, b, AP._iters, AP._speed);
+
+			for (int i = 0; i < amps.Count; i++)
+				amps[i] = ampsSolved[i];
+
+			return ids;
+		}
+
+		public static List<ushort> FindEvery_By_Stupied(float[] array1, out List<float> amps)
+		{
+			List<ushort> peakIndexes = new List<ushort>();
+			amps = new List<float>();
+
+			var arrayCopy = ArrayE.SmoothArrayCopy(array1, 5);
+			peakIndexes = MathE.StupiedFilterMask(arrayCopy, true);
+
+			for (int i = 0; i < peakIndexes.Count; i++)
+				amps.Add(array1[peakIndexes[i]]);
+
+			return peakIndexes;
 		}
 
 		public static List<int> FindEvery_By_Gauss(float[] array1, out List<float> amps)
@@ -69,7 +122,7 @@ namespace PeaksFinding
 
 			FindPeak();
 
-			for (int i = 0; i < AP._peaksLimit_FRM && amp > minimum; i++)
+			for (int i = 0; i < AP._peaksLimit_Gauss && amp > minimum; i++)
 			{
 				FindPeak();
 				peakIndexes.Add(index);
@@ -88,11 +141,11 @@ namespace PeaksFinding
 			void RemovePeak()
 			{
 				float widthN = AP._peakWidth_ForMultiNad_Gauss;
-				widthN *= 1 / SpectrumFinder._frequenciesLogarithmic[index];
+				widthN *= 1 / SpectrumFinder._frequenciesLg[index];
 				float heighN = amp * SpectrumFinder._fadeInLowMask[index];
 
 				float widthL = AP._peakWidth_ForMultiNad_Gauss / AP._lc;
-				widthL *= 1 / SpectrumFinder._frequenciesLogarithmic[index];
+				widthL *= 1 / SpectrumFinder._frequenciesLg[index];
 				float heighL = amp * SpectrumFinder._fadeOutLowMask[index];
 
 				for (int x = 0; x < array2.Length; x++)
@@ -156,7 +209,7 @@ namespace PeaksFinding
 			void RemovePeak()
 			{
 				for (int x = 0; x < array2.Length; x++)
-					array2[x] -= FftRecognitionModel._model[x, index] * amp * AP._peakBig;
+					array2[x] -= SMM._model._modelN[x, index] * amp * AP._peakBig;
 			}
 
 			void FindPeak()
@@ -191,6 +244,24 @@ namespace PeaksFinding
 			return ids;
 		}
 
+		public static List<int> FindEvery_By_SMM(float[] array, out List<float> amps)
+		{
+			int cycles = 10;
+			float[] farray = new float[AP.SpectrumSize];
+
+			for (int cycle = 0; cycle < 10; cycle++)
+				for (int si = 0; si < AP.SpectrumSize; si++)
+					Optimise(si);
+
+			amps = null;
+			return null;
+
+			void Optimise(int si)
+			{
+
+			}
+		}
+
 		public static float[] ProcessSpectrum(float[] array)
 		{
 			Shape shape = new Shape(1, array.Length);
@@ -205,6 +276,121 @@ namespace PeaksFinding
 				answer[i] = Math.Min(answer[i], 1);
 				answer[i] = Math.Max(answer[i], 0);
 			}
+
+			return answer;
+		}
+
+		public static float[] ProcessSpectrumCorr(float[] array)
+		{
+			double[] question = Array.ConvertAll(array, i => (double)i);
+			float[] answer = new float[array.Length];
+
+			for (int i = 0; i < array.Length; i++)
+				answer[i] = MathF.Max(0, (float)Correlation.Pearson(question, SMM._model._modelN2[i]));
+			
+			return answer;
+			///CHEEEEECK
+		}
+
+		public static float[] ProcessSpectrumCorr2(float[] array)
+		{
+			int count = array.Length;
+
+			float[] answer = new float[count];
+
+			for (int belli = 0; belli < count; belli++)
+			{
+				float[] difs = new float[count];
+				float dif = 0;
+
+				float[] bell = new float[count];
+				float[] arrbell = new float[count];
+				float arrbellvol = 0;
+				float bellvol = 0;
+
+				for (int i = 0; i < count; i++)
+				{
+					bell[i] = SMM._model._modelN[belli, i];
+					arrbell[i] = array[i] * bell[i];
+
+					bellvol += bell[i];
+					arrbellvol += arrbell[i];
+				}
+
+				float coefficient = bellvol / arrbellvol;
+
+				for (int i = 0; i < count; i++)
+				{
+					arrbell[i] *= coefficient;
+
+					difs[i] = MathF.Pow(arrbell[i] - bell[i], 2);
+					dif += difs[i];
+				}
+
+				dif /= bellvol;
+				dif = MathF.Pow(dif, 0.5f);
+				float cor = 1 - MathF.Min(dif, 1);
+				cor = MathF.Pow(cor, 4);
+				answer[belli] = cor;
+			}
+
+			return answer;
+		}
+
+		public static float[] ProcessSpectrumStupied(float[] array)
+		{
+			array = ArrayE.SmoothArray(array, 5);
+			array = MathE.StupiedFilter(array, true);
+			return array;
+		}
+
+		public static float[] ProcessSpectrumGauss(float[] array)
+		{
+			float[] res = new float[array.Length];
+			List<float> amps = new List<float>();
+			List<int> ids = FindEvery_By_Gauss(array, out amps);
+
+			for (int i = 0; i < ids.Count; i++)
+				res[ids[i]] = amps[i];
+
+			return res;
+		}
+
+		public static float[] ProcessSpectrumSolver(float[] array)
+		{
+			List<float> amps = new List<float>();
+			List<ushort> ids;
+
+			ids = MathE.StupiedFilterMask(array, true);
+			//ids = new List<int>();
+			//ids.AddRange(ArrayE.OneToN(array.Length - 1));
+
+			for (int i = 0; i < ids.Count; i++)
+				amps.Add(array[ids[i]]);
+
+			int equationsCount = ids.Count();
+			int coefficientsCount = ids.Count();
+
+			float[][] eqs = new float[equationsCount][];
+
+			for (int equation = 0; equation < equationsCount; equation++)
+			{
+				eqs[equation] = new float[coefficientsCount];
+				for (int coefficient = 0; coefficient < coefficientsCount; coefficient++)
+				{
+					int in_spm = ids[equation];
+					int in_frq = ids[coefficient];
+					eqs[equation][coefficient] = SMM._model._modelN3[in_spm][in_frq];
+				}
+			}
+
+			float[] b = amps.ToArray();
+
+			var ampsSolved = Solver.Solve(eqs, b, AP._iters);
+
+			float[] answer = new float[array.Length];
+			for (int i = 0; i < ampsSolved.Length; i++)
+				answer[ids[i]] = ampsSolved[i];
 
 			return answer;
 		}

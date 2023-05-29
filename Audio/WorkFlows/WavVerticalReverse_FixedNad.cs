@@ -17,8 +17,8 @@ namespace MusGen
 			wavIn.Read(wavInPath);
 			SS ss = WavToSS.Make(wavIn);
 			Nad nad = SsToFixedNad.Make(ss, true);
-			int left = (int)SpectrumFinder._octavesIndexes[0];
-			int right = (int)SpectrumFinder._octavesIndexes[9];
+			ushort left = (ushort)SpectrumFinder._octavesIndexes[0];
+			ushort right = (ushort)SpectrumFinder._octavesIndexes[9];
 			nad = NadReverser.Make(nad, left, right);
 			ss = SSVerticalSmoother.Make(ss, 5);
 			nad = NadExampleEq.Make(nad, ss);

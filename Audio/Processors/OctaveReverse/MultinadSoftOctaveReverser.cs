@@ -15,7 +15,7 @@ namespace MusGen
 
 			SsSoftOctaveReverser.Init(nadIn.Width, AP.SpectrumSize);
 
-			Nad nadOut = new Nad(nadIn.Width, nadIn._duration);
+			Nad nadOut = new Nad(nadIn.Width, nadIn._duration, nadIn._cs, nadIn._specturmSize);
 
 			for (int s = 0; s < nadIn.Width; s++)
 			{
@@ -46,12 +46,11 @@ namespace MusGen
 
 			NadSample newOne = new NadSample(count);
 			int ni = 0;
-			for (int si = 0; si < newSpectrum.Length; si++)
+			for (ushort si = 0; si < newSpectrum.Length; si++)
 				if (newSpectrum[si] > 0)
 				{
 					newOne._indexes[ni] = si;
 					newOne._amplitudes[ni] = newSpectrum[si];
-					newOne._frequencies[ni] = SpectrumFinder._frequenciesLogarithmic[si];
 					ni++;
 				}
 

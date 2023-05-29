@@ -37,8 +37,8 @@ namespace MusGen
 				int index0 = (int)Math.Floor(buf);
 				int index1 = (int)Math.Ceiling(buf);
 				index1 = Math.Min(index1, AP.FftSize / 2 - 1);
-				float frequency0 = SpectrumFinder._frequenciesLogarithmic[index0];
-				float frequency1 = SpectrumFinder._frequenciesLogarithmic[index1];
+				float frequency0 = SpectrumFinder._frequenciesLg[index0];
+				float frequency1 = SpectrumFinder._frequenciesLg[index1];
 				float fade = MathE.FadeOutCentered(buf - index0, 7);
 				float signal0 = fade * MathF.Sin(2 * MathF.PI * frequency0 * x / AP.SampleRate + 0);
 				float signal1 = (1 - fade) * MathF.Sin(2 * MathF.PI * frequency1 * x / AP.SampleRate + 0);
@@ -55,8 +55,8 @@ namespace MusGen
 				int index0 = (int)Math.Floor(buf);
 				int index1 = (int)Math.Ceiling(buf);
 				index1 = Math.Min(index1, AP.FftSize / 2 - 1);
-				float frequency0 = SpectrumFinder._frequenciesLogarithmic[index0];
-				float frequency1 = SpectrumFinder._frequenciesLogarithmic[index1];
+				float frequency0 = SpectrumFinder._frequenciesLg[index0];
+				float frequency1 = SpectrumFinder._frequenciesLg[index1];
 				float fade = MathE.FadeOutCentered(buf - index0, 7);
 				float frequency = (frequency0 * fade + frequency1 * (1 - fade)) / 2;
 				frequency /= AP.SampleRate;
@@ -110,12 +110,12 @@ namespace MusGen
 		public static void FftRecognitionModelTest()
 		{
 			SpectrumFinder.Init();
-			FftRecognitionModel.Init(1024, 44100, 16);
+			SMM.Init(1024, 44100, 16);
 			WriteableBitmap sg = WBMP.Create(512, 512);
 			for (int row = 0; row < 512; row++)
 				for (int column = 0; column < 512; column++)
 				{
-					float v = FftRecognitionModel._model[row, column];
+					float v = SMM._model._modelN[row, column];
 					float vl = MathE.ToLogScale(v, 10);
 					byte b = (byte)(vl * 255);
 					sg.SetPixel(row, column, Clr.FromRgb(b, b, b));
@@ -270,6 +270,48 @@ namespace MusGen
 				Logger.Log(strs[s]);
 
 			Logger.Log("Logger test ended...");
+		}
+
+		public static void Alg()
+		{
+			float _x = 2;
+			float _y = 5;
+
+			float _X = X(_x, _y);
+			float _Y = Y(_x, _y);
+
+			_x = _X;
+			_y = _Y;
+
+			Logger.Log($"_x {_x}, _y {_y}");
+
+			for (int i = 0; i < 10; i++)
+			{
+				var xbuf = _x;
+
+				_x = _X - _y * 0.2f;
+				_y = _Y - xbuf * 0.4f;
+
+				Logger.Log($"_x {_x}, _y {_y}");
+			}
+
+			float X(float x, float y)
+			{
+				return x + y * 0.2f;
+			}
+
+			float Y(float x, float y)
+			{
+				return x * 0.4f + y;
+			}
+
+			Logger.Log("THEN");
+
+			float[][] coefs = new float[2][];
+			coefs[0] = new float[] { 1, 0.2f };
+			coefs[1] = new float[] { 0.4f, 1 };
+			float[] b = new float[] { _X, _Y };
+			Solver.Solve(coefs, b);
 		}
 	}
 }

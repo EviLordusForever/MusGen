@@ -18,7 +18,7 @@ namespace MusGen
 		{
 			width = wbmp.PixelWidth - 2;
 
-			SS ss = new SS(width, ReadSps());
+			SS ss = new SS(width, ReadSps(), AP._cs);
 			
 			ProgressShower.Show("Image to ss...");
 			int step = (int)Math.Max(wbmp.PixelWidth / 1000f, 1);

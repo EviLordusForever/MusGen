@@ -19,7 +19,7 @@ namespace MusGen
 
 			Init(ss.Width, ss.Height);
 
-			SS ssout = new SS(_width, ss._sps);
+			SS ssout = new SS(_width, ss._sps, ss._cs);
 
 			for (int s = 0; s < _width; s++)
 			{

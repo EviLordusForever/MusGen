@@ -13,7 +13,9 @@ namespace MusGen
 			ProgressShower.Show("Nad low smoothing...");
 			float step = (int)Math.Max(1, nad.Width / 2000f);
 
-			Nad nadOut = new Nad(nad._channelsCount, nad.Width, nad._duration);
+			float _sps = nad.Width / nad._duration;
+
+			Nad nadOut = new Nad(nad._channelsCount, nad.Width, nad._duration, nad._cs, nad._specturmSize);
 
 			JustCopyToNew();
 
@@ -32,16 +34,16 @@ namespace MusGen
 			{
 				for (int c = 0; c < nad._samples[s].Height; c++)
 				{
-					float frequency = nad._samples[s]._frequencies[c];
-					int n = (int)MathF.Ceiling(AP._sps / frequency);
+					float frequency = SpectrumFinder._frequenciesLg[nad._samples[s]._indexes[c]];
+					int n = (int)MathF.Ceiling(_sps / frequency);
 
 					if (n > 1)
 					{
-						int index = nad._samples[s]._indexes[c];
+						ushort index = nad._samples[s]._indexes[c];
 						float amplitude = nad._samples[s]._amplitudes[c];
 
 						for (int ns = s + 1; (ns < s + n) && (ns < nadOut._samples.Length); ns++)
-							nadOut._samples[ns].Add(index, amplitude, frequency);
+							nadOut._samples[ns].Add(index, amplitude);
 					}
 				}
 			}
@@ -52,8 +54,7 @@ namespace MusGen
 				{
 					nadOut._samples[s] = new NadSample(nad._samples[s].Height);
 					for (int c = 0; c < nad._samples[s].Height; c++)
-					{
-						nadOut._samples[s]._frequencies[c] = nad._samples[s]._frequencies[c];
+					{						
 						nadOut._samples[s]._amplitudes[c] = nad._samples[s]._amplitudes[c];
 						nadOut._samples[s]._indexes[c] = nad._samples[s]._indexes[c];
 					}

@@ -26,10 +26,10 @@ namespace Extensions
 			return res;
 		}
 
-		public static List<int> StupiedFilterMask(float[] array, bool soft)
+		public static List<ushort> StupiedFilterMask(float[] array, bool soft)
 		{
-			List<int> mask = new List<int>();
-			for (int i = 1; i < array.Length - 2; i++)
+			List<ushort> mask = new List<ushort>();
+			for (ushort i = 1; i < array.Length - 2; i++)
 				if (!soft)
 				{
 					if (array[i] > array[i - 1] && array[i] > array[i + 1])
@@ -37,7 +37,8 @@ namespace Extensions
 				}
 				else
 				{
-					if (array[i] >= array[i - 1] && array[i] >= array[i + 1])
+					if (array[i] >= array[i - 1] && array[i] > array[i + 1]
+						|| array[i] > array[i - 1] && array[i] >= array[i + 1])
 						mask.Add(i);
 				}
 			return mask;
@@ -59,6 +60,14 @@ namespace Extensions
 		}
 
 		public static T[] GetValues<T>(T[] array, int[] indexes)
+		{
+			T[] values = new T[indexes.Length];
+			for (int i = 0; i < indexes.Length; i++)
+				values[i] = array[indexes[i]];
+			return values;
+		}
+
+		public static T[] GetValues<T>(T[] array, ushort[] indexes)
 		{
 			T[] values = new T[indexes.Length];
 			for (int i = 0; i < indexes.Length; i++)
@@ -223,11 +232,11 @@ namespace Extensions
 			return min;
 		}
 
-		public static int IndexOfMax<T>(T[] array) where T : IComparable<T>
+		public static ushort IndexOfMax_short<T>(T[] array) where T : IComparable<T>
 		{
 			T max = array[0];
-			int index = 0;
-			for (int i = 1; i < array.Length; i++)
+			ushort index = 0;
+			for (ushort i = 1; i < array.Length; i++)
 			{
 				if (array[i].CompareTo(max) > 0)
 				{

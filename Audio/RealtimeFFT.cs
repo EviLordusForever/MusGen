@@ -5,6 +5,7 @@ using System.Windows.Media.Imaging;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using Extensions;
+using System.Linq;
 
 namespace MusGen
 {
@@ -163,7 +164,7 @@ namespace MusGen
 						else
 						{
 							adaptiveCeiling *= AP._adaptiveCeilingFallSpeed;
-							adaptiveCeiling = Math.Max(adaptiveCeiling, nads._amplitudes[0]);
+							adaptiveCeiling = Math.Max(adaptiveCeiling, nads._amplitudes.Max());
 						}
 					}
 

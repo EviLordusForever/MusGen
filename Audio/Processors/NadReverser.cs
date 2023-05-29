@@ -8,7 +8,7 @@ namespace MusGen
 {
 	public static class NadReverser
 	{
-		public static Nad Make(Nad nad, int left, int right)
+		public static Nad Make(Nad nad, ushort left, ushort right)
 		{
 			ProgressShower.Show("Nad reversing...");
 			int step = (int)(nad._samples.Length / 1000f);
@@ -21,9 +21,8 @@ namespace MusGen
 					if (id < right && id > left)
 					{
 						id = right - (id - left);
-						nad._samples[s]._indexes[c] = id;
+						nad._samples[s]._indexes[c] = (ushort)id; //
 					}
-					nad._samples[s]._frequencies[c] = SpectrumFinder._frequenciesLogarithmic[id];
 				}
 
 				if (s % step == 0)

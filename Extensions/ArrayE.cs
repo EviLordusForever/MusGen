@@ -8,6 +8,31 @@ namespace Extensions
 {
 	public static class ArrayE
 	{
+		public static float[] Add(float[] array, float[]array2)
+		{
+			for (int i = 0; i < array.Length; i++)
+				array[i] += array2[i];
+
+			return array;
+		}
+
+		public static float[] Substract(float[] array, float[] array2)
+		{
+			for (int i = 0; i < array.Length; i++)
+				array[i] -= array2[i];
+
+			return array;
+		}
+
+		public static float[] Divide(float[] array, float a)
+		{
+			float[] newArray = new float[array.Length];
+			for (int i = 0; i < array.Length; i++)
+				newArray[i] = array[i] / a;
+
+			return newArray;
+		}
+
 		public static float[] StupiedStretch(float[] array, int factor)
 		{
 			float[] newArray = new float[array.Length * factor];
@@ -90,6 +115,30 @@ namespace Extensions
 			}
 
 			return array;
+		}
+
+		public static float[] SmoothArrayCopy(float[] array, int n)
+		{
+			float[] arrayCopy = new float[array.Length];
+			float summ = 0;
+			int fi = 0;
+			int li = 0;
+			int nhalf = n / 2;
+
+			for (int s = 0; s < nhalf; s++)
+				summ += array[0];
+
+			for (int s = 0; s < array.Length; s++)
+			{
+				fi = Math.Min(s + nhalf, array.Length - 1);
+				li = Math.Max(s - nhalf, 0);
+
+				summ += array[fi];
+				arrayCopy[s] = summ / n;
+				summ -= array[li];
+			}
+
+			return arrayCopy;
 		}
 
 		public static float[] RescaleArrayFromLog(float[] array, float base_, int new_size)

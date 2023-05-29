@@ -12,7 +12,17 @@ namespace MusGen
 	{
 		public static float FindShift(SS ss)
 		{
-			SsSoftOctaveReverser.Init(ss.Width, ss.Height);
+			return FindShift(SuperEqualiser.MakeModel(ss, 0), ss.Width);
+		}
+
+		public static float FindShift(Nad nad)
+		{
+			return FindShift(SuperEqualiser.MakeModel(nad, 0), nad.Width);
+		}
+
+		private static float FindShift(float[] model, int width)
+		{
+			SsSoftOctaveReverser.Init(width, model.Length);
 
 			float difference = SpectrumFinder._octavesIndexes[9] - SpectrumFinder._octavesIndexes[0];
 			float octaveSize = difference / 9;
@@ -20,7 +30,7 @@ namespace MusGen
 			bool[] octaves = new bool[] { false, true, true, true, true, true, true, true, false };
 			bool[] notOctaves = new bool[] { false, false, false, false, false, false, false, false, false };
 
-			float[] summ = SuperEqualiser.MakeModel(ss, 0);
+			float[] summ = model;
 
 			float[] errors = new float[(int)octaveSize];
 

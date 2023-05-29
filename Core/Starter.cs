@@ -29,7 +29,7 @@ namespace MusGen
 
 				SpectrumFinder.Init();
 				SpectrumDrawer.Init();
-				FftRecognitionModel.Init(AP.FftSize, (int)AP.SampleRate, AP._lc);
+				SMM.Init(AP.FftSize, (int)AP.SampleRate, AP._lc);
 
 				/*				Logger.Log("Tests are started...");
 
@@ -44,9 +44,21 @@ namespace MusGen
 								Tests.Smoothing();
 								Tests.FrequenciesResolution();	
 								Tests.FftRecognitionModelTest();
+								Tests.Alg();
 
 								Logger.Log("Tests are completed.");
 				*/
+
+				//Change("TEST");
+				//Change("TreeSong");
+
+				void Change(string name)
+				{
+					string path = $"{DiskE._programFiles}Export\\Nads\\{name}.nad";
+					Nad nad = new Nad(0, 0, 0, 0);
+					nad.Read(path);
+					nad.Export(name + "_compressed");
+				}
 
 				//PeaksFinding.Workflow.Make();
 

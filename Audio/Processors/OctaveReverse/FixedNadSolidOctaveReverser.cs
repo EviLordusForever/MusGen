@@ -30,14 +30,15 @@ namespace MusGen
 						FindOctave(id);
 
 						id = right - (id - left);
-						nad._samples[s]._indexes[c] = id;
-
-						nad._samples[s]._frequencies[c] = SpectrumFinder._frequenciesLogarithmic[id];
+						if (id > 0)
+						{
+							nad._samples[s]._indexes[c] = (ushort)id;
+						}
+						else
+							nad._samples[s]._amplitudes[c] = 0;
 					}
 					else
-					{
-						nad._samples[s]._amplitudes[c] = 0;
-					}					
+						nad._samples[s]._amplitudes[c] = 0;				
 				}
 
 				if (s % step == 0)

@@ -21,7 +21,7 @@ namespace MusGen
 			int samplesCount = (int)Math.Ceiling(_lastSample / _step);
 			float duration = MathF.Ceiling(1f * wav.Length / wav._sampleRate);
 
-			Nad nad = new Nad(AP._channels, samplesCount, duration);
+			Nad nad = new Nad(AP._channels, samplesCount, duration, AP._cs, (ushort)AP.SpectrumSize);
 
 			ProgressShower.Show("Making nad from wav...");
 			int progressStep = nad._samples.Length / 1000;
@@ -52,7 +52,6 @@ namespace MusGen
 
 			ns._indexes = PeaksFinding.PeaksFinder.Find_FixedCount(SpectrumFinder._spectrumLogarithmic, AP._channels, AP._peakWidth_ForFixedNad);
 			ns._amplitudes = MathE.GetValues(SpectrumFinder._spectrumLogarithmic, ns._indexes);
-			ns._frequencies = MathE.GetValues(SpectrumFinder._frequenciesLogarithmic, ns._indexes);
 
 			return ns;
 		}

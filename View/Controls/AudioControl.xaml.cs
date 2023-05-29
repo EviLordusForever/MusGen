@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using Microsoft.Win32;
 using Extensions;
 using System.Globalization;
+using MusGen.Audio.WorkFlows;
 
 namespace MusGen
 {
@@ -37,25 +38,31 @@ namespace MusGen
 		private void SelBtn_Click(object sender, RoutedEventArgs e)
 		{
 			OpenFileDialog dialog = new OpenFileDialog();
-			dialog.Filter = ".wav files | *.wav";
-			dialog.Title = "Please select wav file";
+			dialog.Filter = "audio files (.wav .nad) |*.wav;*.nad";
+			dialog.Title = "Please select audio file";
 			bool? success = dialog.ShowDialog();
 			if (success == true)
 			{
 				_path = dialog.FileName;
 				string name = dialog.SafeFileName;
 
-				bool isGood = Wav.CheckWav(_path);
+				bool isGood = false;
+				if (TextE.StringAfterLast(name, ".") == "wav")
+					isGood = Wav.CheckWav(_path);
+				else if (TextE.StringAfterLast(name, ".") == "nad")
+					isGood = true;
+				else
+					throw new ArgumentException("wrong file extension");
 
 				if (isGood)
 				{
 					SelAudioButton.Content = name;
-					outNameTb.Text = TextE.StringBeforeLast(name, ".wav");
+					outNameTb.Text = TextE.StringBeforeLast(name, ".");
 				}
 				else
 				{
 					MessageBox.Show("Wrong wav file", "Sorry", MessageBoxButton.OK, MessageBoxImage.Error);
-					SelAudioButton.Content = "Select .wav file";
+					SelAudioButton.Content = "Select file";
 					_path = "";
 				}
 			}
@@ -102,17 +109,23 @@ namespace MusGen
 				RealtimeFFT.Stop();
 
 				if (_s == "Ss octave reverse (soft, MultiNad)")
-					SsOctaveReverse_Soft_MultiNad.Make(_path, _outName, _speed, _pitch);
+					WavToSsOctaveReverse_Soft_MultiNad.Make(_path, _outName, _speed, _pitch);
 				else if (_s == "Jpg to wav ss octave reverse (soft, MultiNad)")
 					JpgSsOctaveReverse_Soft_MultiNad.Make(_path, _outName, _speed, _pitch);
-				if (_s == "Nad octave reverse (soft, MultiNad)")
-					NadOctaveReverse_Soft_MultiNad.Make(_path, _outName, _speed, _pitch);
+				else if (_s == "Wav to nad octave reverse (soft)")
+					WavToNadOctaveReverse_Soft_MultiNad.Make(_path, _outName, _speed, _pitch);
+				else if (_s == "Nad to nad octave reverse (soft)")
+					NadToNadOctaveReverse_Soft.Make(_path, _outName, _speed, _pitch);
 				else if (_s == "Jpg to wav nad octave reverse (soft, MultiNad)")
 					JpgNadOctaveReverse_Soft_MultiNad.Make(_path, _outName, _speed, _pitch);
 				else if (_s == "Wav to wav (FixedNad)")
 					WavToWav_FixedNad.Make(_path, _outName, _speed, _pitch);
 				else if (_s == "Wav to jpg")
 					WavToJpg.Make(_path, _outName, _speed, _pitch);
+				else if (_s == "Wav to nad (MultiNad)")
+					WavToMultiNad.Make(_path, _outName, _speed, _pitch);
+				else if (_s == "Nad to wav")
+					NadToWav.Make(_path, _outName, _speed, _pitch);
 				else if (_s == "Jpg to wav (MultiNad)")
 					JpgToWav_MultiNad.Make(_path, _outName, _speed, _pitch);				
 				else if (_s == "Wav to wav (MultiNad)")

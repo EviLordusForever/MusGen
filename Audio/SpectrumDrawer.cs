@@ -29,7 +29,7 @@ namespace MusGen
 		public static WriteableBitmap _pianoRollWbmp;
 		public static WriteableBitmap _circularWbmp;
 
-		public static WriteableBitmap DrawType1(float[] input_array, int[] verticalLines, float[] theirSizes, float adaptiveCeiling, float maxCeiling)
+		public static WriteableBitmap DrawType1(float[] input_array, ushort[] verticalLines, float[] theirSizes, float adaptiveCeiling, float maxCeiling)
 		{
 			float yScale;
 			float xScale;
@@ -111,7 +111,7 @@ namespace MusGen
 			}
 		}
 
-		public static WriteableBitmap DrawType2(int[] verticalLines, float[] theirSizes, float adaptiveCeiling, float maxCeiling)
+		public static WriteableBitmap DrawType2(ushort[] verticalLines, float[] theirSizes, float adaptiveCeiling, float maxCeiling)
 		{
 			float yScaleUp;
 			float xScale;
@@ -181,7 +181,7 @@ namespace MusGen
 			}
 		}
 
-		public static WriteableBitmap DrawType3(int[] verticalLines, float[] theirSizes, float adaptiveCeiling, float maxCeiling)
+		public static WriteableBitmap DrawType3(ushort[] verticalLines, float[] theirSizes, float adaptiveCeiling, float maxCeiling)
 		{
 			float yScaleUp;
 			float xScale;
@@ -263,7 +263,7 @@ namespace MusGen
 			}
 		}
 
-		public static WriteableBitmap DrawType4(float[] octave, int[] verticalLines, float[] theirSizes, float adaptiveCeiling, float maxCeiling)
+		public static WriteableBitmap DrawType4(float[] octave, ushort[] verticalLines, float[] theirSizes, float adaptiveCeiling, float maxCeiling)
 		{
 			float rScale;
 			int octaveSize = octave.Length;

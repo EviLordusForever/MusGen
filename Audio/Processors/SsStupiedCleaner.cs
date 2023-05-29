@@ -13,7 +13,7 @@ namespace MusGen
 			ProgressShower.Show("Ss stupied cleaning...");
 			int step = (int)(MathF.Max(1, ssin.Width / 1000f));
 
-			SS ssout = new SS(ssin.Width, ssin._sps);
+			SS ssout = new SS(ssin.Width, ssin._sps, ssin._cs);
 
 			for (int s = 0; s < ssin.Width; s++)
 			{

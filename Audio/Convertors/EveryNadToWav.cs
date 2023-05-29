@@ -1,5 +1,6 @@
 ﻿using System;
 using Extensions;
+using Tensorflow;
 
 namespace MusGen
 {
@@ -23,31 +24,42 @@ namespace MusGen
 
 		public static Wav Make(Nad nad, Wav wav)
 		{
+			ushort cs = nad._cs;
 			int length = wav.Length;
-			int fadeSamplesLeft = 0;
-			float sps = 1f * wav.Length / nad.Width;
-			int samplesForFade = (int)(AP._fadeTime * AP.SampleRate / sps);
+			//double sps = nad.Width / (double)nad._duration;
 			float pi2 = MathF.PI * 2;
 			float buf = pi2 / AP.SampleRate;
 			int progressStep = (int)(length / 2000);
 			float max = 0;
 
-			ProgressShower.Show("Nad to Wav...");
+			string delme5 = "";
 
-			int ns = 0;
+			float[] fadeins = new float[cs];
+			float[] fadeouts = new float[cs];
+			int[] lefts = new int[cs];
+			int[] rights = new int[cs];
+
+			var newSamples = new NadSample[nad._samples.Length + cs * 2 + (int)(cs * 10f / 718f * nad.Width)]; ////////
+			Array.Copy(nad._samples, 0, newSamples, cs, nad._samples.Length); 
+
+			ProgressShower.Show("Nad to Wav...");			
+
 			for (int s = 0; s < length; s++)
 			{
-				int newNs = (int)((1f * s / length) * nad._samples.Length);
-				if (newNs != ns)
-				{
-					ns = newNs;
-					fadeSamplesLeft = samplesForFade;
-				}
-				else
-					fadeSamplesLeft--;
-
-				WriteSample(s, ns);
+				GetValues(s);
+				WriteSample(s);
 				Progress(s);
+
+/*				delme5 += String.Join(";", fadeins) + ";;";
+				delme5 += String.Join(";", lefts) + ";;";
+				delme5 += String.Join(";", wav.L[s]) + "\n";
+
+				if (s > AP.SampleRate)
+				{
+					DiskE.WriteToProgramFiles("delme5", "csv", delme5, false);
+					Logger.Log("done.");
+					break;
+				}*/
 			}
 
 			ProgressShower.Close();
@@ -56,54 +68,73 @@ namespace MusGen
 			ProgressShower.Close();
 			return wav;
 
-			void WriteSample(int s, int ns)
+			void GetValues(int s)
 			{
-				float newSignal = 0;
-				float oldSignal = 0;
-				float fade = 0;
-				float antifade = 1;
-
-				if (fadeSamplesLeft > 0)
+				for (int idk = 0; idk < cs; idk++)
 				{
-					float status = 1 - 1f * fadeSamplesLeft / samplesForFade;
-					fade = MathE.FadeOut(status);
-					antifade = 1 - fade;
+					double b = 1.0 * s * nad.Width / (length * cs);
+					double state = b + 1.0 * idk / cs + cs;
+
+					int left = (int)Math.Floor(state);
+					int right = (int)Math.Ceiling(state);
+
+					if (right == left)
+						right += 1;
+
+					fadeouts[idk] = MathE.FadeOut((float)state - left);
+					fadeins[idk] = 1 - fadeouts[idk];
+
+					lefts[idk] = (int)left * cs - idk;
+					rights[idk] = (int)right * cs - idk;
 				}
+			}
 
-				if (nad._samples[ns].Height > 0)
-				{
-					for (int c = 0; c < nad._samples[ns].Height; c++)
-					{
-						if (nad._samples[ns]._frequencies[c] < 20f)
-							nad._samples[ns]._frequencies[c] = 20f;
+			void WriteSample(int s)
+			{
+				float signal = 0;
 
-						float frq = nad._samples[ns]._frequencies[c];
-						float amp = nad._samples[ns]._amplitudes[c];
-						float value = amp * MathF.Sin(pi2 * frq * s / AP.SampleRate);
-						newSignal += value;
-					}
+				for (int i = 0; i < cs; i++)
+					signal += GetSignal(lefts[i], rights[i], fadeins[i], fadeouts[i]);
 
-					newSignal *= antifade / MathF.Sqrt(nad._samples[ns].Height);
-				} //
-
-				if (fadeSamplesLeft > 0)
-					if (nad._samples[ns - 1].Height > 0)
-					{
-						for (int c = 0; c < nad._samples[ns - 1].Height; c++)
-						{
-							float frq = nad._samples[ns - 1]._frequencies[c];
-							float amp = nad._samples[ns - 1]._amplitudes[c];
-							float value = amp * MathF.Sin(pi2 * frq * s / AP.SampleRate);
-							oldSignal += value;
-						}
-
-						oldSignal *= fade / MathF.Sqrt(nad._samples[ns - 1].Height);
-					}
-
-				wav.L[s] = oldSignal + newSignal;
+				signal /= cs;
+				
+				wav.L[s] = signal;
 
 				if (Math.Abs(wav.L[s]) > max)
 					max = Math.Abs(wav.L[s]);
+
+				float GetSignal(int left, int right, float fadein, float fadeout)
+				{
+					float leftSignal = 0;
+					float rightSignal = 0;
+
+					if (newSamples[left] != null)
+						leftSignal = GetSignal2(newSamples[left], fadeout);
+					if (newSamples[right] != null)
+						rightSignal = GetSignal2(newSamples[right], fadein);
+
+					return leftSignal + rightSignal;
+				}
+
+				float GetSignal2(NadSample ns, float fade)
+				{
+					float signal = 0;
+
+					if (ns.Height > 0)
+					{
+						for (int c = 0; c < ns.Height; c++)
+						{
+							float frq = SpectrumFinder._frequenciesLg[ns._indexes[c]];
+							float amp = ns._amplitudes[c];
+
+							signal += amp * MathF.Sin(buf * frq * s);
+						}
+
+						signal *= fade / MathF.Sqrt(ns.Height);
+					}
+
+					return signal;
+				}
 			}
 
 			void Progress(int s)

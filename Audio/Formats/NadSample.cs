@@ -17,12 +17,10 @@ using System.Collections;
 
 namespace MusGen
 {
+	[Serializable]
 	public class NadSample
 	{
-		[JsonIgnore]
-		public int[] _indexes;
-
-		public float[] _frequencies;
+		public ushort[] _indexes;
 
 		public float[] _amplitudes;
 
@@ -30,56 +28,54 @@ namespace MusGen
 		{
 			for (int c = 0; c < Height; c++)
 			{
-				_frequencies[c] *= pitch;
-				_indexes[c] += (int)(SpectrumFinder._octaveSize * MathF.Log2(pitch));
+				_indexes[c] += (ushort)(SpectrumFinder._octaveSize * MathF.Log2(pitch));
 				//check mb ^
 			}
 		}
 
 		public void Filter(float sps)
 		{
-			List<float> newFrequencies = new List<float>();
-			List<int> newIndexes = new List<int>();
+			List<ushort> newIndexes = new List<ushort>();
 			List<float> newAmplitudes = new List<float>();
 
 			for (int c = 0; c < Height; c++)
-				if (_frequencies[c] < AP.SampleRate / 2 && _frequencies[c] > SpectrumFinder._frequenciesLogarithmic[1])
+			{
+				float frq = SpectrumFinder._frequenciesLg[_indexes[c]];
+
+				if (frq < AP.SampleRate / 2 &&
+					frq > SpectrumFinder._frequenciesLg[1] &&
+					_amplitudes[c] > 0)
 				{
-					newFrequencies.Add(_frequencies[c]);
 					newIndexes.Add(_indexes[c]);
 					newAmplitudes.Add(_amplitudes[c]);
 				}
+			}
 
-			_frequencies = newFrequencies.ToArray();
 			_indexes = newIndexes.ToArray();
 			_amplitudes = newAmplitudes.ToArray();
 		}
 
-		public void Add(int index, float amp, float frq)
+		public void Add(ushort index, float amp)
 		{
-			if (!_frequencies.Contains(frq))
-			{
-				Array.Resize(ref _indexes, _indexes.Length + 1);
-				Array.Resize(ref _amplitudes, _amplitudes.Length + 1);
-				Array.Resize(ref _frequencies, _frequencies.Length + 1);
-
-				_indexes[_indexes.Length - 1] = index;
-				_amplitudes[_amplitudes.Length - 1] = amp;
-				_frequencies[_frequencies.Length - 1] = frq;
-			}
-			else
+			if (_indexes.Contains(index))
 			{
 				int i = Array.IndexOf(_indexes, index);
 				_amplitudes[i] = amp * 0.5f + _amplitudes[i] * 0.5f;
-				_frequencies[i] = frq * 0.5f + _frequencies[i] * 0.5f;
+			}
+			else
+			{
+				Array.Resize(ref _indexes, _indexes.Length + 1);
+				Array.Resize(ref _amplitudes, _amplitudes.Length + 1);
+
+				_indexes[_indexes.Length - 1] = index;
+				_amplitudes[_amplitudes.Length - 1] = amp;
 			}
 		}
 
 		public NadSample(int channels)
 		{
-			_frequencies = new float[channels];
 			_amplitudes = new float[channels];
-			_indexes = new int[channels];
+			_indexes = new ushort[channels];
 		}
 
 		public int Height
@@ -92,10 +88,10 @@ namespace MusGen
 
 		public Note[] GetMidiNotes()
 		{
-			Note[] notes = new Note[_frequencies.Length];
+			Note[] notes = new Note[_indexes.Length];
 			for (int n = 0; n < notes.Length; n++)
 			{
-				float frequency = _frequencies[n];
+				float frequency = SpectrumFinder._frequenciesLg[_indexes[n]];
 				byte note = (byte)(Math.Log2(frequency) * 100000000);
 
 				SevenBitNumber sbn = new SevenBitNumber(note);

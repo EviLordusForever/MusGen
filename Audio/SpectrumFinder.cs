@@ -14,7 +14,7 @@ namespace MusGen
 		public static float[] _spectrumLowLogarithmic;
 
 		public static float[] _frequenciesLinear;
-		public static float[] _frequenciesLogarithmic;
+		public static float[] _frequenciesLg;
 
 		public static float[] _frequenciesLowLinear;
 		public static float[] _frequenciesLowLogarithmic;
@@ -98,17 +98,17 @@ namespace MusGen
 
 			void FindFrequenciesLogarithmic()
 			{
-				_frequenciesLogarithmic = ArrayE.RescaleArrayToLog(_frequenciesLinear, AP.FftSize, AP.FftSize / 2, false);
+				_frequenciesLg = ArrayE.RescaleArrayToLog(_frequenciesLinear, AP.FftSize, AP.FftSize / 2, false);
 				_frequenciesLowLogarithmic = ArrayE.RescaleArrayToLog(_frequenciesLowLinear, AP.FftSize / AP._lc, (int)_spectrumLowEndIndex, false);
-				float[] copy = new float[_frequenciesLogarithmic.Length];
-				_frequenciesLogarithmic.CopyTo(copy, 0);				
+				float[] copy = new float[_frequenciesLg.Length];
+				_frequenciesLg.CopyTo(copy, 0);				
 
 				for (int i = 0; i < _frequenciesLowLogarithmic.Length; i++)
-					_frequenciesLogarithmic[i] = _frequenciesLowLogarithmic[i];
+					_frequenciesLg[i] = _frequenciesLowLogarithmic[i];
 
 				float[] empty = new float[0];
 
-				DiskE.WriteToProgramFiles("frqs", "csv", TextE.ToCsvString(_frequenciesLinear, copy, _frequenciesLowLinear, _frequenciesLowLogarithmic, empty, copy, _frequenciesLogarithmic), false);
+				DiskE.WriteToProgramFiles("frqs", "csv", TextE.ToCsvString(_frequenciesLinear, copy, _frequenciesLowLinear, _frequenciesLowLogarithmic, empty, copy, _frequenciesLg), false);
 			}
 
 			void SetOctaves()
@@ -153,11 +153,11 @@ namespace MusGen
 				float FindIndex(float f)
 				{
 					int i = 0;
-					while (_frequenciesLogarithmic[i] < f)
+					while (_frequenciesLg[i] < f)
 						i++;
 
-					float less = _frequenciesLogarithmic[i - 1];
-					float more = _frequenciesLogarithmic[i];
+					float less = _frequenciesLg[i - 1];
+					float more = _frequenciesLg[i];
 					float power = MathE.Interpolate(less, more, f);
 
 					float index = i - 1 + power;
@@ -174,6 +174,24 @@ namespace MusGen
 			Wav wavLow = new Wav(signalLow.Length);
 			wavLow.L = signalLow;
 			return Find(wav, wavLow, 0);
+		}
+
+		public static float[] FindX(Wav wav, Wav wavLow, int start, int x, int step)
+		{
+			float[] res = new float[AP.SpectrumSize];
+
+			for (int i = 0; i < x; i++)
+			{
+				float[] subres = Find(wav, wavLow, start + step * i);
+
+				for (int j = 0; j < res.Length; j++)
+					res[j] += subres[j];
+			}
+
+			for (int i = 0; i < res.Length; i++)
+				res[i] /= x;
+
+			return res;
 		}
 
 		public static float[] Find(Wav wav, Wav wavLow, int start)

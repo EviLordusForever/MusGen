@@ -75,7 +75,7 @@ namespace PeaksFinding
 			for (int index = 0; index < AP.SpectrumSize; index++)
 				if (answer[index] != 0)
 				{
-					float frequency = SpectrumFinder._frequenciesLogarithmic[index];
+					float frequency = SpectrumFinder._frequenciesLg[index];
 					float phase = MathE.rnd.NextSingle() * MathF.PI * 2;
 
 					for (int x = 0; x < AP.FftSize * AP._lc; x++)

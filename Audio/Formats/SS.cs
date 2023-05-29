@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,12 +10,19 @@ namespace MusGen
 	public class SS
 	{
 		public float[][] _s;
-		public int _sps;
+		public ushort _sps;
+		public ushort _cs;
 
-		public SS(int count, int spectrumsPerSecond)
+		public SS(int count, ushort sps, ushort cs)
 		{
-			_sps = spectrumsPerSecond;
+			_sps = sps;
 			_s = new float[count][];
+			_cs = cs;
+		}
+
+		public string ToCsv()
+		{
+			return TextE.ToCsv(_s);
 		}
 
 		public int Width

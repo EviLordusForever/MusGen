@@ -10,8 +10,9 @@ namespace MusGen
 
 		private static int _fftSize = 1024 * 1; //1024
 		public const int _lc = 16; //how much fftLow bigger than fft //16
-		public static int _channels = 20;
-		public const int _sps = 120;
+		public static short _channels = 20;
+		public const ushort _sps = 120; //spectrums per second
+		public static ushort _cs = 5; //how much spectrums per one specturm
 
 		public static float _lcFadeStart = 0.5f;
 
@@ -20,7 +21,7 @@ namespace MusGen
 		//Peaks
 
 		//For peaks finding by gauss model
-		public static float _peakWidth_ForMultiNad_Gauss = 20000f;
+		public static float _peakWidth_ForMultiNad_Gauss = 80000f;
 		public static float _lowestPeak_FromAverage_Gauss = 0.125f / 8; //0.125f / 32
 		public static float _lowestPeak_FromMaximum_Gauss = 0.01f / 8; //0.01f / 32
 		public static int _peaksLimit_Gauss = 150; //150 or less
@@ -32,7 +33,21 @@ namespace MusGen
 		public static float _lowestPeak_FromMaximum_FRM = 0.02f / 1;
 		public static int _peaksLimit_FRM = 300;
 
+		//public static int _smoother = 2;
+		public static int _iters = 4; //idk if it doing something
+		public static float _speed = 1f;
+
+		// EQ
+
+		public static int _nadModelSmoother = 12;
+		public static int _ssModelSmoother = 12;
+
+		public static float _omegaEqSmoothY = 0.2f; //from height
+		public static float _omegaEqSmoothX = 1; //in seconds
+		 
 		//
+
+		public static float _spectrumModelThreshold = 0.05f;
 
 		public static int _wbmpResX = 256 * 2;
 		public static int _wbmpResY = 16 * 9 * 2 * 2;
@@ -70,7 +85,7 @@ namespace MusGen
 					Logger.Log($"Sample rate was changed to {_sampleRate}");
 					SpectrumFinder.Init();
 					SpectrumDrawer.SetPianoImages();
-					FftRecognitionModel.Init(_fftSize, (int)_sampleRate, _lc);
+					SMM.Init(_fftSize, (int)_sampleRate, _lc);
 				}
 			}
 		}
@@ -90,7 +105,7 @@ namespace MusGen
 					SpectrumDrawer.Init();
 					SpectrumFinder.Init();
 					WindowFunction.Init();
-					FftRecognitionModel.Init(_fftSize, (int)_sampleRate, _lc);
+					SMM.Init(_fftSize, (int)_sampleRate, _lc);
 				}
 			}
 		}
