@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Extensions;
+using MusGen.Audio.Processors;
 
 namespace MusGen
 {
@@ -11,12 +12,10 @@ namespace MusGen
 	{
 		public static Nad Make(SS ss)
 		{
-			AP.FftSize = ss.Height * 2;
-
 			ProgressShower.Show("Ss to MultiNad...");
 			int progressStep = (int)MathF.Ceiling(ss.Width / 1000f);
 
-			AP.FftSize = ss.Height * 2;
+			//AP.FftSize = ss.Height * 2;
 
 			Nad nad = new Nad(ss.Width, 1f * ss.Width / ss._sps, ss._cs, (ushort)ss.Height);
 
@@ -30,16 +29,18 @@ namespace MusGen
 
 			ProgressShower.Close();
 
+			nad = NadCurveEqualiser.Make(nad);
+
 			return nad;
 		}
 
 		public static NadSample MakeSample_Multi(float[] spectrum)
 		{
 			List<float> amps;
-			ushort[] indexes = PeaksFinding.PeaksFinder.FindEvery_By_Solver(spectrum, out amps).ToArray();
+			ushort[] indexes = PeaksFinding.PeaksFinder.FindEvery_By_Stupied(spectrum, out amps).ToArray();
 			var ns = new NadSample(indexes.Length);
 			ns._indexes = indexes;
-			ns._amplitudes = amps.ToArray();
+			ns._amplitudes = amps.ToArray();			
 
 			return ns;
 		}

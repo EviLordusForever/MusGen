@@ -70,14 +70,14 @@ namespace MusGen
 					FPS();
 
 					if (AP._captureType == "microphone")
-						wav.L = AudioCapturerMicrophone.GetSamples((int)AP.FftSize * AP._lc);
+						wav.L = AudioCapturerMicrophone.GetSamples(AP.FftSize * AP._lc);
 					else if (AP._captureType == "system")
-						wav.L = AudioCapturerSystem.GetSamples((int)AP.FftSize * AP._lc);
+						wav.L = AudioCapturerSystem.GetSamples(AP.FftSize * AP._lc);
 
 					Wav wavLow = WavLowPass.FillWavLow(wav, AP._kaiserFilterLength_ForRealtime, false);
 
 					nadsOld = nads;
-					var sp = SpectrumFinder.Find(wav, wavLow, 0);
+					var sp = SpectrumFinder.Find(wav, wavLow, 0, false);
 					nads = SsToMultiNad.MakeSample_Multi(sp);
 
 					Octavisate();
@@ -141,7 +141,7 @@ namespace MusGen
 				void DrawSpectrum()
 				{
 					if (AP._graphType == 1)
-						_wbmp = SpectrumDrawer.DrawType1(SpectrumFinder._spectrumLogarithmic, nads._indexes, nads._amplitudes, adaptiveCeiling2, adaptiveCeiling2);
+						_wbmp = SpectrumDrawer.DrawType1(SpectrumFinder._spectrumMixed, nads._indexes, nads._amplitudes, adaptiveCeiling2, adaptiveCeiling2);
 					else if (AP._graphType == 2)
 						_wbmp = SpectrumDrawer.DrawType2(nads._indexes, nads._amplitudes, adaptiveCeiling, adaptiveCeiling);
 					else if (AP._graphType == 3)

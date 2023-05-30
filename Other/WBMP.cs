@@ -7,6 +7,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.Windows;
 using System.Runtime.InteropServices;
+using Extensions;
 
 namespace MusGen
 {
@@ -25,6 +26,13 @@ namespace MusGen
             WriteableBitmap writeableBitmap = new WriteableBitmap(bitmapImage);
 
             return writeableBitmap;
+        }
+
+        public static void Export(WriteableBitmap wbmp, string name)
+        {
+            string path = $"{DiskE._programFiles}Spectrograms\\{name}.jpg";
+            GraphicsE.SaveJPG100(wbmp, path);
+            DialogE.ShowFile(path);
         }
 
         public static void CopyPixels(WriteableBitmap source, WriteableBitmap destination,

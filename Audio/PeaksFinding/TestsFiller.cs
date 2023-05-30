@@ -97,7 +97,7 @@ namespace PeaksFinding
 
 			signalLow = KaiserFilter.Make(signalLow, AP.SampleRate, cutOff, AP._kaiserFilterLength_ForProcessing, AP._kaiserFilterBeta, false);
 
-			float[] question = SpectrumFinder.Find(signal, signalLow);
+			float[] question = SpectrumFinder.Find(signal, signalLow, false);
 
 			return question;
 		}

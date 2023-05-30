@@ -27,10 +27,8 @@ namespace MusGen
 		public void RaisePitch(float pitch)
 		{
 			for (int c = 0; c < Height; c++)
-			{
 				_indexes[c] += (ushort)(SpectrumFinder._octaveSize * MathF.Log2(pitch));
 				//check mb ^
-			}
 		}
 
 		public void Filter(float sps)
@@ -44,7 +42,7 @@ namespace MusGen
 
 				if (frq < AP.SampleRate / 2 &&
 					frq > SpectrumFinder._frequenciesLg[1] &&
-					_amplitudes[c] > 0)
+					_amplitudes[c] > AP._nadMin)
 				{
 					newIndexes.Add(_indexes[c]);
 					newAmplitudes.Add(_amplitudes[c]);
@@ -72,10 +70,26 @@ namespace MusGen
 			}
 		}
 
-		public NadSample(int channels)
+
+		public void Normalise(float max)
 		{
-			_amplitudes = new float[channels];
-			_indexes = new ushort[channels];
+			for (int c = 0; c < Height; c++)
+				_amplitudes[c] /= max;
+		}
+
+		public void EQ(float[] curve, ref float max)
+		{
+			for (int c = 0; c < Height; c++)
+			{
+				_amplitudes[c] *= curve[_indexes[c]];
+				max = max > _amplitudes[c] ? max : _amplitudes[c];
+			}
+		}
+
+		public NadSample(int height)
+		{
+			_amplitudes = new float[height];
+			_indexes = new ushort[height];
 		}
 
 		public int Height

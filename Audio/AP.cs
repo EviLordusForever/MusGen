@@ -13,6 +13,18 @@ namespace MusGen
 		public static short _channels = 20;
 		public const ushort _sps = 120; //spectrums per second
 		public static ushort _cs = 5; //how much spectrums per one specturm
+		public static ushort _gg = 2; //how much
+
+		public static int _smootherL = 8; //2 //8 //it is actually improves sound
+		public static int _smootherH = 4;
+		public static float _smootherFadeStart = 0.5f;
+		public static float _smootherFadeEnd = 0.85f;
+
+		public static int _iters = 4; //idk if it doing something
+		public static float _speed = 1f;
+		public static float _spectrumMiddleSmoother = 25f;
+
+		public static float _nadMin = 0.0015f;
 
 		public static float _lcFadeStart = 0.5f;
 
@@ -33,9 +45,7 @@ namespace MusGen
 		public static float _lowestPeak_FromMaximum_FRM = 0.02f / 1;
 		public static int _peaksLimit_FRM = 300;
 
-		//public static int _smoother = 2;
-		public static int _iters = 4; //idk if it doing something
-		public static float _speed = 1f;
+
 
 		// EQ
 
@@ -49,8 +59,8 @@ namespace MusGen
 
 		public static float _spectrumModelThreshold = 0.05f;
 
-		public static int _wbmpResX = 256 * 2;
-		public static int _wbmpResY = 16 * 9 * 2 * 2;
+		public static int _wbmpResX = 256 * 2 * 2;
+		public static int _wbmpResY = 16 * 9 * 2;
 
 		public static float _fadeTime = 0.99f;
 		public static string _waveForm = "sin";
@@ -85,7 +95,7 @@ namespace MusGen
 					Logger.Log($"Sample rate was changed to {_sampleRate}");
 					SpectrumFinder.Init();
 					SpectrumDrawer.SetPianoImages();
-					SMM.Init(_fftSize, (int)_sampleRate, _lc);
+					SMM.Init();
 				}
 			}
 		}
@@ -105,12 +115,28 @@ namespace MusGen
 					SpectrumDrawer.Init();
 					SpectrumFinder.Init();
 					WindowFunction.Init();
-					SMM.Init(_fftSize, (int)_sampleRate, _lc);
+					SMM.Init();
 				}
 			}
 		}
 
+		public static int SpectrumSizeGG
+		{
+			get
+			{
+				return SpectrumSize;
+			}
+		}
+
 		public static int SpectrumSize
+		{
+			get
+			{
+				return _fftSize / 2 * AP._gg;
+			}
+		}
+
+		public static int SpectrumSizeNoGG
 		{
 			get
 			{

@@ -107,7 +107,7 @@ namespace MusGen
 				yScale = 1f * _resY / Math.Max(input_array.Max(), adaptiveCeiling);
 				yScale /= 2;
 				powerScale = 1f / maxCeiling;
-				xScale = 1f * _resX / input_array.Length;
+				xScale = 1f * _resX / AP.SpectrumSizeGG;
 			}
 		}
 
@@ -177,7 +177,7 @@ namespace MusGen
 			{
 				yScaleUp = 1f * _resY / adaptiveCeiling;
 				yScaleUp /= 4;
-				xScale = 1f * _resX / _resX;
+				xScale = 1f * _resX / AP.SpectrumSizeGG;
 			}
 		}
 
@@ -382,7 +382,7 @@ namespace MusGen
 
 			void Method()
 			{
-				float spectrumSize = AP.FftSize / 2;
+				float spectrumSize = AP.SpectrumSizeGG;
 
 				BitmapImage bitmap = new BitmapImage();
 				bitmap.BeginInit();
@@ -427,7 +427,7 @@ namespace MusGen
 		public static void SetPianoImages()
 		{
 			double l = SpectrumFinder._octavesIndexes[0];
-			double r = AP.FftSize / 2 - SpectrumFinder._octavesIndexes[9];
+			double r = AP.SpectrumSizeGG - SpectrumFinder._octavesIndexes[9];
 			double w = SpectrumFinder._octavesIndexes[9] - SpectrumFinder._octavesIndexes[0];
 
 			if (WindowsManager._realtimeFFTWindow != null)

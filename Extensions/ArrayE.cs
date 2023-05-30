@@ -8,6 +8,33 @@ namespace Extensions
 {
 	public static class ArrayE
 	{
+		public static float[] CreateInterpolatedArray(int length, int[] points, float[] values)
+		{
+			float[] array = new float[length];
+
+			int j = 0;
+			int k = 1;
+
+			for (int i = 0; i < length - 1; i++)
+			{
+				if (i >= points[k])
+				{
+					j = k;
+					k++;
+
+					if (k >= points.Length)
+						k = points.Length - 1;
+				}
+
+				float t = (float)(i - points[j]) / (points[k] - points[j]);
+				array[i] = values[j] * (1 - t) + values[k] * t;
+			}
+
+			array[length - 1] = values[values.Length - 1];
+
+			return array;
+		}
+
 		public static float[] Add(float[] array, float[]array2)
 		{
 			for (int i = 0; i < array.Length; i++)
@@ -41,8 +68,10 @@ namespace Extensions
 			return newArray;
 		}
 
-		public static float[] NormalStretch(float[] array, int factor)
+		public static float[] NormalStretch(float[] array, int new_size)
 		{
+			int factor = (int)(new_size / array.Length);
+
 			float[] newArray = new float[array.Length * factor];
 			for (int i = 0; i < newArray.Length; i++)
 				newArray[i] = array[i / factor];
@@ -51,6 +80,8 @@ namespace Extensions
 
 		public static float[] RescaleArrayToLog(float[] array, float base_, int new_size, bool byMax)
 		{
+			//return NormalStretch(array, new_size);
+
 			int indexA = 0;
 			int indexB = 0;
 			int size = array.Count();
@@ -117,25 +148,39 @@ namespace Extensions
 			return array;
 		}
 
+		public static float[] MixArrays(float[] ar1, float[] ar2, float[] mask1, float[] mask2)
+		{
+			for (int i = 0; i < ar1.Length; i++)
+				ar1[i] = ar1[i] * mask1[i] + ar2[i] * mask2[i];
+
+			return ar1;
+		}
+
 		public static float[] SmoothArrayCopy(float[] array, int n)
 		{
 			float[] arrayCopy = new float[array.Length];
 			float summ = 0;
-			int fi = 0;
 			int li = 0;
+			int ri = 0;
 			int nhalf = n / 2;
 
-			for (int s = 0; s < nhalf; s++)
-				summ += array[0];
+			float oldli = 0;
+			float oldri = 0;
 
-			for (int s = 0; s < array.Length; s++)
+			for (int s = -nhalf; s < array.Length; s++)
 			{
-				fi = Math.Min(s + nhalf, array.Length - 1);
+				oldli = li;
+				oldri = ri;
+				ri = Math.Min(s + nhalf, array.Length - 1);
 				li = Math.Max(s - nhalf, 0);
 
-				summ += array[fi];
-				arrayCopy[s] = summ / n;
-				summ -= array[li];
+				if (oldri != ri)
+					summ += array[ri];
+				if (oldli != li)
+					summ -= array[li];
+
+				if (s >= 0)
+					arrayCopy[s] = summ / (ri - li + 1);
 			}
 
 			return arrayCopy;

@@ -15,6 +15,7 @@ namespace MusGen
 		public int[][] _mask;
 		public float _max;
 		public float[] _maxesForColumns;
+		public float[] _curve;
 		public int _size;
 
 		public float[] _power;

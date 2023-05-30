@@ -122,6 +122,8 @@ namespace MusGen
 					WavToWav_FixedNad.Make(_path, _outName, _speed, _pitch);
 				else if (_s == "Wav to jpg")
 					WavToJpg.Make(_path, _outName, _speed, _pitch);
+				else if (_s == "Nad to jpg")
+					NadToJpg.Make(_path, _outName, _speed, _pitch);
 				else if (_s == "Wav to nad (MultiNad)")
 					WavToMultiNad.Make(_path, _outName, _speed, _pitch);
 				else if (_s == "Nad to wav")

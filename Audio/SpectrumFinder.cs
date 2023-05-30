@@ -13,11 +13,13 @@ namespace MusGen
 		public static float[] _spectrumLowLinear;
 		public static float[] _spectrumLowLogarithmic;
 
+		public static float[] _spectrumMixed;
+
 		public static float[] _frequenciesLinear;
 		public static float[] _frequenciesLg;
 
 		public static float[] _frequenciesLowLinear;
-		public static float[] _frequenciesLowLogarithmic;
+		public static float[] _frequenciesLowLg;
 
 		public static float[] _octaves;
 		public static float[] _octavesIndexes;
@@ -33,11 +35,13 @@ namespace MusGen
 
 		public static void Init()
 		{
-			_spectrumLinear = new float[AP.FftSize / 2];
-			_spectrumLogarithmic = new float[AP.FftSize / 2];
+			_spectrumLinear = new float[AP.SpectrumSizeNoGG];
+			_spectrumLogarithmic = new float[AP.SpectrumSizeGG];
 
-			_spectrumLowLinear = new float[AP.FftSize / 2];
-			_spectrumLowLogarithmic = new float[AP.FftSize / 2];
+			_spectrumLowLinear = new float[AP.SpectrumSizeNoGG];
+			_spectrumLowLogarithmic = new float[AP.SpectrumSizeGG];
+
+			_spectrumMixed = new float[AP.SpectrumSizeGG];
 
 			FindFrequenciesLinear();
 			FindLowIndex();
@@ -48,9 +52,9 @@ namespace MusGen
 
 			void FindLowIndex()
 			{
-				float lastIndex = AP.FftSize / 2f / AP._lc;
+				float lastIndex = AP.SpectrumSize / AP._lc;
 				int L0 = AP.FftSize;
-				int L = AP.FftSize / 2;
+				int L = AP.SpectrumSize;
 				_spectrumLowEndIndex = (int)(MathE.ToLogScale(lastIndex / L, L0) * L) - 1;
 				//
 			}
@@ -61,8 +65,8 @@ namespace MusGen
 				float end = _spectrumLowEndIndex;
 				float count = end - start;
 
-				_fadeInLowMask = new float[AP.FftSize / 2];
-				_fadeOutLowMask = new float[AP.FftSize / 2];
+				_fadeInLowMask = new float[AP.SpectrumSize];
+				_fadeOutLowMask = new float[AP.SpectrumSize];
 
 				for (int i = 0; i < _fadeInLowMask.Length; i++)
 				{
@@ -86,29 +90,29 @@ namespace MusGen
 
 			void FindFrequenciesLinear()
 			{
-				_frequenciesLinear = new float[AP.FftSize / 2];
-				_frequenciesLowLinear = new float[AP.FftSize / 2];
+				_frequenciesLinear = new float[AP.SpectrumSize];
+				_frequenciesLowLinear = new float[AP.SpectrumSize];
 
-				for (int index = 0; index < AP.FftSize / 2; index++)
-					_frequenciesLinear[index] = (1f * index / AP.FftSize) * AP.SampleRate;
+				for (int index = 0; index < _frequenciesLinear.Length; index++)
+					_frequenciesLinear[index] = (1f * (index / AP._gg) / AP.FftSize) * AP.SampleRate;
 
-				for (int index = 0; index < AP.FftSize / 2; index++)
-					_frequenciesLowLinear[index] = (1f * index / AP.FftSize) * AP.SampleRate / AP._lc;
+				for (int index = 0; index < _frequenciesLowLinear.Length; index++)
+					_frequenciesLowLinear[index] = (1f * (index / AP._gg) / AP.FftSize) * AP.SampleRate / AP._lc;
 			}
 
 			void FindFrequenciesLogarithmic()
 			{
-				_frequenciesLg = ArrayE.RescaleArrayToLog(_frequenciesLinear, AP.FftSize, AP.FftSize / 2, false);
-				_frequenciesLowLogarithmic = ArrayE.RescaleArrayToLog(_frequenciesLowLinear, AP.FftSize / AP._lc, (int)_spectrumLowEndIndex, false);
+				_frequenciesLg = ArrayE.RescaleArrayToLog(_frequenciesLinear, AP.FftSize, AP.SpectrumSizeGG, false);
+				_frequenciesLowLg = ArrayE.RescaleArrayToLog(_frequenciesLowLinear, AP.FftSize / AP._lc, (int)_spectrumLowEndIndex, false);
 				float[] copy = new float[_frequenciesLg.Length];
 				_frequenciesLg.CopyTo(copy, 0);				
 
-				for (int i = 0; i < _frequenciesLowLogarithmic.Length; i++)
-					_frequenciesLg[i] = _frequenciesLowLogarithmic[i];
+				for (int i = 0; i < _frequenciesLowLg.Length; i++)
+					_frequenciesLg[i] = _frequenciesLowLg[i];
 
 				float[] empty = new float[0];
 
-				DiskE.WriteToProgramFiles("frqs", "csv", TextE.ToCsvString(_frequenciesLinear, copy, _frequenciesLowLinear, _frequenciesLowLogarithmic, empty, copy, _frequenciesLg), false);
+				DiskE.WriteToProgramFiles("frqs", "csv", TextE.ToCsvString(_frequenciesLinear, copy, _frequenciesLowLinear, _frequenciesLowLg, empty, copy, _frequenciesLg), false);
 			}
 
 			void SetOctaves()
@@ -167,22 +171,22 @@ namespace MusGen
 			}
 		}
 
-		public static float[] Find(float[] signal, float[] signalLow)
+		public static float[] Find(float[] signal, float[] signalLow, bool useMiddleSmooth)
 		{
 			Wav wav = new Wav(signal.Length);
 			wav.L = signal;
 			Wav wavLow = new Wav(signalLow.Length);
 			wavLow.L = signalLow;
-			return Find(wav, wavLow, 0);
+			return Find(wav, wavLow, 0, useMiddleSmooth);
 		}
 
-		public static float[] FindX(Wav wav, Wav wavLow, int start, int x, int step)
+		public static float[] FindN(Wav wav, Wav wavLow, int start, int x, int step, bool useMiddleSmooth)
 		{
 			float[] res = new float[AP.SpectrumSize];
 
 			for (int i = 0; i < x; i++)
 			{
-				float[] subres = Find(wav, wavLow, start + step * i);
+				float[] subres = Find(wav, wavLow, start + step * i, useMiddleSmooth);
 
 				for (int j = 0; j < res.Length; j++)
 					res[j] += subres[j];
@@ -194,7 +198,7 @@ namespace MusGen
 			return res;
 		}
 
-		public static float[] Find(Wav wav, Wav wavLow, int start)
+		public static float[] Find(Wav wav, Wav wavLow, int start, bool useMiddleSmooth)
 		{
 			Complex[] complex;
 
@@ -206,19 +210,19 @@ namespace MusGen
 			complex = FFT.Forward(complex);
 			ProcessComplexLow();
 
-			Logarithmise();
-			return _spectrumLogarithmic;
+			LogarithmiseAndMix();
+			return _spectrumMixed;
 
 			void FillComplexFromWav()
 			{
 				complex = new Complex[AP.FftSize];
 				complex[0] = new Complex(0, 0);
-				int offset = AP.FftSize * (AP._lc - 1);
+				int offset = AP.FftSize * ((AP._lc - 1) / 2);
 				for (int i = 1; i < AP.FftSize; i++)
 				{
 					float wf = WindowFunction.F(i);					
 					complex[i] = new Complex(wav.L[start + offset + i] * wf, 0);
-				}	
+				}
 			}
 
 			void FillComplexFromWavLow()
@@ -229,7 +233,7 @@ namespace MusGen
 
 				for (int i = 1; i < AP.FftSize; i++)
 				{
-					float wf = WindowFunction.F((int)(i));
+					float wf = WindowFunction.F(i);
 
 					int newIndex = start + i * AP._lc; //
 
@@ -249,19 +253,34 @@ namespace MusGen
 					_spectrumLowLinear[i] = (float)(Math.Sqrt(Math.Pow(complex[i].Real, 2) + Math.Pow(complex[i].Imaginary, 2)));
 			}
 
-			void Logarithmise()
+			void LogarithmiseAndMix()
 			{
-				_spectrumLogarithmic = ArrayE.RescaleArrayToLog(_spectrumLinear, AP.FftSize, AP.FftSize / 2, false);
+				float[] newSpectrumLg = ArrayE.RescaleArrayToLog(_spectrumLinear, AP.FftSize, AP.SpectrumSizeGG, false);
 
-				_spectrumLowLogarithmic = ArrayE.RescaleArrayToLog(_spectrumLowLinear, AP.FftSize / AP._lc, (int)_spectrumLowEndIndex, false);
+				if (useMiddleSmooth)
+					for (int i = 0; i < newSpectrumLg.Length; i++)
+					{
+						float frq = _frequenciesLg[i];
+						float x = AP._spectrumMiddleSmoother * AP._sps * AP._cs;
+						float influence = x / (frq + x);
+						_spectrumLogarithmic[i] = _spectrumLogarithmic[i] * influence + newSpectrumLg[i] * (1 - influence);
+					}
+				else
+					_spectrumLogarithmic = newSpectrumLg;
 
-				for (int i = 0; i < _spectrumLogarithmic.Length; i++)
+				_spectrumLowLogarithmic = ArrayE.RescaleArrayToLog(_spectrumLowLinear, AP.FftSize / AP._lc, _spectrumLowEndIndex, false);
+
+				_spectrumMixed = new float[_spectrumMixed.Length];
+
+				for (int i = 0; i < _spectrumMixed.Length; i++)
 				{
 					if (i < _spectrumLowLogarithmic.Length)
-						_spectrumLogarithmic[i] = _spectrumLogarithmic[i] * _fadeInLowMask[i] + _spectrumLowLogarithmic[i] * _fadeOutLowMask[i];
+						_spectrumMixed[i] = _spectrumLogarithmic[i] * _fadeInLowMask[i] + _spectrumLowLogarithmic[i] * _fadeOutLowMask[i];
+					else
+						_spectrumMixed[i] = _spectrumLogarithmic[i];
 
-					if (_max < _spectrumLogarithmic[i])
-						_max = _spectrumLogarithmic[i];
+					if (_max < _spectrumMixed[i])
+						_max = _spectrumMixed[i];
 				}
 			}
 		}

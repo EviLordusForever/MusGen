@@ -29,7 +29,7 @@ namespace MusGen
 
 				SpectrumFinder.Init();
 				SpectrumDrawer.Init();
-				SMM.Init(AP.FftSize, (int)AP.SampleRate, AP._lc);
+				SMM.Init();
 
 				/*				Logger.Log("Tests are started...");
 
@@ -45,12 +45,15 @@ namespace MusGen
 								Tests.FrequenciesResolution();	
 								Tests.FftRecognitionModelTest();
 								Tests.Alg();
-
+								//Tests.NLS();
 								Logger.Log("Tests are completed.");
 				*/
 
+				Tests.Curve();
+
 				//Change("TEST");
 				//Change("TreeSong");
+				
 
 				void Change(string name)
 				{

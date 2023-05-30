@@ -25,6 +25,7 @@
 			<ComboBoxItem>Jpg to wav nad octave reverse (soft, MultiNad)</ComboBoxItem>
 			<ComboBoxItem>Wav to nad (MultiNad)</ComboBoxItem>
 			<ComboBoxItem>Nad to wav</ComboBoxItem>
+			<ComboBoxItem>Nad to jpg</ComboBoxItem>
 			<ComboBoxItem>Wav to jpg</ComboBoxItem>
 			<ComboBoxItem>Jpg to wav (MultiNad)</ComboBoxItem>
 			<ComboBoxItem>Jpg to clean jpg</ComboBoxItem>

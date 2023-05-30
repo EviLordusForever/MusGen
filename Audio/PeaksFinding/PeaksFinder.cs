@@ -6,6 +6,7 @@ using Tensorflow.Keras.Engine;
 using Tensorflow;
 using MusGen;
 using MathNet.Numerics.Statistics;
+using Newtonsoft.Json;
 
 namespace PeaksFinding
 {
@@ -17,9 +18,35 @@ namespace PeaksFinding
 		public static float _minFromMaximum;
 		public static IModel _model;
 
+		private static float[] fadeLow;
+		private static float[] fadeHight;
+
 		static PeaksFinder()
 		{
 			_model = ModelManager.GetModel();
+			FillFades();
+		}
+
+		private static void FillFades()
+		{
+			fadeLow = new float[AP.SpectrumSizeGG];
+			fadeHight = new float[AP.SpectrumSizeGG];
+
+			float fadeStart = AP._smootherFadeStart;
+			float fadeEnd = AP._smootherFadeEnd;
+			float fadeLength = fadeEnd - fadeStart;
+
+			for (int i = 0; i < fadeLow.Length; i++)
+			{
+				if (i < fadeStart)
+					fadeLow[i] = 1;
+				else if (i < fadeEnd)
+					fadeLow[i] = MathE.FadeOut(i - fadeStart / fadeLength);
+				else
+					fadeLow[i] = 0;
+
+				fadeHight[i] = 1 - fadeLow[i];
+			}
 		}
 
 		public static ushort[] Find_FixedCount(float[] array, int count, float peakSize)
@@ -49,8 +76,11 @@ namespace PeaksFinding
 
 		public static List<ushort> FindEvery_By_Solver(float[] array1, out List<float> amps)
 		{
-			float[] array2 = new float[array1.Length];
-			array1.CopyTo(array2, 0);
+			float[] array2 = ArrayE.SmoothArrayCopy(array1, AP._smootherL);
+			/////
+
+/*			for (int i = array2.Length / 2; i < array2.Length; i++)
+				array2[i] = array1[i];*/
 
 			amps = new List<float>();
 			List<ushort> ids;
@@ -88,11 +118,14 @@ namespace PeaksFinding
 
 		public static List<ushort> FindEvery_By_Stupied(float[] array1, out List<float> amps)
 		{
-			List<ushort> peakIndexes = new List<ushort>();
 			amps = new List<float>();
 
-			var arrayCopy = ArrayE.SmoothArrayCopy(array1, 5);
-			peakIndexes = MathE.StupiedFilterMask(arrayCopy, true);
+			var arrayCopyH = ArrayE.SmoothArrayCopy(array1, AP._smootherH);
+			var arrayCopyL = ArrayE.SmoothArrayCopy(array1, AP._smootherL);
+
+			var arrayCopy = ArrayE.MixArrays(arrayCopyL, arrayCopyH, fadeLow, fadeHight);
+
+			List<ushort> peakIndexes = MathE.StupiedFilterMask(arrayCopy, true);
 
 			for (int i = 0; i < peakIndexes.Count; i++)
 				amps.Add(array1[peakIndexes[i]]);

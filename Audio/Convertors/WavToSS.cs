@@ -32,7 +32,7 @@ namespace MusGen
 			int ns = 0;
 			for (double s = 0; s < _lastSample; s += _step, ns++)
 			{
-				ss._s[ns] = SpectrumFinder.Find(wav, wavLow, (int)s);
+				ss._s[ns] = SpectrumFinder.Find(wav, wavLow, (int)s, true);
 
 				if (ns % progressStep == 0)
 					ProgressShower.Set(1.0 * ns / ss.Width);
@@ -43,12 +43,12 @@ namespace MusGen
 
 			float max = SpectrumFinder._max;
 
-			for (int s = 0; s < ss._s.Length; s++)
+			for (int s = 0; s < ss.Width; s++)
 			{
-				for (int c = 0; c < ss._s[0].Length; c++)
+				for (int c = 0; c < ss.Height; c++)
 					ss._s[s][c] /= max;
 
-				ProgressShower.Set(1.0 * s / ss._s.Length);
+				ProgressShower.Set(1.0 * s / ss.Width);
 			}
 
 			ProgressShower.Close();
@@ -57,8 +57,8 @@ namespace MusGen
 
 			void EnlargeWav()
 			{
-				int n = 2 * AP.FftSize * AP._lc;
-				float[] newArray = new float[wav.Length + n];
+				int n = AP.FftSize * AP._lc;
+				float[] newArray = new float[wav.Length + 2 * n];
 				Array.Copy(wav.L, 0, newArray, n, wav.L.Length);
 				wav.L = newArray;
 			}

@@ -13,6 +13,32 @@ namespace MusGen
 {
 	public static class Tests
 	{
+		public static void Curve()
+		{
+			int[] points = new int[] { 0, 200, 400, 450, 511 };
+			float[] values = new float[] { 1, 1.5f, 0.8f, 1f, 2 };
+
+			float[] array = ArrayE.CreateInterpolatedArray(512, points, values);
+
+			points = new int[] { 200, 250, 300, 350, 420 };
+			values = new float[] { 0.5f, -1f, 0.5f, 0.75f, 0.6f };
+
+			float[] array2 = ArrayE.CreateInterpolatedArray(512, points, values);
+
+			DiskE.WriteToProgramFiles("curveTest", "csv", TextE.ToCsvString(array, array2), false);
+		}
+
+		public static void NLS()
+		{
+			Nad nad = new Nad();
+			nad.ReadFromExport("TEST");
+			var wbmp = NadToWbmp.Make(nad);
+			WBMP.Export(wbmp, "TEST_BEFORE");
+			nad = NadLowSmoother.Make(nad);
+			var wbmp2 = NadToWbmp.Make(nad);
+			WBMP.Export(wbmp2, "TEST_AFTER");
+		}
+
 		public static void SPL()
 		{
 			string str = "";
@@ -110,7 +136,7 @@ namespace MusGen
 		public static void FftRecognitionModelTest()
 		{
 			SpectrumFinder.Init();
-			SMM.Init(1024, 44100, 16);
+			SMM.Init();
 			WriteableBitmap sg = WBMP.Create(512, 512);
 			for (int row = 0; row < 512; row++)
 				for (int column = 0; column < 512; column++)

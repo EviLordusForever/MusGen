@@ -15,17 +15,15 @@ namespace MusGen
 
 		public static WriteableBitmap Make(SS ss)
 		{
-			_lastSample = ss._s.Length;
-
-			WriteableBitmap wbmp = WBMP.Create(ss._s.Length, AP.FftSize / 2);
+			WriteableBitmap wbmp = WBMP.Create(ss.Width, ss.Height);
 
 			ProgressShower.Show("Making image from ss...");
 
-			int progressStep = (int)Math.Max(1, ss._s.Length / 1000f);
+			int progressStep = (int)Math.Max(1, ss.Width / 1000f);
 
-			byte[] bytes = new byte[ss._s[0].Length];
+			byte[] bytes = new byte[ss.Height];
 
-			for (int c = 0; c < _lastSample; c++)
+			for (int c = 0; c < ss.Width; c++)
 			{
 				for (int b = 0; b < bytes.Length; b++)
 					bytes[b] = (byte)(MathE.ToLogScale(ss._s[c][b], 10) * 255);
@@ -33,7 +31,7 @@ namespace MusGen
 				WBMP.WriteByteArrayToColumn(wbmp, bytes, c);
 
 				if (c % progressStep == 0)
-					ProgressShower.Set(1.0 * c / ss._s.Length);
+					ProgressShower.Set(1.0 * c / ss.Width);
 			}
 
 			AddSps();

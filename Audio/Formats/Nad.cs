@@ -24,6 +24,10 @@ namespace MusGen
 		public ushort _cs;
 		public ushort _specturmSize;
 
+		public Nad()
+		{
+		}
+
 		public Nad(int samplesCount, float duration, ushort cs, ushort spectrumSize)
 		{
 			_channelsCount = -1;
@@ -42,6 +46,22 @@ namespace MusGen
 			_specturmSize = spectrumSize;
 		}
 
+		public void Normalise(float max)
+		{
+			ProgressShower.Show("Nad normalising...");
+			int step = (int)Math.Max(Width / 1000f, 1);
+
+			for (int s = 0; s < Width; s++)
+			{
+				_samples[s].Normalise(max);
+
+				if (s % step == 0)
+					ProgressShower.Set(1.0 * s / Width);
+			}
+
+			ProgressShower.Close();
+		}
+
 		public void Export(string outName)
 		{
 			ProgressShower.Show("Nad exporting...");
@@ -58,6 +78,11 @@ namespace MusGen
 			}
 			DialogE.ShowFile(path);
 			ProgressShower.Close();
+		}
+
+		public void ReadFromExport(string name)
+		{
+			Read($"{DiskE._programFiles}\\Export\\Nads\\{name}.nad");
 		}
 
 		public void Read(string path)
@@ -82,7 +107,26 @@ namespace MusGen
 			_specturmSize = newObj._specturmSize;
 
 			ProgressShower.Close();
-			Logger.Log($"Some nad info: duration {MathF.Round(_duration, 2)}s, samples {_samples.Length}, cs {_cs}", Brushes.Cyan);
+			Logger.Log($"Some nad info: duration {MathF.Round(_duration, 2)}s, samples {_samples.Length}, cs {_cs}, size {SizeKb} KB", Brushes.Cyan);
+		}
+
+		private int Size
+		{
+			get
+			{
+				int size = 0;
+				for (int i = 0; i < _samples.Length; i++)
+					size += _samples[i].Height;
+				return size;
+			}
+		}
+
+		private double SizeKb
+		{
+			get
+			{
+				return Math.Round((Size * 6 + 2 + 2 + 4 + 2) / 1024.0, 2);
+			}
 		}
 
 		public int Width

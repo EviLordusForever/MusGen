@@ -11,19 +11,19 @@ using Tensorflow;
 
 namespace MusGen
 {
-	public static class SMM
+	public static class SMM //Spectrum Model Manager
 	{
 		private static string _path = $"{DiskE._programFiles}\\SpectrumModel.json";
 
 		public static SpectrumModel _model = new SpectrumModel();
 
-		public static void Init(int fftSize, int sampleRate, int lc)
+		public static void Init()
 		{
 			if (File.Exists(_path))
 				Load();
 			else
-			{			
-				_model._size = fftSize / 2;
+			{
+				_model._size = AP.SpectrumSizeGG;
 				_model._model = new float[_model._size, _model._size];
 				_model._modelN = new float[_model._size, _model._size];
 				_model._modelN2 = new double[_model._size][];
@@ -31,6 +31,7 @@ namespace MusGen
 				_model._mask = new int[_model._size][];
 				_model._maxesForColumns = new float[_model._size];
 				_model._power = new float[_model._size];
+				_model._curve = new float[_model._size];
 
 				Fill();				
 				Normalize();
@@ -76,7 +77,19 @@ namespace MusGen
 					gg[index] = widthN * heighN + widthL * heighL;
 				}
 
-				DiskE.WriteToProgramFiles("SpectrumPower", "csv", TextE.ToCsvString(_model._maxesForColumns, _model._power, gg), false);
+				_model._maxesForColumns[0] = _model._maxesForColumns[1];
+
+				for (int i = 0; i < _model._curve.Length; i++)
+					_model._curve[i] = _model._maxesForColumns[i] / _model._max;
+
+				_model._curve = ArrayE.SmoothArrayCopy(_model._curve, (int)(20 * AP.SpectrumSizeGG / 512f));
+
+				float max = _model._curve.Max();
+
+				for (int i = 0; i < _model._curve.Length; i++)
+					_model._curve[i] = 1 / (_model._curve[i] / max);
+
+				DiskE.WriteToProgramFiles("SpectrumPower", "csv", TextE.ToCsvString(_model._maxesForColumns, _model._power, gg, _model._curve), false);
 				Logger.Log("Spectrum model powers were calculated.");
 			}
 
@@ -87,21 +100,21 @@ namespace MusGen
 				for (int fi = 0; fi < _model._size; fi++)
 				{
 					float frequency = SpectrumFinder._frequenciesLg[fi];
-					float[] signal = new float[fftSize * lc];
-					float[] signalLow = new float[fftSize * lc];
+					float[] signal = new float[AP.FftSize * AP._lc];
+					float[] signalLow = new float[AP.FftSize * AP._lc];
 
-					for (int x = 0; x < fftSize * lc; x++)
+					for (int x = 0; x < AP.FftSize * AP._lc; x++)
 					{
-						float t = 1f * x / sampleRate; //time in seconds
+						float t = 1f * x / AP.SampleRate; //time in seconds
 						signal[x] = MathF.Sin(2f * MathF.PI * frequency * t);
 						signalLow[x] = signal[x];
 					}
 
-					float cutOff = 0.5f * (sampleRate / lc);
+					float cutOff = 0.5f * (AP.SampleRate / AP._lc);
 
-					signalLow = KaiserFilter.Make(signalLow, sampleRate, cutOff, AP._kaiserFilterLength_ForProcessing, AP._kaiserFilterBeta, false);
+					signalLow = KaiserFilter.Make(signalLow, AP.SampleRate, cutOff, AP._kaiserFilterLength_ForProcessing, AP._kaiserFilterBeta, false);
 
-					float[] spectrum = SpectrumFinder.Find(signal, signalLow);
+					float[] spectrum = SpectrumFinder.Find(signal, signalLow, false);
 					
 					if (fi == 0)
 						spectrum[5] = 0;
@@ -156,7 +169,7 @@ namespace MusGen
 				for (int in_f = 0; in_f < _model._size; in_f++)
 					_model._modelN3[in_s][in_f] = _model._modelN[in_s, in_f];
 
-			DiskE.WriteToProgramFiles("delme", "csv", TextE.ToCsvString(_model._modelN3), false);
+			DiskE.WriteToProgramFiles("SpectrumModel", "csv", TextE.ToCsvString(_model._modelN3), false);			
 
 			Logger.Log("Spectrum model was normalized.");
 		}
