@@ -12,21 +12,22 @@ namespace MusGen
 		public const int _lc = 16; //how much fftLow bigger than fft //16
 		public static short _channels = 20;
 		public const ushort _sps = 120; //spectrums per second
-		public static ushort _cs = 5; //how much spectrums per one specturm
+		public static ushort _cs = 5; //how many spectrums per one specturm
 		public static ushort _gg = 2; //how much
 
-		public static int _smootherL = 8; //2 //8 //it is actually improves sound
-		public static int _smootherH = 4;
-		public static float _smootherFadeStart = 0.5f;
-		public static float _smootherFadeEnd = 0.85f;
+		public static int _smootherL = 32; //2 //8 //it is actually improves sound
+		public static int _smootherH = 6;
+		public static float[] _smootherpoints = new float[] { 0, 0.64f, 0.78f, 0.88f, 0.92f, 1 };
+		public static float[] _smoothervalues = new float[] { 0, 0,     1,     1,     0,     0 };
 
 		public static int _iters = 4; //idk if it doing something
 		public static float _speed = 1f;
-		public static float _spectrumMiddleSmoother = 25f;
+		public static float _spectrumMiddleSmoother = 20f;
 
 		public static float _nadMin = 0.0015f;
 
-		public static float _lcFadeStart = 0.5f;
+		public static float _lcFadeStart = 0.4f;
+		public static float _lcFadeEnd = 0.45f;
 
 		public static float _peakWidth_ForFixedNad = 70; //70
 
@@ -44,8 +45,6 @@ namespace MusGen
 		public static float _lowestPeak_FromAverage_FRM = 0.25f / 1;
 		public static float _lowestPeak_FromMaximum_FRM = 0.02f / 1;
 		public static int _peaksLimit_FRM = 300;
-
-
 
 		// EQ
 

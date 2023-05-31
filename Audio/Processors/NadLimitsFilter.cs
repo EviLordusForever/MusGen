@@ -13,11 +13,9 @@ namespace MusGen
 			ProgressShower.Show("Nad filtering by limits...");
 			int step = (int)(Math.Max(1, nad.Width / 1000f));
 
-			float sps = nad.Width / nad._duration;
-
 			for (int s = 0; s < nad._samples.Length; s++)
 			{
-				nad._samples[s].Filter(sps);
+				nad._samples[s].Filter();
 				if (s % step == 0)
 					ProgressShower.Set(1.0 * s / step);
 			}

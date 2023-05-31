@@ -40,30 +40,40 @@ namespace MusGen
 
 			for (int octave = 0; octave < 9; octave++)
 			{
-				int from = (int)(SpectrumFinder._octavesIndexes[octave] - _octaveSize / 2 + octaveShift);
-				int to = (int)(SpectrumFinder._octavesIndexes[octave + 1] + _octaveSize / 2 + octaveShift);
-				int count = to - from;
+				int fromBefore = (int)(SpectrumFinder._octavesIndexes[octave] - _octaveSize / 2 + octaveShift);
+				int toBefore = (int)(SpectrumFinder._octavesIndexes[octave + 1] + _octaveSize / 2 + octaveShift);
+				int count = toBefore - fromBefore;
+				int toShifted = toBefore - (int)octaveShift;
+				int fromShifted = fromBefore - (int)octaveShift;
 
-				for (int i = from; i < to; i++)
+				for (int i = fromBefore; i < toBefore; i++)
 				{
-					int rev = to - 1 - (i - from);
-					int rev2 = rev;
+					int rev = toBefore - 1 - (i - fromBefore);
+					int orig = i;
+
+					int point = rev;
 					if (!octaves[octave])
-						rev = i;
+						point = orig;
+
+					int iShift = i - (int)octaveShift;
+
 					if (useRev2)
 					{
-						if (i >= 0 && rev2 >= 0 && i < _height && rev2 < _height)
+						if (iShift >= 0 && orig >= 0 && iShift < _height && orig < _height)
 						{
-							float power = F(1f * (i - from) / count);
-							newone[i] += spectrum[rev] * power;
+							if (rev >= 0 && rev < _height)
+							{
+								float power = F(1f * (i - fromBefore) / count);
+								newone[iShift] += spectrum[point] * power;
+							}
 						}
 					}
 					else
 					{
-						if (i >= 0 && rev >= 0 && i < _height && rev < _height)
+						if (iShift >= 0 && point >= 0 && iShift < _height && point < _height)
 						{
-							float power = F(1f * (i - from) / count);
-							newone[i] += spectrum[rev] * power;
+							float power = F(1f * (i - fromBefore) / count);
+							newone[iShift] += spectrum[point] * power;
 						}
 					}
 				}

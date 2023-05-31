@@ -31,7 +31,7 @@ namespace MusGen
 				//check mb ^
 		}
 
-		public void Filter(float sps)
+		public void Filter()
 		{
 			List<ushort> newIndexes = new List<ushort>();
 			List<float> newAmplitudes = new List<float>();

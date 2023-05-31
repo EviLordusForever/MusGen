@@ -1,11 +1,17 @@
 ﻿using System;
+using System.Linq;
 using Extensions;
+using NAudio.SoundFont;
+using OneOf.Types;
 using Tensorflow;
 
 namespace MusGen
 {
 	public static class EveryNadToWav
 	{
+		public static int zonesCount = 3;
+		public static bool _divideZones = false;
+
 		public static Wav Make(Nad nad, string wavPath)
 		{
 			Wav wav = new Wav();
@@ -39,6 +45,12 @@ namespace MusGen
 			int[] lefts = new int[cs];
 			int[] rights = new int[cs];
 
+			float[][] signals = new float[zonesCount][];
+
+			signals[0] = new float[wav.Length];
+			signals[1] = new float[wav.Length];
+			signals[2] = new float[wav.Length];
+
 			var newSamples = new NadSample[nad._samples.Length + cs * 2 + (int)(cs * 10f / 718f * nad.Width)]; ////////
 			Array.Copy(nad._samples, 0, newSamples, cs, nad._samples.Length); 
 
@@ -47,25 +59,35 @@ namespace MusGen
 			for (int s = 0; s < length; s++)
 			{
 				GetValues(s);
-				WriteSample(s);
+				for (int zone = 0; zone < 3; zone++)
+					WriteSample(s, zone);
 				Progress(s);
+			}
 
-/*				delme5 += String.Join(";", fadeins) + ";;";
-				delme5 += String.Join(";", lefts) + ";;";
-				delme5 += String.Join(";", wav.L[s]) + "\n";
+			//ClearZone2(signals[1]);
 
-				if (s > AP.SampleRate)
+			if (!_divideZones)
+				for (int s = 0; s < length; s++)
 				{
-					DiskE.WriteToProgramFiles("delme5", "csv", delme5, false);
-					Logger.Log("done.");
-					break;
-				}*/
+					float signal = 0;
+					for (int zone = 0; zone < 3; zone++)
+						signal += signals[zone][s];
+					wav.L[s] = signal;
+
+					max = max >= MathF.Abs(signal) ? max : MathF.Abs(signal);
+
+					Progress(s);
+				}
+			else
+			{
+				wav.L = signals[0].concat(signals[1]).concat(signals[2]);
+				max = MathF.Max(wav.L.Max(), -wav.L.Min());
 			}
 
 			ProgressShower.Close();
 
 			Normalize();
-			ProgressShower.Close();
+
 			return wav;
 
 			void GetValues(int s)
@@ -89,19 +111,10 @@ namespace MusGen
 				}
 			}
 
-			void WriteSample(int s)
+			void WriteSample(int s, int zone)
 			{
-				float signal = 0;
-
 				for (int i = 0; i < cs; i++)
-					signal += GetSignal(lefts[i], rights[i], fadeins[i], fadeouts[i]);
-
-				signal /= cs;
-				
-				wav.L[s] = signal;
-
-				if (Math.Abs(wav.L[s]) > max)
-					max = Math.Abs(wav.L[s]);
+					signals[zone][s] += GetSignal(lefts[i], rights[i], fadeins[i], fadeouts[i]);
 
 				float GetSignal(int left, int right, float fadein, float fadeout)
 				{
@@ -122,19 +135,37 @@ namespace MusGen
 
 					if (ns.Height > 0)
 					{
+						int count = 0;
 						for (int c = 0; c < ns.Height; c++)
 						{
-							float frq = SpectrumFinder._frequenciesLg[ns._indexes[c]];
-							float amp = ns._amplitudes[c];
+							ushort ind = ns._indexes[c];
+							if (GetZone(ind) == zone)
+							{
+								count++;
 
-							signal += amp * MathF.Sin(buf * frq * s);
+								float frq = SpectrumFinder._frequenciesLg[ind];
+								float amp = ns._amplitudes[c];
+
+								signal += amp * MathF.Sin(buf * frq * s);
+							}
 						}
 
-						signal *= fade / MathF.Sqrt(ns.Height);
+						if (count > 0)
+							signal *= fade / MathF.Sqrt(count);
 					}
 
 					return signal;
 				}
+			}
+
+			ushort GetZone(ushort ind)
+			{
+				if (ind < AP.SpectrumSize * 0.6f)
+					return 0;
+				else if (ind < AP.SpectrumSize * 0.90f)
+					return 1;
+				else
+					return 2;
 			}
 
 			void Progress(int s)
@@ -148,13 +179,92 @@ namespace MusGen
 				ProgressShower.Show("Normalization");
 				for (int s = 0; s < length; s++)
 				{
-					wav.L[s] /= max;
+					float v = wav.L[s];
+					wav.L[s] = v / max;
 					if (wav._channels == 2)
 						wav.R[s] = wav.L[s];
 
 					Progress(s);
 				}
+				ProgressShower.Close();
 			}
+
+			void ClearZone2(float[] zone)
+			{
+				int window1 = (int)(AP.SampleRate / 300f);
+				int window2 = (int)(AP.SampleRate / 300f / 6);
+				var abs = ArrayE.AbsArrayCopy(zone);
+				var average1 = ArrayE.SmoothArrayCopy_Quality_NonNegative(abs, window1);
+				var average2 = ArrayE.SmoothArrayCopy_Quality_NonNegative(abs, window2);
+				var stdDev1 = ArrayE.StdDev(average1, abs, window1);
+				var stdDev2 = ArrayE.StdDev(average2, abs, window2);
+
+
+				for (int i = 0; i < zone.Length; i++)
+				{
+					float d = (average1[i] + stdDev1[i]) / (average2[i] + stdDev2[i]);
+					if (d < 1)
+						zone[i] *= d;
+				}
+			}
+
+			void ClearZone(float[] zone)
+			{
+				int window = (int)(AP.SampleRate / 120f);
+				var abs = ArrayE.AbsArrayCopy(zone);
+				var average = ArrayE.SmoothArrayCopy_Quality_NonNegative(abs, window);
+				var stdDev = new float[zone.Length];
+
+				for (int i = 0; i < zone.Length; i++)
+				{
+					stdDev[i] = MathF.Pow(average[i] - abs[i], 2);
+
+					if (float.IsNaN(stdDev[i]))
+					{
+					}
+				}
+
+				stdDev = ArrayE.SmoothArrayCopy_Quality_NonNegative(stdDev, window);
+				stdDev = ArrayE.Sqrt(stdDev);
+
+				for (int i = 0; i < zone.Length; i++)
+				{
+					float x = abs[i];
+					float av = average[i];
+					float std = stdDev[i];
+					float h = SoftCut(x, 1, (av + std) * 1.3f);
+					zone[i] = h * MathF.Sign(zone[i]);
+					if (float.IsNaN(zone[i]))
+					{
+					}
+				}
+			}
+
+			void ClearZoneKaiser(float[] zone)
+			{
+				float cutoff = SpectrumFinder._frequenciesLg[(int)(AP.SpectrumSize * 0.9f)];
+				zone = KaiserFilter.Make(zone, AP.SampleRate, cutoff, AP._kaiserFilterLength_ForProcessing, AP._kaiserFilterBeta, true);
+			}
+		}
+
+		public static float SoftCut(float x, float c, float h)
+		{
+			if (h == 0)
+				return 0;
+			if (x < h)
+				return x;
+			else
+				return h * (1 + (1 - 1 / MathF.Pow(x / h, c)) / c);
+		}
+
+		public static float HardTanh(float x, float c, float h)
+		{
+			if (h == 0)
+				return 0;
+			if (x < h * (c - 1) / c)
+				return x;
+			else
+				return h * (MathF.Tanh((x / h - 1) * c + 1) + c - 1) / c;
 		}
 
 		public static double F(double t)

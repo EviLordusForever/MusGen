@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using Microsoft.Win32;
 using WPFFolderBrowser;
 using System.Diagnostics;
+using MusGen;
 
 namespace Extensions
 {
@@ -34,7 +35,15 @@ namespace Extensions
 
 		public static bool Ask(string q)
 		{
-			return MessageBox.Show(q, "Hey", MessageBoxButton.YesNo) == MessageBoxResult.Yes;
+			bool result = false;
+			Application.Current.Dispatcher.Invoke(() => {
+				var result0 = MessageBox.Show(q, "Hey", MessageBoxButton.YesNo);
+				//Logger.Log(result0.ToString());
+				//Logger.Log(MessageBoxResult.Yes.ToString());
+				result = result0 == MessageBoxResult.Yes;
+				//Logger.Log(result.ToString());
+			});
+			return result;
 		}
 
 		public static string AskFolder(Environment.SpecialFolder rootFolder, string description)

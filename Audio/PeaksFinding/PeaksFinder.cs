@@ -32,21 +32,15 @@ namespace PeaksFinding
 			fadeLow = new float[AP.SpectrumSizeGG];
 			fadeHight = new float[AP.SpectrumSizeGG];
 
-			float fadeStart = AP._smootherFadeStart;
-			float fadeEnd = AP._smootherFadeEnd;
-			float fadeLength = fadeEnd - fadeStart;
+			int[] points = ArrayE.Multiply(AP._smootherpoints, AP.SpectrumSizeGG);
+			points[points.Length - 1]--; //
+
+			fadeLow = ArrayE.CreateInterpolatedArray(AP.SpectrumSizeGG, points, AP._smoothervalues);
 
 			for (int i = 0; i < fadeLow.Length; i++)
-			{
-				if (i < fadeStart)
-					fadeLow[i] = 1;
-				else if (i < fadeEnd)
-					fadeLow[i] = MathE.FadeOut(i - fadeStart / fadeLength);
-				else
-					fadeLow[i] = 0;
-
 				fadeHight[i] = 1 - fadeLow[i];
-			}
+
+			DiskE.WriteToProgramFiles("fades2", "csv", TextE.ToCsvString(fadeLow, fadeHight), false);
 		}
 
 		public static ushort[] Find_FixedCount(float[] array, int count, float peakSize)
@@ -123,9 +117,9 @@ namespace PeaksFinding
 			var arrayCopyH = ArrayE.SmoothArrayCopy(array1, AP._smootherH);
 			var arrayCopyL = ArrayE.SmoothArrayCopy(array1, AP._smootherL);
 
-			var arrayCopy = ArrayE.MixArrays(arrayCopyL, arrayCopyH, fadeLow, fadeHight);
+			var arrayMix = ArrayE.MixArrays(arrayCopyL, arrayCopyH, fadeLow, fadeHight);
 
-			List<ushort> peakIndexes = MathE.StupiedFilterMask(arrayCopy, true);
+			List<ushort> peakIndexes = MathE.StupiedFilterMask(arrayMix, true);
 
 			for (int i = 0; i < peakIndexes.Count; i++)
 				amps.Add(array1[peakIndexes[i]]);

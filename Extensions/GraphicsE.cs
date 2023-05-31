@@ -10,6 +10,7 @@ using System.Windows.Media.Imaging;
 using Clr0 = System.Drawing.Color;
 using Clr = System.Windows.Media.Color;
 using System.Runtime.InteropServices;
+using MusGen;
 
 namespace Extensions
 {
@@ -149,6 +150,23 @@ namespace Extensions
 		{
 			JpegBitmapEncoder encoder = new JpegBitmapEncoder();
 			encoder.QualityLevel = 100;
+			encoder.Frames.Add(BitmapFrame.Create(bitmap));
+			try
+			{
+				using (var fileStream = new FileStream(path, FileMode.Create))
+				{
+					encoder.Save(fileStream);
+				}
+			}
+			catch (ArgumentException ex)
+			{
+				SaveTiff(bitmap, path + ".tiff");
+			}
+		}
+
+		public static void SaveTiff(this WriteableBitmap bitmap, string path)
+		{
+			TiffBitmapEncoder encoder = new TiffBitmapEncoder();
 			encoder.Frames.Add(BitmapFrame.Create(bitmap));
 			using (var fileStream = new FileStream(path, FileMode.Create))
 			{

@@ -8,6 +8,8 @@ namespace MusGen
 {
 	public static class MultiNadSoftOctaveReverser
 	{
+		private static float _max;
+
 		public static Nad Make(Nad nadIn, float octaveShift, bool[] octaves)
 		{
 			ProgressShower.Show("Nad soft octave reversing...");
@@ -27,6 +29,8 @@ namespace MusGen
 
 			ProgressShower.Close();
 
+			nadOut.Normalise(_max);
+
 			return nadOut;
 		}		
 
@@ -35,13 +39,13 @@ namespace MusGen
 			float[] spectrum = new float[AP.SpectrumSize];
 
 			for (int n = 0; n < nads.Height; n++)
-				spectrum[nads._indexes[n]] = nads._amplitudes[n];
+				spectrum[nads._indexes[n]] += nads._amplitudes[n];
 
 			float[] newSpectrum = SsSoftOctaveReverser.MakeOne(spectrum, octaveShift, octaves);
 
 			int count = 0;
 			for (int i = 0; i < newSpectrum.Length; i++)
-				if (newSpectrum[i] > 0)
+				if (newSpectrum[i] > 0) //ok
 					count++;
 
 			NadSample newOne = new NadSample(count);
@@ -51,6 +55,7 @@ namespace MusGen
 				{
 					newOne._indexes[ni] = si;
 					newOne._amplitudes[ni] = newSpectrum[si];
+					_max = _max > newOne._amplitudes[ni] ? _max : newOne._amplitudes[ni];
 					ni++;
 				}
 

@@ -60,6 +60,37 @@ namespace Extensions
 			return newArray;
 		}
 
+		public static float[] StdDev(float[] average, float[] abs, int window)
+		{
+			var stdDev = new float[average.Length];
+
+			for (int i = 0; i < average.Length; i++)
+				stdDev[i] = MathF.Pow(average[i] - abs[i], 2);
+
+			stdDev = ArrayE.SmoothArrayCopy_Quality_NonNegative(stdDev, window);
+			stdDev = ArrayE.Sqrt(stdDev);
+
+			return stdDev;
+		}
+
+		public static float[] Multiply(float[] array, float a)
+		{
+			float[] newArray = new float[array.Length];
+			for (int i = 0; i < array.Length; i++)
+				newArray[i] = array[i] * a;
+
+			return newArray;
+		}
+
+		public static int[] Multiply(float[] array, int a)
+		{
+			int[] newArray = new int[array.Length];
+			for (int i = 0; i < array.Length; i++)
+				newArray[i] = (int)(array[i] * a);
+
+			return newArray;
+		}
+
 		public static float[] StupiedStretch(float[] array, int factor)
 		{
 			float[] newArray = new float[array.Length * factor];
@@ -127,6 +158,14 @@ namespace Extensions
 			return newArray;
 		}
 
+		public static float[] Sqrt(float[] array)
+		{
+			for (int s = 0; s < array.Length; s++)
+				array[s] = MathF.Sqrt(array[s]);
+
+			return array;
+		}
+
 		public static float[] SmoothArray(float[] array, int n)
 		{
 			float summ = 0;
@@ -156,15 +195,25 @@ namespace Extensions
 			return ar1;
 		}
 
+		public static float[] AbsArrayCopy(float[] array)
+		{
+			float[] arrayCopy = new float[array.Length];
+
+			for (int s = 0; s < array.Length; s++)
+				arrayCopy[s] = MathF.Abs(array[s]);
+
+			return arrayCopy;
+		}
+
 		public static float[] SmoothArrayCopy(float[] array, int n)
 		{
 			float[] arrayCopy = new float[array.Length];
 			float summ = 0;
-			int li = 0;
-			int ri = 0;
 			int nhalf = n / 2;
 
-			float oldli = 0;
+			int li = -1;
+			int ri = 0;
+			float oldli = -1;
 			float oldri = 0;
 
 			for (int s = -nhalf; s < array.Length; s++)
@@ -174,13 +223,46 @@ namespace Extensions
 				ri = Math.Min(s + nhalf, array.Length - 1);
 				li = Math.Max(s - nhalf, 0);
 
-				if (oldri != ri)
+				if (ri != oldri)
 					summ += array[ri];
-				if (oldli != li)
+				if (li != oldli)
 					summ -= array[li];
 
 				if (s >= 0)
 					arrayCopy[s] = summ / (ri - li + 1);
+			}
+
+			return arrayCopy;
+		}
+
+		public static float[] SmoothArrayCopy_Quality_NonNegative(float[] array, int n)
+		{
+			float[] arrayCopy = new float[array.Length];
+			int nhalf = n / 2;
+			decimal summ = 0;
+
+			int li = 0;
+			int oldli = 0;
+			int ri = -1;
+			int oldri = -1;
+
+			for (int s = -nhalf; s < array.Length; s++)
+			{
+				oldli = li;
+				oldri = ri;
+				ri = Math.Min(s + nhalf, array.Length - 1);
+				li = Math.Max(s - nhalf, 0);
+
+				if (ri != oldri)
+					summ += (decimal)array[ri];
+				if (li != oldli)
+					summ -= (decimal)array[li];
+
+				if (summ < 0)
+					summ = 0;
+
+				if (s >= 0)
+					arrayCopy[s] = (float)(summ / (ri - li + 1));
 			}
 
 			return arrayCopy;

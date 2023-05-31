@@ -62,30 +62,32 @@ namespace MusGen
 			void FillFadeLowMask()
 			{
 				float start = _spectrumLowEndIndex * AP._lcFadeStart;
-				float end = _spectrumLowEndIndex;
+				float end = _spectrumLowEndIndex * AP._lcFadeEnd;
 				float count = end - start;
 
-				_fadeInLowMask = new float[AP.SpectrumSize];
-				_fadeOutLowMask = new float[AP.SpectrumSize];
+				_fadeInLowMask = new float[AP.SpectrumSizeGG];
+				_fadeOutLowMask = new float[AP.SpectrumSizeGG];
 
-				for (int i = 0; i < _fadeInLowMask.Length; i++)
+				for (int i = 0; i < AP.SpectrumSizeGG; i++)
 				{
 					if (i < (int)start)
 					{
-						_fadeInLowMask[i] = 0;
 						_fadeOutLowMask[i] = 1;
+						_fadeInLowMask[i] = 0;						
 					}
 					else if (i < (int)end)
 					{
-						_fadeInLowMask[i] = 1 - MathE.FadeOut((i - start) / count);
-						_fadeOutLowMask[i] = 1 - _fadeInLowMask[i];
+						_fadeOutLowMask[i] = MathE.FadeOut((i - start) / count);
+						_fadeInLowMask[i] = 1 - _fadeOutLowMask[i];
 					}
 					else
 					{
-						_fadeInLowMask[i] = 1;
 						_fadeOutLowMask[i] = 0;
+						_fadeInLowMask[i] = 1;					
 					}
 				}
+
+				DiskE.WriteToProgramFiles("fades", "csv", TextE.ToCsvString(_fadeInLowMask, _fadeOutLowMask), false);
 			}
 
 			void FindFrequenciesLinear()

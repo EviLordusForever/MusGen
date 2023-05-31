@@ -19,9 +19,14 @@ namespace MusGen
 
 		public static void Init()
 		{
-			if (File.Exists(_path))
-				Load();
+			if (!File.Exists(_path))
+				Regen();
+			else if (DialogE.Ask("Regenerate spectrum model?"))
+				Regen();
 			else
+				Load();
+
+			void Regen()
 			{
 				_model._size = AP.SpectrumSizeGG;
 				_model._model = new float[_model._size, _model._size];
