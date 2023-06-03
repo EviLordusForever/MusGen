@@ -29,6 +29,8 @@ namespace MusGen
 		public static float[] _fadeInLowMask;
 		public static float[] _fadeOutLowMask;
 
+		public static float[] _randomPhases;
+
 		public static float[,] _fftRecognitionModel;
 
 		public static float _max;
@@ -48,7 +50,15 @@ namespace MusGen
 			FindFrequenciesLogarithmic();
 			SetOctaves();
 			FillFadeLowMask();
+			FillPhases();
 			Logger.Log("Spectrum Finder was initialized.");
+
+			void FillPhases()
+			{
+				_randomPhases = new float[AP.SpectrumSizeGG];
+				for (int i = 0; i < AP.SpectrumSizeGG; i++)
+					_randomPhases[i] = MathE.rnd.Next(100000) - 50000;
+			}
 
 			void FindLowIndex()
 			{

@@ -160,7 +160,8 @@ namespace Extensions
 			}
 			catch (ArgumentException ex)
 			{
-				SaveTiff(bitmap, path + ".tiff");
+				path += ".tiff";
+				SaveTiff(bitmap, path);
 			}
 		}
 

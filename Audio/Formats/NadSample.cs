@@ -38,10 +38,8 @@ namespace MusGen
 
 			for (int c = 0; c < Height; c++)
 			{
-				float frq = SpectrumFinder._frequenciesLg[_indexes[c]];
-
-				if (frq < AP.SampleRate / 2 &&
-					frq > SpectrumFinder._frequenciesLg[1] &&
+				if (_indexes[c] < AP.SpectrumSizeGG &&
+					_indexes[c] > 0 &&
 					_amplitudes[c] > AP._nadMin)
 				{
 					newIndexes.Add(_indexes[c]);

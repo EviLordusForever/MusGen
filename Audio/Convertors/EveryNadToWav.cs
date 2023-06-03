@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Extensions;
 using NAudio.SoundFont;
 using OneOf.Types;
@@ -9,9 +12,6 @@ namespace MusGen
 {
 	public static class EveryNadToWav
 	{
-		public static int zonesCount = 3;
-		public static bool _divideZones = false;
-
 		public static Wav Make(Nad nad, string wavPath)
 		{
 			Wav wav = new Wav();
@@ -31,58 +31,92 @@ namespace MusGen
 		public static Wav Make(Nad nad, Wav wav)
 		{
 			ushort cs = nad._cs;
-			int length = wav.Length;
-			//double sps = nad.Width / (double)nad._duration;
-			float pi2 = MathF.PI * 2;
-			float buf = pi2 / AP.SampleRate;
-			int progressStep = (int)(length / 2000);
+			float buf = MathF.PI * 2 / AP.SampleRate;
+			int progressStep = (int)(wav.Length / 2000);
 			float max = 0;
-
-			string delme5 = "";
-
-			float[] fadeins = new float[cs];
-			float[] fadeouts = new float[cs];
-			int[] lefts = new int[cs];
-			int[] rights = new int[cs];
-
-			float[][] signals = new float[zonesCount][];
-
-			signals[0] = new float[wav.Length];
-			signals[1] = new float[wav.Length];
-			signals[2] = new float[wav.Length];
 
 			var newSamples = new NadSample[nad._samples.Length + cs * 2 + (int)(cs * 10f / 718f * nad.Width)]; ////////
 			Array.Copy(nad._samples, 0, newSamples, cs, nad._samples.Length); 
 
-			ProgressShower.Show("Nad to Wav...");			
+			ProgressShower.Show("NAD to WAV...");
 
-			for (int s = 0; s < length; s++)
+			int startedCount = 0;
+			int cores = HardwareParams._coresCount;
+
+			for (int core = 0; core < cores; core++)
 			{
-				GetValues(s);
-				for (int zone = 0; zone < 3; zone++)
-					WriteSample(s, zone);
-				Progress(s);
+				int coreCopy = core;
+				Task.Run(() => AsyncTask(coreCopy));
 			}
 
-			//ClearZone2(signals[1]);
+			async Task AsyncTask(int core)
+			{
+				startedCount++;
 
-			if (!_divideZones)
-				for (int s = 0; s < length; s++)
+				float[] fadeins = new float[cs];
+				float[] fadeouts = new float[cs];
+				int[] lefts = new int[cs];
+				int[] rights = new int[cs];
+
+				for (int s = core; s < wav.Length; s += cores)
 				{
-					float signal = 0;
-					for (int zone = 0; zone < 3; zone++)
-						signal += signals[zone][s];
-					wav.L[s] = signal;
-
-					max = max >= MathF.Abs(signal) ? max : MathF.Abs(signal);
-
+					GetValues(s);
+					WriteSignal(s);
 					Progress(s);
 				}
-			else
-			{
-				wav.L = signals[0].concat(signals[1]).concat(signals[2]);
-				max = MathF.Max(wav.L.Max(), -wav.L.Min());
+				startedCount--;
+
+				void GetValues(int s)
+				{
+					for (int idk = 0; idk < cs; idk++)
+					{
+						double b = 1.0 * s * nad.Width / (wav.Length * cs);
+						double state = b + 1.0 * idk / cs + cs;
+
+						int left = (int)Math.Floor(state);
+						int right = (int)Math.Ceiling(state);
+
+						if (right == left)
+							right += 1;
+
+						fadeouts[idk] = MathE.FadeOut((float)state - left);
+						fadeins[idk] = 1 - fadeouts[idk];
+
+						lefts[idk] = (int)left * cs - idk;
+						rights[idk] = (int)right * cs - idk;
+					}
+				}
+
+				void WriteSignal(int s)
+				{
+					Sines sines = new Sines();
+
+					for (int i = 0; i < cs; i++)
+					{
+						AddSines(newSamples[lefts[i]], fadeouts[i]);
+						AddSines(newSamples[rights[i]], fadeins[i]);
+					}
+
+					wav.L[s] = sines.GetSignal(s);
+					max = max >= MathF.Abs(wav.L[s]) ? max : MathF.Abs(wav.L[s]);
+
+					void AddSines(NadSample ns, float fade)
+					{
+						if (ns != null)
+							for (int c = 0; c < ns.Height; c++)
+							{
+								ushort idx = ns._indexes[c];
+								float amp = ns._amplitudes[c] * fade;
+								sines.Add(amp, idx);
+							}
+					}
+				}
 			}
+
+			Thread.Sleep(1000);
+
+			while (startedCount > 0)
+				Thread.Sleep(500);
 
 			ProgressShower.Close();
 
@@ -90,97 +124,19 @@ namespace MusGen
 
 			return wav;
 
-			void GetValues(int s)
-			{
-				for (int idk = 0; idk < cs; idk++)
-				{
-					double b = 1.0 * s * nad.Width / (length * cs);
-					double state = b + 1.0 * idk / cs + cs;
-
-					int left = (int)Math.Floor(state);
-					int right = (int)Math.Ceiling(state);
-
-					if (right == left)
-						right += 1;
-
-					fadeouts[idk] = MathE.FadeOut((float)state - left);
-					fadeins[idk] = 1 - fadeouts[idk];
-
-					lefts[idk] = (int)left * cs - idk;
-					rights[idk] = (int)right * cs - idk;
-				}
-			}
-
-			void WriteSample(int s, int zone)
-			{
-				for (int i = 0; i < cs; i++)
-					signals[zone][s] += GetSignal(lefts[i], rights[i], fadeins[i], fadeouts[i]);
-
-				float GetSignal(int left, int right, float fadein, float fadeout)
-				{
-					float leftSignal = 0;
-					float rightSignal = 0;
-
-					if (newSamples[left] != null)
-						leftSignal = GetSignal2(newSamples[left], fadeout);
-					if (newSamples[right] != null)
-						rightSignal = GetSignal2(newSamples[right], fadein);
-
-					return leftSignal + rightSignal;
-				}
-
-				float GetSignal2(NadSample ns, float fade)
-				{
-					float signal = 0;
-
-					if (ns.Height > 0)
-					{
-						int count = 0;
-						for (int c = 0; c < ns.Height; c++)
-						{
-							ushort ind = ns._indexes[c];
-							if (GetZone(ind) == zone)
-							{
-								count++;
-
-								float frq = SpectrumFinder._frequenciesLg[ind];
-								float amp = ns._amplitudes[c];
-
-								signal += amp * MathF.Sin(buf * frq * s);
-							}
-						}
-
-						if (count > 0)
-							signal *= fade / MathF.Sqrt(count);
-					}
-
-					return signal;
-				}
-			}
-
-			ushort GetZone(ushort ind)
-			{
-				if (ind < AP.SpectrumSize * 0.6f)
-					return 0;
-				else if (ind < AP.SpectrumSize * 0.90f)
-					return 1;
-				else
-					return 2;
-			}
-
 			void Progress(int s)
 			{
 				if (s % progressStep == 0)
-					ProgressShower.Set(1.0 * s / length);
+					ProgressShower.Set(1.0 * s / wav.Length);
 			}
 
 			void Normalize()
 			{
 				ProgressShower.Show("Normalization");
-				for (int s = 0; s < length; s++)
+				for (int s = 0; s < wav.Length; s++)
 				{
 					float v = wav.L[s];
-					wav.L[s] = v / max;
+					wav.L[s] = v / max * 0.9f;
 					if (wav._channels == 2)
 						wav.R[s] = wav.L[s];
 

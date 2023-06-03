@@ -26,7 +26,7 @@ namespace MusGen
 
 			Wav wavLow = WavLowPass.FillWavLow(wav, AP._kaiserFilterLength_ForProcessing, true);
 
-			ProgressShower.Show($"Making ss from wav... (cs {AP._cs})");
+			ProgressShower.Show($"WAV to SS... (sps = {AP._sps}, cs = {AP._cs})");
 			int progressStep = (int)MathF.Ceiling(ss._s.Length / 1000f);
 
 			int ns = 0;
@@ -39,7 +39,7 @@ namespace MusGen
 			}
 
 			ProgressShower.Close();
-			ProgressShower.Show("Ss normalisation...");
+			ProgressShower.Show("SS normalisation...");
 
 			float max = SpectrumFinder._max;
 

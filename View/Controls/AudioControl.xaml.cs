@@ -16,6 +16,7 @@ using Microsoft.Win32;
 using Extensions;
 using System.Globalization;
 using MusGen.Audio.WorkFlows;
+using System.IO;
 
 namespace MusGen
 {
@@ -29,8 +30,8 @@ namespace MusGen
 			InitializeComponent();
 		}
 
-		public string _path;
-		private string _outName;
+		public string[] _paths;
+		private string[] _outNames;
 		private float _pitch;
 		private float _speed;
 		public string _s;
@@ -38,32 +39,28 @@ namespace MusGen
 		private void SelBtn_Click(object sender, RoutedEventArgs e)
 		{
 			OpenFileDialog dialog = new OpenFileDialog();
-			dialog.Filter = "audio files (.wav .nad) |*.wav;*.nad";
-			dialog.Title = "Please select audio file";
+			dialog.Filter = "audio files |*.wav;*.nad";
+			dialog.Title = "Please select audio file(s)";
+			dialog.Multiselect = true;
 			bool? success = dialog.ShowDialog();
 			if (success == true)
 			{
-				_path = dialog.FileName;
-				string name = dialog.SafeFileName;
+				_paths = dialog.FileNames;
+				_outNames = dialog.SafeFileNames;
 
-				bool isGood = false;
-				if (TextE.StringAfterLast(name, ".") == "wav")
-					isGood = Wav.CheckWav(_path);
-				else if (TextE.StringAfterLast(name, ".") == "nad")
-					isGood = true;
-				else
-					throw new ArgumentException("wrong file extension");
+				for (int i = 0; i < _outNames.Length; i++)
+					_outNames[i] = TextE.StringBeforeLast(_outNames[i], ".");
 
-				if (isGood)
+				SelAudioButton.Content = _outNames[0];
+				if (_paths.Count() == 1)
 				{
-					SelAudioButton.Content = name;
-					outNameTb.Text = TextE.StringBeforeLast(name, ".");
+					SelAudioButton.Content = _outNames[0];
+					outNameTb.Text = _outNames[0];
 				}
 				else
 				{
-					MessageBox.Show("Wrong wav file", "Sorry", MessageBoxButton.OK, MessageBoxImage.Error);
-					SelAudioButton.Content = "Select file";
-					_path = "";
+					SelAudioButton.Content = $"{_paths.Length} files";
+					outNameTb.Text = "";
 				}
 			}
 		}
@@ -71,12 +68,12 @@ namespace MusGen
 		private void SelImageButton_Click(object sender, RoutedEventArgs e)
 		{
 			OpenFileDialog dialog = new OpenFileDialog();
-			dialog.Filter = "Image Files (*.bmp, *.jpg, *.jpeg, *.png)|*.bmp;*.jpg;*.jpeg;*.png";
+			dialog.Filter = "Image Files |*.jpg"; //
 			dialog.Title = "Please select image file";
 			bool? success = dialog.ShowDialog();
 			if (success == true)
 			{
-				_path = dialog.FileName;
+				_paths = dialog.FileNames;
 				string name = dialog.SafeFileName;
 
 				SelImageButton.Content = name;
@@ -86,12 +83,6 @@ namespace MusGen
 
 		private void ProcessBtn_Click(object sender, RoutedEventArgs e)
 		{
-			_outName = outNameTb.Text;
-
-			if (_outName == null || _path == null)
-				return;
-			if (_path == "" || _outName == "")
-				return;
 			if (!GetPitch())
 				return;
 			if (!GetSpeed())
@@ -106,38 +97,60 @@ namespace MusGen
 
 			void Tr()
 			{
+				string outNameAddiction = "";
+				if (_paths.Length > 1)
+					if (outNameTb.Text != "")
+						outNameAddiction = "_" + outNameTb.Text;
+
 				RealtimeFFT.Stop();
 
-				if (_s == "Ss octave reverse (soft, MultiNad)")
-					WavToSsOctaveReverse_Soft_MultiNad.Make(_path, _outName, _speed, _pitch);
-				else if (_s == "Jpg to wav ss octave reverse (soft, MultiNad)")
-					JpgSsOctaveReverse_Soft_MultiNad.Make(_path, _outName, _speed, _pitch);
-				else if (_s == "Wav to nad octave reverse (soft)")
-					WavToNadOctaveReverse_Soft_MultiNad.Make(_path, _outName, _speed, _pitch);
-				else if (_s == "Nad to nad octave reverse (soft)")
-					NadToNadOctaveReverse_Soft.Make(_path, _outName, _speed, _pitch);
-				else if (_s == "Jpg to wav nad octave reverse (soft, MultiNad)")
-					JpgNadOctaveReverse_Soft_MultiNad.Make(_path, _outName, _speed, _pitch);
-				else if (_s == "Wav to wav (FixedNad)")
-					WavToWav_FixedNad.Make(_path, _outName, _speed, _pitch);
-				else if (_s == "Wav to jpg")
-					WavToJpg.Make(_path, _outName, _speed, _pitch);
-				else if (_s == "Nad to jpg")
-					NadToJpg.Make(_path, _outName, _speed, _pitch);
-				else if (_s == "Wav to nad (MultiNad)")
-					WavToMultiNad.Make(_path, _outName, _speed, _pitch);
-				else if (_s == "Nad to wav")
-					NadToWav.Make(_path, _outName, _speed, _pitch);
-				else if (_s == "Jpg to wav (MultiNad)")
-					JpgToWav_MultiNad.Make(_path, _outName, _speed, _pitch);				
-				else if (_s == "Wav to wav (MultiNad)")
-					WavToWav_MultiNad.Make(_path, _outName, _speed, _pitch);
-				else if (_s == "Jpg to clean jpg")
-					JpegSpectrumClean.Make(_path, _outName, _speed, _pitch);
-				else if (_s == "Vertical reverse (FixedNad)")
-					WavVerticalReverse_FixedNad.Make(_path, _outName, _speed, _pitch);
-				else
-					outNameTb.Text = "Wrong type in list";
+				if (_paths.Length > 0)
+					for (int i = 0; i < _outNames.Length; i++)
+						Do(_outNames[i] + outNameAddiction, _paths[i]);
+
+				RealtimeFFT.Stop();
+
+				void Do(string outName, string path)
+				{
+					if (path == "" || !File.Exists(path))
+						return;
+
+					if (_s == "WAV_SORS_MNAD_WAV_exp")
+						WAV_SORS_MNAD_WAV_exp.Make(path, outName, _speed, _pitch);
+
+					else if (_s == "WAV_MNAD_NORS_WAV_exp")
+						WAV_MNAD_NORS_WAV_exp.Make(path, outName, _speed, _pitch);
+
+					else if (_s == "NAD_NORS_exp")
+						NAD_NORS_exp.Make(path, outName, _speed, _pitch);
+
+					else if (_s == "WAV_FNAD_WAV_exp")
+						WAV_FNAD_WAV_exp.Make(path, outName, _speed, _pitch);
+
+					else if (_s == "WAV_JPG_exp")
+						WAV_JPG_exp.Make(path, outName, _speed, _pitch);
+
+					else if (_s == "NAD_JPG_exp")
+						NAD_JPG_exp.Make(path, outName, _speed, _pitch);
+
+					else if (_s == "WAV_MNAD_exp")
+						WAV_MNAD_exp.Make(path, outName, _speed, _pitch);
+
+					else if (_s == "WAV_MNAD_exp_NORS_WAV_exp")
+						WAV_MNAD_exp_NORS_WAV_exp.Make(path, outName, _speed, _pitch);
+
+					else if (_s == "NAD_WAV_exp")
+						NAD_WAV_exp.Make(path, outName, _speed, _pitch);
+
+					else if (_s == "WAV_MNAD_WAV_exp")
+						WAV_MNAD_WAV_exp.Make(path, outName, _speed, _pitch);
+
+					else if (_s == "JpegSpectrumClean")
+						JpegSpectrumClean.Make(path, outName, _speed, _pitch);
+
+					else
+						outNameTb.Text = "Wrong type in list";
+				}
 
 				Application.Current.Dispatcher.Invoke(() =>
 				{
@@ -190,7 +203,7 @@ namespace MusGen
 
 			if (SelAudioButton != null && SelImageButton != null)
 			{
-				if (_s.Contains("Jpg to"))
+				if (_s.Contains("Jpeg"))
 					ImageSelection();
 				else
 					AudioSelection();

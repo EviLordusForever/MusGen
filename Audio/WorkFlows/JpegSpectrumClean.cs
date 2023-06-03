@@ -12,7 +12,7 @@ namespace MusGen
 	{
 		public static void Make(string jpgInPath, string exportName, float speed, float pitch)
 		{
-			Logger.Log($"Image to clean image (MultiNad) started for\n{jpgInPath}");
+			Logger.Log($"JpegSpectrumClean started for\n{jpgInPath}");
 
 			WriteableBitmap wbmp = WBMP.Load(jpgInPath);
 			SS ss = WbmpToSs.Make(wbmp);
@@ -22,9 +22,9 @@ namespace MusGen
 			WriteableBitmap wbmp2 = SsToWbmp.Make(ss);
 			string path = $"{DiskE._programFiles}Spectrograms\\{exportName}.jpg";
 			GraphicsE.SaveJPG100(wbmp2, path);
-			DialogE.ShowFile(path);
+			DialogE.ShowFile(path + " (JSC)");
 
-			Logger.Log($"Image to clean iamge (MultiNad) finished. Saved as ({exportName})");
+			Logger.Log($"JpegSpectrumClean finished. Saved as ({exportName})");
 		}
 	}
 }

@@ -49,11 +49,27 @@ namespace MusGen
 								Logger.Log("Tests are completed.");
 				*/
 
-				Tests.Curve();
+				//Tests.Curve();
 
 				//Change("TEST");
 				//Change("TreeSong");
-				
+
+/*				ushort samplesCount = 10;
+				float duration = 2;
+				ushort heigh = 1024;
+				ushort cs = 1;
+				Nad grad = new Nad(samplesCount, duration, cs, heigh);
+				for (int s = 0; s < samplesCount; s++)
+				{
+					grad._samples[s] = new NadSample(heigh);
+					for (ushort c = 0; c < heigh; c++)
+					{
+						grad._samples[s]._amplitudes[c] = 1;
+						grad._samples[s]._indexes[c] = c;
+					}
+				}
+
+				grad.Export("Grad");*/
 
 				void Change(string name)
 				{

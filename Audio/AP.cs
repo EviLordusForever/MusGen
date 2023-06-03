@@ -12,17 +12,20 @@ namespace MusGen
 		public const int _lc = 16; //how much fftLow bigger than fft //16
 		public static short _channels = 20;
 		public const ushort _sps = 120; //spectrums per second
-		public static ushort _cs = 5; //how many spectrums per one specturm
-		public static ushort _gg = 2; //how much
+		public static ushort _cs = 3; //how many spectrums per one specturm
+		public static ushort _gg = 4; //how much
 
-		public static int _smootherL = 32; //2 //8 //it is actually improves sound
-		public static int _smootherH = 6;
-		public static float[] _smootherpoints = new float[] { 0, 0.64f, 0.78f, 0.88f, 0.92f, 1 };
-		public static float[] _smoothervalues = new float[] { 0, 0,     1,     1,     0,     0 };
+		public static int _smootherL = 6; //2 //8 //it is actually improves sound
+		public static int _smootherH = 4;
+		public static float[] _smootherpoints = new float[] { 0, 0.70f, 0.80f, 1 };
+		public static float[] _smoothervalues = new float[] { 1, 1,     0,     0 };
+
+		public static float[] _normalEQpoints = new float[] { 0, 1 };
+		public static float[] _normalEQvalues = new float[] { 1, 2f };
 
 		public static int _iters = 4; //idk if it doing something
 		public static float _speed = 1f;
-		public static float _spectrumMiddleSmoother = 20f;
+		public static float _spectrumMiddleSmoother = 14f;
 
 		public static float _nadMin = 0.0015f;
 

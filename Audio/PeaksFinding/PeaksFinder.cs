@@ -127,6 +127,21 @@ namespace PeaksFinding
 			return peakIndexes;
 		}
 
+		public static List<ushort> FindEvery_By_Every(float[] array1, out List<float> amps)
+		{
+			amps = new List<float>();
+
+			List<ushort> idxs = new List<ushort>();
+
+			for (ushort i = 0; i < array1.Length; i++)
+			{
+				idxs.Add(i);
+				amps.Add(array1[i]);
+			}
+
+			return idxs;
+		}
+
 		public static List<int> FindEvery_By_Gauss(float[] array1, out List<float> amps)
 		{
 			List<int> peakIndexes = new List<int>();

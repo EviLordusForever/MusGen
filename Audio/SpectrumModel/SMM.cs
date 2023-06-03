@@ -151,6 +151,7 @@ namespace MusGen
 
 		private static void Save()
 		{
+			Logger.Log("Started saving spectrum model.");
 			string str = JsonConvert.SerializeObject(_model);
 			File.WriteAllText(_path, str);
 			Logger.Log("Spectrum model was saved.");

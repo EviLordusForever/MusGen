@@ -12,7 +12,7 @@ namespace MusGen
 	{
 		public static Nad Make(SS ss)
 		{
-			ProgressShower.Show("Ss to MultiNad...");
+			ProgressShower.Show("SS to MNAD...");
 			int progressStep = (int)MathF.Ceiling(ss.Width / 1000f);
 
 			//AP.FftSize = ss.Height * 2;
@@ -29,7 +29,11 @@ namespace MusGen
 
 			ProgressShower.Close();
 
-			nad = NadCurveEqualiser.Make(nad);
+			nad = NadCurveEqualiser.Make(nad, SMM._model._curve);
+			int[] points = ArrayE.Multiply(AP._normalEQpoints, AP.SpectrumSizeGG);
+
+			float[] curve2 = ArrayE.CreateInterpolatedArray(AP.SpectrumSizeGG, points, AP._normalEQvalues);
+			nad = NadCurveEqualiser.Make(nad, curve2);
 
 			return nad;
 		}
@@ -40,7 +44,7 @@ namespace MusGen
 			ushort[] indexes = PeaksFinding.PeaksFinder.FindEvery_By_Stupied(spectrum, out amps).ToArray();
 			var ns = new NadSample(indexes.Length);
 			ns._indexes = indexes;
-			ns._amplitudes = amps.ToArray();			
+			ns._amplitudes = amps.ToArray();
 
 			return ns;
 		}
