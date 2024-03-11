@@ -21,7 +21,6 @@ namespace MusGen
 	public class NadSample
 	{
 		public ushort[] _indexes;
-
 		public float[] _amplitudes;
 
 		public void RaisePitch(float pitch)
@@ -68,6 +67,34 @@ namespace MusGen
 			}
 		}
 
+		public void Add2(ushort index, float amp)
+		{
+			if (_indexes.Contains(index))
+			{
+				int i = Array.IndexOf(_indexes, index);
+				_amplitudes[i] += amp;
+			}
+			else
+			{
+				Array.Resize(ref _indexes, _indexes.Length + 1);
+				Array.Resize(ref _amplitudes, _amplitudes.Length + 1);
+
+				_indexes[_indexes.Length - 1] = index;
+				_amplitudes[_amplitudes.Length - 1] = amp;
+			}
+		}
+
+		public void Add2(NadSample sample)
+		{
+			for (int i = 0; i < sample._indexes.Length; i++)
+				Add2(sample._indexes[i], sample._amplitudes[i]);
+		}
+
+		public void Divide(float number)
+		{
+			for (int i = 0; i < Height; i++)
+				_amplitudes[i] /= number;
+		}
 
 		public void Normalise(float max)
 		{

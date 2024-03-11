@@ -11,8 +11,8 @@ namespace MusGen
 		private static int _fftSize = 1024 * 1; //1024
 		public const int _lc = 16; //how much fftLow bigger than fft //16
 		public static short _channels = 20;
-		public const ushort _sps = 120; //spectrums per second
-		public static ushort _cs = 3; //how many spectrums per one specturm
+		public const ushort _sps = 1; //spectrums per second
+		public static ushort _cs = 1; //how many spectrums per one specturm
 		public static ushort _gg = 4; //how much
 
 		public static int _smootherL = 6; //2 //8 //it is actually improves sound
@@ -65,7 +65,7 @@ namespace MusGen
 		public static int _wbmpResY = 16 * 9 * 2;
 
 		public static float _fadeTime = 0.99f;
-		public static string _waveForm = "sin";
+		public static string _waveForm = "square"; // sin / square
 
 		public static string _captureType = "system";
 		public static string _windowFunction = "hamming";

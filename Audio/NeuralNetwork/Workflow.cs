@@ -19,11 +19,11 @@ using Extensions;
 using System.Windows.Media;
 using System.IO;
 
-namespace PeaksFinding
+namespace MusGen
 {
 	public static class Workflow
 	{
-		public static void Make()
+		public static void EVOLVE()
 		{
 			InputData data = TestsFiller.Fill();
 
@@ -35,9 +35,9 @@ namespace PeaksFinding
 			NDArray yTrain = np.array(data.answers.SelectMany(x => x).ToArray());
 			yTrain = yTrain.reshape(newShape);
 
-			IModel model = PeaksModelManager.GetModel();
+			IModel model = ModelManager.Load();
 
-			for (int i = 0; i < Params._epochs; i++)
+			for (int i = 0; ; i++)
 			{
 				var history = model.fit(xTrain, yTrain, Params._batchSize, 1);
 				float mae = history.history["mean_absolute_error"][0];

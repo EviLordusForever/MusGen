@@ -23,7 +23,7 @@ namespace PeaksFinding
 
 		static PeaksFinder()
 		{
-			_model = ModelManager.GetModel();
+			_model = PeaksModelManager.GetModel();
 			FillFades();
 		}
 

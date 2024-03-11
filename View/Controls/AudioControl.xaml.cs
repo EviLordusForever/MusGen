@@ -39,7 +39,7 @@ namespace MusGen
 		private void SelBtn_Click(object sender, RoutedEventArgs e)
 		{
 			OpenFileDialog dialog = new OpenFileDialog();
-			dialog.Filter = "audio files |*.wav;*.nad";
+			dialog.Filter = "audio files |*.wav;*.nad;*.mid;*.fnad";
 			dialog.Title = "Please select audio file(s)";
 			dialog.Multiselect = true;
 			bool? success = dialog.ShowDialog();
@@ -117,6 +117,12 @@ namespace MusGen
 
 					if (_s == "WAV_SORS_MNAD_WAV_exp")
 						WAV_SORS_MNAD_WAV_exp.Make(path, outName, _speed, _pitch);
+
+					else if (_s == "FNAD_MID_exp")
+						FNAD_MID_exp.Make(path, outName, _speed, _pitch);
+
+					else if (_s == "MIDI_MNAD_WAV_exp")
+						MID_MNAD_WAV_exp.Make(path, outName, _speed, _pitch);
 
 					else if (_s == "WAV_MNAD_NORS_WAV_exp")
 						WAV_MNAD_NORS_WAV_exp.Make(path, outName, _speed, _pitch);

@@ -12,7 +12,7 @@ using Tensorflow.Keras;
 
 namespace PeaksFinding
 {
-	public static class ModelManager
+	public static class PeaksModelManager
 	{
 		public static IModel GetModel()
 		{

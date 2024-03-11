@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Melanchall.DryWetMidi;
-using Melanchall.DryWetMidi.Core;
-using Melanchall.DryWetMidi.Common;
-using Melanchall.DryWetMidi.Composing;
-using Melanchall.DryWetMidi.Interaction;
 using Extensions;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows.Media;
 using System.IO.Compression;
+/*using NAudio;
+using NAudio.Midi;*/
+using Melanchall.DryWetMidi;
+using Melanchall.DryWetMidi.Core;
+using Melanchall.DryWetMidi.Interaction;
 
 namespace MusGen
 {
@@ -26,6 +26,15 @@ namespace MusGen
 
 		public Nad()
 		{
+		}
+
+		public Nad(int samplesCount, float duration)
+		{
+			_channelsCount = -1;
+			_samples = new NadSample[samplesCount];
+			_duration = duration;
+			_cs = AP._cs;
+			_specturmSize = (ushort)AP.SpectrumSize;
 		}
 
 		public Nad(int samplesCount, float duration, ushort cs, ushort spectrumSize)
@@ -44,6 +53,31 @@ namespace MusGen
 			_duration = duration;
 			_cs = cs;
 			_specturmSize = spectrumSize;
+		}
+
+		public Nad Modify(int bps)
+		{
+			int oldSamplesCount = _samples.Length;
+			int newSamplesCount = (int)(bps * _duration);
+			Nad nad = new Nad(newSamplesCount, _duration);
+
+			for (int sample = 0; sample < newSamplesCount; sample++)
+			{
+				nad._samples[sample] = new NadSample(0);
+
+				int from = (int)(1f * sample / newSamplesCount * oldSamplesCount);
+				int to = (int)(1f * (sample + 1) / newSamplesCount * oldSamplesCount);
+				int count = to - from;
+
+				for (int i = from; i < to; i++)
+					nad._samples[sample].Add2(_samples[i]);
+
+				nad._samples[sample].Divide(count);
+			}
+
+			Logger.Log("Nad successfully modified!");
+
+			return nad;
 		}
 
 		public void Normalise(float max)
@@ -175,29 +209,139 @@ namespace MusGen
 			return newNad;
 		}
 
-        private TrackChunk Build(TempoMap tempoMap)
+        public void ToMidi(string name)
         {
-            ProgramChangeEvent pce = new ProgramChangeEvent((SevenBitNumber)1);
-            TrackChunk trackChunk = new TrackChunk(pce);
+			var midiFile = new MidiFile();
+			var trackChunk = new TrackChunk();
+			float durationInSeconds = _duration;
 
-            using (var chordsManager = trackChunk.ManageChords())
-            {
-                for (int s = 0; s < _samples.Length; s++)
-                {
-                    var chords = chordsManager.Objects;
+			short ticksPerQuarterNote = 480;
 
-                    Note[] notes = _samples[s].GetMidiNotes();
+			midiFile.TimeDivision = new TicksPerQuarterNoteTimeDivision(ticksPerQuarterNote);
+			//new SmpteTimeDivision(Melanchall.DryWetMidi.Common.SmpteFormat.TwentyFour, 40);
 
-                    chords.Add(new Chord(notes, s * 50));////
-                }
-            }
+			int durationInTicks = (int)(durationInSeconds * ticksPerQuarterNote * 4);
 
-            return trackChunk;
-        }
 
-        public static float F(float t)
+			float[] oldNotes = new float[128];
+
+			int lastEventTime = 0;
+
+			for (int sample = 0; sample < _samples.Length; sample++)
+			{
+				float[] newNotes = new float[128];
+				int timeInTicks = (int)(durationInTicks / _samples.Length * sample / 2);
+
+				for (int i = 0; i < _samples[sample].Height; i++)
+				{
+					ushort index = _samples[sample]._indexes[i];
+					float amplitude = _samples[sample]._amplitudes[i];
+					byte velocity = (byte)(amplitude * 128);
+					float frequency = SpectrumFinder._frequenciesLg[index];
+					byte noteNumber = (byte)(69 + 12 * MathF.Log2(frequency / 440));
+
+					newNotes[noteNumber] = velocity;
+
+					if (newNotes[noteNumber] > 0 && oldNotes[noteNumber] == 0)
+					{
+						var noteOnEvent = new NoteOnEvent();
+						noteOnEvent.NoteNumber = new Melanchall.DryWetMidi.Common.SevenBitNumber(noteNumber);
+						noteOnEvent.Velocity = new Melanchall.DryWetMidi.Common.SevenBitNumber(velocity);
+						noteOnEvent.DeltaTime = timeInTicks - lastEventTime;
+						lastEventTime = timeInTicks;
+						trackChunk.Events.Add(noteOnEvent);
+					}
+					else if (newNotes[noteNumber] == 0 && oldNotes[noteNumber] > 0)
+					{
+						var noteOffEvent = new NoteOffEvent();
+						noteOffEvent.NoteNumber = new Melanchall.DryWetMidi.Common.SevenBitNumber(noteNumber);
+						noteOffEvent.Velocity = new Melanchall.DryWetMidi.Common.SevenBitNumber(velocity);
+						noteOffEvent.DeltaTime = timeInTicks - lastEventTime;
+						lastEventTime = timeInTicks;
+						trackChunk.Events.Add(noteOffEvent);
+					}
+				}
+
+				oldNotes = newNotes;
+			}
+
+			midiFile.Chunks.Add(trackChunk);
+			string path = $"{DiskE._programFiles}Export\\{name}.mid";
+			midiFile.Write(path, true, MidiFileFormat.SingleTrack);
+		}
+
+		public FNad ToFNad()
 		{
-			return MathF.Sign(MathF.Sin(t));
+			FNad fnad = new FNad();
+			List<FNadSample> fnadSamples = new List<FNadSample>();
+
+			short ticksPerQuarterNote = 480;
+
+			int fullDurationInTicks = (int)(_duration * ticksPerQuarterNote * 4);
+
+			float[,] map = new float[_samples.Length, SpectrumFinder._frequenciesLg.Length];
+
+			FillMap();
+
+			int lastEventTime = 0;
+
+			for (int sample = 0; sample < _samples.Length; sample++)
+			{
+				int absoluteTimeInTicks = (int)(fullDurationInTicks * (1f * sample / _samples.Length) / 2);
+
+				for (int index = 0; index < SpectrumFinder._frequenciesLg.Length; index++)
+				{
+					if (map[sample, index] > 0)
+					{
+						FNadSample fnadSample = new FNadSample();
+						float index01 = 1f * index / SpectrumFinder._frequenciesLg.Length;
+						float amplitude = map[sample, index];
+						
+						int deltaTimeInTicks = absoluteTimeInTicks - lastEventTime;
+						lastEventTime = absoluteTimeInTicks;
+
+						int samplesOfNote = 0;
+						for (int subSample = sample; subSample < _samples.Length; subSample++)
+						{
+							if (map[subSample, index] > 0)
+							{
+								samplesOfNote++;
+								map[subSample, index] = 0;
+							}
+							else
+								break;
+						}
+
+						int noteDurationInTicks = (int)(fullDurationInTicks * (1f * samplesOfNote / _samples.Length));
+
+						fnadSample._amplitude = amplitude;
+						fnadSample._index = index01;
+						fnadSample._deltaTime = deltaTimeInTicks;
+						fnadSample._absoluteTime = absoluteTimeInTicks;
+						fnadSample._duration = noteDurationInTicks;
+
+						fnadSamples.Add(fnadSample);
+					}
+				}
+			}
+
+			fnad._samples = fnadSamples.ToArray();
+			fnad._ticks = fullDurationInTicks;
+			Logger.Log("Nad converted to FNad");
+			return fnad;
+
+			void FillMap()
+			{
+				for (int sample = 0; sample < _samples.Length; sample++)
+				{
+					for (int i = 0; i < _samples[sample].Height; i++)
+					{
+						ushort index = _samples[sample]._indexes[i];
+						float amplitude = _samples[sample]._amplitudes[i];
+						map[sample, index] = amplitude;
+					}
+				}
+			}
 		}
 	}
 }

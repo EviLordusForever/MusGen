@@ -18,14 +18,14 @@ namespace MusGen
 			idxs = new List<ushort>();
 		}
 
-		public float GetSignal(int s)
+		public float GetSignal(int s, string function)
 		{
 			float signal = 0;
 			float frq;
 			for (int i = 0; i < idxs.Count; i++)
 			{
 				frq = SpectrumFinder._frequenciesLg[idxs[i]];
-				signal += amps[i] * MathF.Sin(buf * frq * s + SpectrumFinder._randomPhases[idxs[i]]);
+				signal += amps[i] * F(function, buf * frq * s + SpectrumFinder._randomPhases[idxs[i]]);
 			}
 
 			float summ = GetSummOfAmps();
@@ -64,6 +64,16 @@ namespace MusGen
 				idxs.Add(idx);
 				amps.Add(amp);
 			}
+		}
+
+		public float F(string function, float x)
+		{
+			if (function == "sin")
+				return MathF.Sin(x);
+			else if (function == "square")
+				return MathF.Sign(MathF.Sin(x));
+			else
+				return 0;
 		}
 	}
 }

@@ -29,7 +29,7 @@ namespace MusGen
 
 				SpectrumFinder.Init();
 				SpectrumDrawer.Init();
-				SMM.Init();
+				//SMM.Init(); ////////////////////////////
 
 				/*				Logger.Log("Tests are started...");
 

@@ -97,7 +97,7 @@ namespace MusGen
 						AddSines(newSamples[rights[i]], fadeins[i]);
 					}
 
-					wav.L[s] = sines.GetSignal(s);
+					wav.L[s] = sines.GetSignal(s, AP._waveForm);
 					max = max >= MathF.Abs(wav.L[s]) ? max : MathF.Abs(wav.L[s]);
 
 					void AddSines(NadSample ns, float fade)
@@ -172,13 +172,7 @@ namespace MusGen
 				var stdDev = new float[zone.Length];
 
 				for (int i = 0; i < zone.Length; i++)
-				{
 					stdDev[i] = MathF.Pow(average[i] - abs[i], 2);
-
-					if (float.IsNaN(stdDev[i]))
-					{
-					}
-				}
 
 				stdDev = ArrayE.SmoothArrayCopy_Quality_NonNegative(stdDev, window);
 				stdDev = ArrayE.Sqrt(stdDev);
@@ -190,9 +184,6 @@ namespace MusGen
 					float std = stdDev[i];
 					float h = SoftCut(x, 1, (av + std) * 1.3f);
 					zone[i] = h * MathF.Sign(zone[i]);
-					if (float.IsNaN(zone[i]))
-					{
-					}
 				}
 			}
 
@@ -221,26 +212,6 @@ namespace MusGen
 				return x;
 			else
 				return h * (MathF.Tanh((x / h - 1) * c + 1) + c - 1) / c;
-		}
-
-		public static double F(double t)
-		{
-			if (AP._waveForm == "sin")
-				return Math.Sin(t);
-			else if (AP._waveForm == "sqaure")
-				return Math.Sign(Math.Sin(t));
-			else
-				return Math.Sin(t);
-		}
-
-		public static float F(float t)
-		{
-			if (AP._waveForm == "sin")
-				return MathF.Sin(t);
-			else if (AP._waveForm == "sqaure")
-				return MathF.Sign(MathF.Sin(t));
-			else
-				return MathF.Sin(t);
 		}
 	}
 }

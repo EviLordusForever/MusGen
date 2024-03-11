@@ -183,6 +183,15 @@ namespace MusGen
 			}
 		}
 
+		public static ushort IndexByFrequency(float frequency)
+		{
+			for (ushort i = 0; i < _frequenciesLg.Length; i++)
+				if (_frequenciesLg[i] > frequency)
+					return i;
+
+			return (ushort)(_frequenciesLg.Length - 1);
+		}
+
 		public static float[] Find(float[] signal, float[] signalLow, bool useMiddleSmooth)
 		{
 			Wav wav = new Wav(signal.Length);
