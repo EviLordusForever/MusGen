@@ -30,7 +30,7 @@ namespace MusGen
 				{
 					for (int subSample = sample; subSample < _samples.Length; subSample++)
 					{
-						int noteOffTime = list[sample]._absoluteTime + list[sample]._duration;
+						float noteOffTime = list[sample]._absoluteTime + list[sample]._duration;
 						if (list[subSample]._absoluteTime > noteOffTime)
 						{
 							FNadSample noteOff = new FNadSample();
@@ -70,16 +70,21 @@ namespace MusGen
 			for (int sample = 0; sample < samplesWithNoteOffs.Length; sample++)
 			{
 				float index01 = samplesWithNoteOffs[sample]._index;
-				int index = (int)(samplesWithNoteOffs[sample]._index * SpectrumFinder._frequenciesLg.Length);
+				int index = (int)(index01 * SpectrumFinder._frequenciesLg.Length);
 				float amplitude01 = samplesWithNoteOffs[sample]._amplitude;
 				byte velocity = (byte)(amplitude01 * 128);
 				float frequency = SpectrumFinder._frequenciesLg[index];
 				byte noteNumber = (byte)(69 + 12 * MathF.Log2(frequency / 440));
 
+				if (noteNumber > 127)
+					noteNumber = 127;
+
 				var noteOnEvent = new NoteOnEvent();
 				noteOnEvent.NoteNumber = new Melanchall.DryWetMidi.Common.SevenBitNumber(noteNumber);
 				noteOnEvent.Velocity = new Melanchall.DryWetMidi.Common.SevenBitNumber(velocity);
-				noteOnEvent.DeltaTime = samplesWithNoteOffs[sample]._deltaTime;
+				if (samplesWithNoteOffs[sample]._deltaTime < 0)
+					samplesWithNoteOffs[sample]._deltaTime = 0.1f; ////////////////
+				noteOnEvent.DeltaTime = (long)(samplesWithNoteOffs[sample]._deltaTime * 2000f);
 				trackChunk.Events.Add(noteOnEvent);
 			}
 

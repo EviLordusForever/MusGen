@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Threading;
 
 namespace MusGen
 {
@@ -23,6 +24,30 @@ namespace MusGen
 		public MainMenuControl()
 		{
 			InitializeComponent();
+		}
+
+		private void NNClick(object sender, RoutedEventArgs e)
+		{
+			Thread myThread = new Thread(MyThread);
+			myThread.Name = "EVOLUTION";
+			myThread.Start();
+
+			void MyThread()
+			{
+				NNWorkflow.EVOLVE();
+			}
+		}
+
+		private void GeneratorClick(object sender, RoutedEventArgs e)
+		{
+			Thread myThread = new Thread(MyThread);
+			myThread.Name = "GENERATING";
+			myThread.Start();
+
+			void MyThread()
+			{
+				Generator.Generate("RESULT");
+			}
 		}
 
 		private void Button_Click(object sender, RoutedEventArgs e)

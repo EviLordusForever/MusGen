@@ -10,6 +10,14 @@ namespace MusGen
 	{
 		public float[][][] _data;
 
+		//[q/a][number][values]
+		//values: index, amplitude, deltatime, duration
+
+		public InputData()
+		{
+			_data = new float[2][][];
+		}
+
 		public float[][] questions
 		{
 			get

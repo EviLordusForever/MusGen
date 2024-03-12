@@ -21,19 +21,17 @@ using System.IO;
 
 namespace MusGen
 {
-	public static class Workflow
+	public static class NNWorkflow
 	{
 		public static void EVOLVE()
 		{
 			InputData data = TestsFiller.Fill();
 
-			Shape newShape = new Shape(Params._testsCount, AP.SpectrumSize);
-
 			NDArray xTrain = np.array(data.questions.SelectMany(x => x).ToArray());
-			xTrain = xTrain.reshape(newShape);
+			xTrain = xTrain.reshape(new Shape(Params._testsCount, 400));
 
 			NDArray yTrain = np.array(data.answers.SelectMany(x => x).ToArray());
-			yTrain = yTrain.reshape(newShape);
+			yTrain = yTrain.reshape(new Shape(Params._testsCount, 4));
 
 			IModel model = ModelManager.Load();
 
@@ -51,7 +49,6 @@ namespace MusGen
 					model.save_weights(Params._modelPath);
 					Logger.Log($"Model was saved!", Brushes.Blue);
 				}
-				//512 * 2 * 30000
 			}
 		}
 	}

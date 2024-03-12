@@ -295,7 +295,7 @@ namespace MusGen
 					{
 						FNadSample fnadSample = new FNadSample();
 						float index01 = 1f * index / SpectrumFinder._frequenciesLg.Length;
-						float amplitude = map[sample, index];
+						float amplitude01 = map[sample, index];
 						
 						int deltaTimeInTicks = absoluteTimeInTicks - lastEventTime;
 						lastEventTime = absoluteTimeInTicks;
@@ -314,11 +314,11 @@ namespace MusGen
 
 						int noteDurationInTicks = (int)(fullDurationInTicks * (1f * samplesOfNote / _samples.Length));
 
-						fnadSample._amplitude = amplitude;
+						fnadSample._amplitude = amplitude01;
 						fnadSample._index = index01;
-						fnadSample._deltaTime = deltaTimeInTicks;
-						fnadSample._absoluteTime = absoluteTimeInTicks;
-						fnadSample._duration = noteDurationInTicks;
+						fnadSample._deltaTime = deltaTimeInTicks / 2000f;
+						fnadSample._absoluteTime = absoluteTimeInTicks / 2000f;
+						fnadSample._duration = noteDurationInTicks / 2000f;
 
 						fnadSamples.Add(fnadSample);
 					}

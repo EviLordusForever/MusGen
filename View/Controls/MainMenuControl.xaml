@@ -6,8 +6,10 @@
              xmlns:local="clr-namespace:MusGen"			 
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-	<Grid Height="250" Width="390">
+	<Grid Height="300" Width="390">
 		<Grid.RowDefinitions>
+			<RowDefinition/>
+			<RowDefinition/>
 			<RowDefinition/>
 			<RowDefinition/>
 			<RowDefinition/>
@@ -23,6 +25,8 @@
 			<ComboBoxItem>Spectrogram type 4</ComboBoxItem>
 		</ComboBox>
 		<Button FontSize="22" Margin ="0,3,0,3" Content="Audio Processing" Grid.Row="3" Click="Button_Click"></Button>
-		<Button FontSize="22" Margin ="0,3,0,3" Content="About" Grid.Row="4" Click="Button_Click_3"></Button>
+		<Button FontSize="22" Margin ="0,3,0,3" Content="Neural Network" Grid.Row="4" Click="NNClick"></Button>
+		<Button FontSize="22" Margin ="0,3,0,3" Content="Generate" Grid.Row="5" Click="GeneratorClick"></Button>
+		<Button FontSize="22" Margin ="0,3,0,3" Content="About" Grid.Row="6" Click="Button_Click_3"></Button>
 	</Grid>
 </UserControl>

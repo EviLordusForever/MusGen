@@ -13,7 +13,7 @@ namespace MusGen
 		public static short _channels = 20;
 		public const ushort _sps = 1; //spectrums per second
 		public static ushort _cs = 1; //how many spectrums per one specturm
-		public static ushort _gg = 4; //how much
+		public static ushort _gg = 2; //how much
 
 		public static int _smootherL = 6; //2 //8 //it is actually improves sound
 		public static int _smootherH = 4;
@@ -29,8 +29,8 @@ namespace MusGen
 
 		public static float _nadMin = 0.0015f;
 
-		public static float _lcFadeStart = 0.4f;
-		public static float _lcFadeEnd = 0.45f;
+		public static float _lcFadeStart = 0.5f;
+		public static float _lcFadeEnd = 1f;
 
 		public static float _peakWidth_ForFixedNad = 70; //70
 
