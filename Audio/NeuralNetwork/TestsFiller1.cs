@@ -11,7 +11,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace MusGen
 {
-	public static class TestsFiller
+	public static class TestsFiller1
 	{
 		public static List<FNadSample[]> _allQuestions;
 		public static List<FNadSample> _allAnswers;
@@ -51,9 +51,38 @@ namespace MusGen
 			Logger.Log($"Available {_allQuestions.Count} tests.");
 		}
 
+		public static void Filter()
+		{
+			int removedCount = 0;
+			int allCount = _allQuestions.Count();
+
+			for (int test = 0; test < _allQuestions.Count(); test++)
+			{
+				float index01 = _allAnswers[test]._index;
+				int index = (int)(index01 * SpectrumFinder._frequenciesLg.Length);
+				float frequency = SpectrumFinder._frequenciesLg[index];
+				byte noteNumber = (byte)(69 + 12 * MathF.Log2(frequency / 440));
+
+				float index01_2 = _allQuestions[test][99]._index;
+				int index_2 = (int)(index01_2 * SpectrumFinder._frequenciesLg.Length);
+				float frequency_2 = SpectrumFinder._frequenciesLg[index_2];
+				byte noteNumber_2 = (byte)(69 + 12 * MathF.Log2(frequency_2 / 440));
+
+				if (noteNumber == noteNumber_2)
+				{
+					_allAnswers.RemoveAt(test);
+					_allQuestions.RemoveAt(test);
+					removedCount++;
+				}
+			}
+
+			Logger.Log($"REMOVED {removedCount} from {allCount}");
+			Params._testsCount = _allQuestions.Count();
+		}
+
 		public static InputData Fill()
 		{		
-			string path = $"{DiskE._programFiles}\\NNTests.bin";
+			string path = $"{DiskE._programFiles}\\NNTests1.bin";
 			if (File.Exists(path))
 			{
 				Logger.Log("Reading tests from bin...");
@@ -72,6 +101,7 @@ namespace MusGen
 			else
 			{
 				MakeAll();
+				Filter();
 				Params._testsCount = _allQuestions.Count;
 
 				ProgressShower.Show("Generating new tests...");
@@ -107,13 +137,13 @@ namespace MusGen
 		public static float[] CreateActualQuestion(int test)
 		{
 			FNadSample[] fnadSamples = _allQuestions[test];
-			float[] question = new float[400];
+			float[] question = new float[100];
 			for (int i = 0; i < 100; i++)
 			{				
-				question[i * 4 + 0] = fnadSamples[i]._index;
-				question[i * 4 + 1] = fnadSamples[i]._amplitude;
-				question[i * 4 + 2] = fnadSamples[i]._deltaTime;
-				question[i * 4 + 3] = fnadSamples[i]._duration;
+				question[i * 1 + 0] = fnadSamples[i]._index;
+/*				question[i * 1 + 1] = fnadSamples[i]._amplitude;
+				question[i * 1 + 2] = fnadSamples[i]._deltaTime;
+				question[i * 1 + 3] = fnadSamples[i]._duration;*/
 			}
 
 			return question;
@@ -121,11 +151,22 @@ namespace MusGen
 
 		public static float[] CreateActualAnswer(int test)
 		{
-			float[] answer = new float[4];
-			answer[0] = _allAnswers[test]._index;
-			answer[1] = _allAnswers[test]._amplitude;
-			answer[2] = _allAnswers[test]._deltaTime;
-			answer[3] = _allAnswers[test]._duration;
+			float[] answer = new float[128];
+			for (int i = 0; i < 128; i++)
+				answer[i] = 0.2f;
+
+			float index01 = _allAnswers[test]._index;
+			int index = (int)(index01 * SpectrumFinder._frequenciesLg.Length);
+			float frequency = SpectrumFinder._frequenciesLg[index];
+			byte noteNumber = (byte)(69 + 12 * MathF.Log2(frequency / 440));
+			answer[noteNumber] = 1f;
+
+			float index01_2 = _allQuestions[test][99]._index;
+			int index_2 = (int)(index01_2 * SpectrumFinder._frequenciesLg.Length);
+			float frequency_2 = SpectrumFinder._frequenciesLg[index_2];
+			byte noteNumber_2 = (byte)(69 + 12 * MathF.Log2(frequency_2 / 440));
+			answer[noteNumber_2] = 0f;
+
 			return answer;
 		}
 	}

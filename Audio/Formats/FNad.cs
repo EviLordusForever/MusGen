@@ -72,7 +72,8 @@ namespace MusGen
 				float index01 = samplesWithNoteOffs[sample]._index;
 				int index = (int)(index01 * SpectrumFinder._frequenciesLg.Length);
 				float amplitude01 = samplesWithNoteOffs[sample]._amplitude;
-				byte velocity = (byte)(amplitude01 * 128);
+				byte velocity = (byte)(amplitude01 * 127);
+
 				float frequency = SpectrumFinder._frequenciesLg[index];
 				byte noteNumber = (byte)(69 + 12 * MathF.Log2(frequency / 440));
 
@@ -82,8 +83,6 @@ namespace MusGen
 				var noteOnEvent = new NoteOnEvent();
 				noteOnEvent.NoteNumber = new Melanchall.DryWetMidi.Common.SevenBitNumber(noteNumber);
 				noteOnEvent.Velocity = new Melanchall.DryWetMidi.Common.SevenBitNumber(velocity);
-				if (samplesWithNoteOffs[sample]._deltaTime < 0)
-					samplesWithNoteOffs[sample]._deltaTime = 0.1f; ////////////////
 				noteOnEvent.DeltaTime = (long)(samplesWithNoteOffs[sample]._deltaTime * 2000f);
 				trackChunk.Events.Add(noteOnEvent);
 			}

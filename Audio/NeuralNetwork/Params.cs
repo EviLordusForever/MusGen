@@ -9,7 +9,8 @@ namespace MusGen
 {
 	public static class Params
 	{
-		public static string _modelPath = $"{DiskE._programFiles}TheModel";
+		public static string _model1Path = $"{DiskE._programFiles}NNModel1";
+		public static string _model2Path = $"{DiskE._programFiles}NNModel2";
 		public static int _testsCount = -1;
 		public static int _batchSize = 3000;
 

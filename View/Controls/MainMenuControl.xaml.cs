@@ -38,6 +38,18 @@ namespace MusGen
 			}
 		}
 
+		private void NN2Click(object sender, RoutedEventArgs e)
+		{
+			Thread myThread = new Thread(MyThread);
+			myThread.Name = "EVOLUTION";
+			myThread.Start();
+
+			void MyThread()
+			{
+				NNWorkflow.EVOLVE_2();
+			}
+		}
+
 		private void GeneratorClick(object sender, RoutedEventArgs e)
 		{
 			Thread myThread = new Thread(MyThread);
@@ -46,7 +58,7 @@ namespace MusGen
 
 			void MyThread()
 			{
-				Generator.Generate("RESULT");
+				Generator.Generate();
 			}
 		}
 

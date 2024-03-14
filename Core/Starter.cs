@@ -91,6 +91,8 @@ namespace MusGen
 					WindowsManager._mainWindow.Focus();
 					WindowsManager._mainWindow.BringIntoView();
 				}));
+
+				Generator.GeneratePart2();
 			}
 		}
 	}
