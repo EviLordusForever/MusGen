@@ -30,7 +30,7 @@ namespace MusGen
 {
 	public static class Generator
 	{
-		public static int _count = 300;
+		public static int _count = 1500;
 
 		public static void Generate()
 		{
@@ -72,6 +72,21 @@ namespace MusGen
 
 					Tensor ts = model1.predict(tensor);
 					float[] answer = ts.ToArray<float>();
+
+					// Preventing repeating:
+
+					for (int i = 0; i < 100; i++)
+					{
+						float index01_2 = question[i];
+						int index_2 = (int)(index01_2 * SpectrumFinder._frequenciesLg.Length);
+						float frequency_2 = SpectrumFinder._frequenciesLg[index_2];
+						int noteNumber_2 = (int)(69 + 12 * MathF.Log2(frequency_2 / 440));
+						float x = 100 - i;
+						float decreaser = 1 - 1 / (x / 2 + 1);
+						answer[noteNumber_2] *= decreaser;
+					}
+
+					//Finding leading note:
 
 					float max = 0;
 					float noteNumber = 0;

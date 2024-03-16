@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Threading;
+using MusGen.Audio.NeuralNetwork;
 
 namespace MusGen
 {
@@ -26,6 +27,18 @@ namespace MusGen
 			InitializeComponent();
 		}
 
+		private void EvolveRNNClick(object sender, RoutedEventArgs e)
+		{
+			Thread myThread = new Thread(MyThread);
+			myThread.Name = "EVOLUTION";
+			myThread.Start();
+
+			void MyThread()
+			{
+				Evolution.EVOLVE_RNN_1();
+			}
+		}
+
 		private void NNClick(object sender, RoutedEventArgs e)
 		{
 			Thread myThread = new Thread(MyThread);
@@ -34,7 +47,7 @@ namespace MusGen
 
 			void MyThread()
 			{
-				NNWorkflow.EVOLVE();
+				Evolution.EVOLVE();
 			}
 		}
 
@@ -46,7 +59,7 @@ namespace MusGen
 
 			void MyThread()
 			{
-				NNWorkflow.EVOLVE_2();
+				Evolution.EVOLVE_2();
 			}
 		}
 

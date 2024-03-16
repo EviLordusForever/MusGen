@@ -11,7 +11,7 @@
 		<Grid>
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="1*"/>
-				<ColumnDefinition Width="3*"/>
+				<ColumnDefinition Width="9*"/>
 				<ColumnDefinition Width="1*"/>
 			</Grid.ColumnDefinitions>
 
@@ -32,7 +32,7 @@
 				<Grid x:Name="gg" Grid.Column="1"></Grid>
 			</Grid>
 
-			<Viewbox Name="place" Grid.Column="1" Grid.Row="1" Stretch="Uniform" MaxWidth="{Binding ActualWidth, ElementName=gg}">
+			<Viewbox Name="place" Grid.Column="1" Grid.Row="1" Stretch="Uniform">
 			</Viewbox>
 		</Grid>
 	</Grid>
