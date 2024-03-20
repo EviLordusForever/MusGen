@@ -58,6 +58,11 @@ namespace MusGen
 
 		public void ToMidiAndExport(string name)
 		{
+			ToMidiAndExport(name, 1);
+		}
+
+		public void ToMidiAndExport(string name, float speed)
+		{
 			FNadSample[] samplesWithNoteOffs = AddNoteOffs();
 
 			var midiFile = new MidiFile();
@@ -83,7 +88,7 @@ namespace MusGen
 				var noteOnEvent = new NoteOnEvent();
 				noteOnEvent.NoteNumber = new Melanchall.DryWetMidi.Common.SevenBitNumber(noteNumber);
 				noteOnEvent.Velocity = new Melanchall.DryWetMidi.Common.SevenBitNumber(velocity);
-				noteOnEvent.DeltaTime = (long)(samplesWithNoteOffs[sample]._deltaTime * 2000f);
+				noteOnEvent.DeltaTime = (long)(samplesWithNoteOffs[sample]._deltaTime * 2000f / speed);
 				trackChunk.Events.Add(noteOnEvent);
 			}
 

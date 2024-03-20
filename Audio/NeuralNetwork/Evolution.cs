@@ -35,21 +35,37 @@ namespace MusGen
 
 			Sequential model = ModelManager.LoadModel1();
 
+			float lossRecord = 10000;
+			float accuracyRecord = 0;
+
 			for (int i = 0; ; i++)
 			{
 				var history = model.fit(xTrain, yTrain, epochs: 1);
-				float mae = history.history["mean_absolute_error"][0];
 				float loss = history.history["loss"][0];
+				float mae = history.history["mean_absolute_error"][0];
+				//float precision = history.history["precision"][0];
 				float accuracy = history.history["accuracy"][0];
 				Logger.Log($"Epoch {i} done. Mae {mae}. Accuracy {accuracy}. Loss {loss}.");
 
 				DiskE.WriteToProgramFiles("historyM1", "csv", $"{mae};{accuracy};{loss}\n", true);
 
-				if ((i + 1) % Params._savingEvery == 0)
+				if (loss <= lossRecord)
 				{
-					model.save_weights(Params._model1Path);
-					Logger.Log($"Model was saved!", Brushes.Blue);
+					lossRecord = loss;
+					Save();
 				}
+
+/*				if (accuracy >= accuracyRecord)
+				{
+					accuracyRecord = accuracy;
+					Save();
+				}*/
+			}
+
+			void Save()
+			{
+				model.save_weights(Params._model1Path);
+				Logger.Log($"Model was saved!", Brushes.Blue);
 			}
 		}
 
@@ -65,6 +81,8 @@ namespace MusGen
 
 			Sequential model = ModelManager.LoadModel2();
 
+			float lossRecord = 100000;
+
 			for (int i = 0; ; i++)
 			{
 				var history = model.fit(xTrain, yTrain, epochs: 1);
@@ -74,11 +92,17 @@ namespace MusGen
 
 				DiskE.WriteToProgramFiles("historyM2", "csv", $"{mae};{loss}\n", true);
 
-				if ((i + 1) % Params._savingEvery == 0)
+				if (loss <= lossRecord)
 				{
-					model.save_weights(Params._model2Path);
-					Logger.Log($"Model 2 was saved!", Brushes.Blue);
+					lossRecord = loss;
+					Save();
 				}
+			}
+
+			void Save()
+			{
+				model.save_weights(Params._model2Path);
+				Logger.Log($"Model 2 was saved!", Brushes.Blue);
 			}
 		}
 
@@ -100,6 +124,8 @@ namespace MusGen
 
 			Sequential model = ModelManager.LoadRNN1(maxSequenceLength);
 
+			float accuracyRecord = 0;
+
 			for (int i = 0; ; i++)
 			{
 				if (model == null)
@@ -109,26 +135,26 @@ namespace MusGen
 				if (yTrain == null)
 					return;
 
-				try
-				{
-					var history = model.fit(xTrain, yTrain, epochs: 1);
+				var history = model.fit(xTrain, yTrain, epochs: 1);
 
-					float mae = history.history["mean_absolute_error"][0];
-					float loss = history.history["loss"][0];
-					float accuracy = history.history["accuracy"][0];
-					Logger.Log($"Epoch {i} done. Mae {mae}. Accuracy {accuracy}. Loss {loss}.");
+				float mae = history.history["mean_absolute_error"][0];
+				float loss = history.history["loss"][0];
+				float accuracy = history.history["accuracy"][0];
+				Logger.Log($"Epoch {i} done. Mae {mae}. Accuracy {accuracy}. Loss {loss}.");
 
-					DiskE.WriteToProgramFiles("historyRNN1", "csv", $"{mae};{accuracy};{loss}\n", true);
-				}
-				catch (NullReferenceException ex)
+				DiskE.WriteToProgramFiles("historyRNN1", "csv", $"{mae};{accuracy};{loss}\n", true);
+
+				if (accuracy >= accuracyRecord)
 				{
+					accuracyRecord = accuracy;
+					Save();
 				}
-				
-				if ((i + 1) % Params._savingEvery == 0)
-				{
-					model.save_weights(Params._model1Path);
-					Logger.Log($"RNN1 was saved!", Brushes.Blue);
-				}
+			}
+
+			void Save()
+			{
+				model.save_weights(Params._rnn1Path);
+				Logger.Log($"RNN1 was saved!", Brushes.Blue);
 			}
 		}
 	}

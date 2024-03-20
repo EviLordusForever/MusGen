@@ -11,6 +11,7 @@ using System.Windows.Media;
 using Tensorflow.Keras;
 using static Tensorflow.Binding;
 using static Tensorflow.KerasApi;
+using Tensorflow.Keras.Metrics;
 
 namespace MusGen
 {
@@ -22,33 +23,34 @@ namespace MusGen
 
 		public static Sequential CreateFirstModel()
 		{
-			model = KerasApi.keras.Sequential();
+			model = keras.Sequential();
 
 			var shape = new Shape(100); //100 * 4
-			var layer0 = KerasApi.keras.layers.InputLayer(shape);
+			var layer0 = keras.layers.InputLayer(shape);
 			model.add(layer0);
 
-			var act1 = KerasApi.keras.activations.Tanh;
-			var layer1 = KerasApi.keras.layers.Dense(140, activation: act1, use_bias: true);
+			var act1 = keras.activations.Tanh;
+			var layer1 = keras.layers.Dense(600, activation: act1, use_bias: true);
 			model.add(layer1);
 
-			var act2 = KerasApi.keras.activations.Tanh;
-			var layer2 = KerasApi.keras.layers.Dense(140, activation: act2, use_bias: true);
+			var act2 = keras.activations.Tanh;
+			var layer2 = keras.layers.Dense(600, activation: act2, use_bias: true);
 			model.add(layer2);
 
-			var act3 = KerasApi.keras.activations.Tanh;
-			var layer3 = KerasApi.keras.layers.Dense(140, activation: act3, use_bias: true);
+			var act3 = keras.activations.Tanh;
+			var layer3 = keras.layers.Dense(600, activation: act3, use_bias: true);
 			model.add(layer3);
 
-			var act4 = KerasApi.keras.activations.Tanh;
-			var layer4 = KerasApi.keras.layers.Dense(140, activation: act4, use_bias: true);
-			model.add(layer4);
+/*			var act4 = keras.activations.Tanh;
+			var layer4 = keras.layers.Dense(600, activation: act4, use_bias: true);
+			model.add(layer4);*/
 
-			var act5 = KerasApi.keras.activations.Softmax;
-			var layer5 = KerasApi.keras.layers.Dense(128, activation: act5, use_bias: true);
+			var act5 = keras.activations.Sigmoid;
+			//var act5 = keras.activations.Softmax;
+			var layer5 = keras.layers.Dense(128, activation: act5, use_bias: true);
 			model.add(layer5);
 
-			var loss = "categorical_crossentropy";
+			var loss = "binary_crossentropy";
 			var optimizer = "adam";
 			var metrics = new[] { "mae", "accuracy" };
 
@@ -59,26 +61,26 @@ namespace MusGen
 
 		public static Sequential CreateSecondModel()
 		{
-			_model2 = KerasApi.keras.Sequential();
+			_model2 = keras.Sequential();
 
 			var shape = new Shape(401);
-			var layer0 = KerasApi.keras.layers.InputLayer(shape);
+			var layer0 = keras.layers.InputLayer(shape);
 			_model2.add(layer0);
 
-			var act1 = KerasApi.keras.activations.Tanh;
-			var layer1 = KerasApi.keras.layers.Dense(90, activation: act1, use_bias: true);
+			var act1 = keras.activations.Tanh;
+			var layer1 = keras.layers.Dense(100, activation: act1, use_bias: true);
 			_model2.add(layer1);
 
-			var act2 = KerasApi.keras.activations.Tanh;
-			var layer2 = KerasApi.keras.layers.Dense(90, activation: act2, use_bias: true);
+			var act2 = keras.activations.Tanh;
+			var layer2 = keras.layers.Dense(100, activation: act2, use_bias: true);
 			_model2.add(layer2);
 
-			var act3 = KerasApi.keras.activations.Tanh;
-			var layer3 = KerasApi.keras.layers.Dense(90, activation: act3, use_bias: true);
+			var act3 = keras.activations.Tanh;
+			var layer3 = keras.layers.Dense(100, activation: act3, use_bias: true);
 			_model2.add(layer3);
 
-			var act4 = KerasApi.keras.activations.Linear;
-			var layer4 = KerasApi.keras.layers.Dense(3, activation: act4, use_bias: true);
+			var act4 = keras.activations.Linear;
+			var layer4 = keras.layers.Dense(3, activation: act4, use_bias: true);
 			_model2.add(layer4);
 
 			var loss = "mean_squared_error";

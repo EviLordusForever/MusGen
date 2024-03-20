@@ -8,6 +8,7 @@ using Extensions;
 using MusGen;
 using Newtonsoft.Json;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Windows.Media;
 
 namespace MusGen
 {
@@ -24,6 +25,8 @@ namespace MusGen
 			_allAnswers = new List<FNadSample>();
 			_allQuestions = new List<FNadSample[]>();
 
+			int accordNotesCount = 0;
+
 			for (int m = 0; m < _midis.Length; m++)
 			{
 				Midi midi = new Midi();
@@ -37,10 +40,15 @@ namespace MusGen
 
 				for (int t = 100; t < length; t++)
 				{
-					_allAnswers.Add(fnad._samples[t]);
-					FNadSample[] subArray = new FNadSample[100];
-					Array.Copy(fnad._samples, t - 100, subArray, 0, 100);
-					_allQuestions.Add(subArray);
+					if (fnad._samples[t]._deltaTime <= Params._accordMaxTime)
+						accordNotesCount++;
+					else
+					{
+						_allAnswers.Add(fnad._samples[t]);
+						FNadSample[] subArray = new FNadSample[100];
+						Array.Copy(fnad._samples, t - 100, subArray, 0, 100);
+						_allQuestions.Add(subArray);
+					}
 				}
 
 				ProgressShower.Set(1.0 * m / _midis.Length);
@@ -48,7 +56,8 @@ namespace MusGen
 
 			ProgressShower.Close();
 
-			Logger.Log($"Available {_allQuestions.Count} tests.");
+			Logger.Log($"Available {_allQuestions.Count} tests.", Brushes.Cyan);
+			Logger.Log($"Removed {accordNotesCount} notes via accords.", Brushes.Red);
 		}
 
 		public static InputData Fill()

@@ -14,6 +14,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Threading;
 using MusGen.Audio.NeuralNetwork;
+using System.IO;
+using Extensions;
 
 namespace MusGen
 {
@@ -25,6 +27,24 @@ namespace MusGen
 		public MainMenuControl()
 		{
 			InitializeComponent();
+		}
+
+		private void DeleteClick(object sender, RoutedEventArgs e)
+		{
+			Thread myThread = new Thread(MyThread);
+			myThread.Name = "Deleter";
+			myThread.Start();
+
+			void MyThread()
+			{
+				File.Delete($"{DiskE._programFiles}NNTests1.bin");
+				File.Delete($"{DiskE._programFiles}NNTests2.bin");
+				File.Delete($"{DiskE._programFiles}NNModel1");
+				File.Delete($"{DiskE._programFiles}NNModel2");
+				File.Delete($"{DiskE._programFiles}historyM1.csv");
+				File.Delete($"{DiskE._programFiles}historyM2.csv");
+				Logger.Log("Models and tests were deleted!", Brushes.Red);
+			}
 		}
 
 		private void EvolveRNNClick(object sender, RoutedEventArgs e)

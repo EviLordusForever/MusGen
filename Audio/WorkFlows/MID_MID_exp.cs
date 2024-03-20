@@ -7,13 +7,15 @@ using NAudio.Midi;
 
 namespace MusGen
 {
-	public static class FNAD_MID_exp
+	public static class MID_MID_exp
 	{
 		public static void Make(string path, string outName, float speed, float pitch)
 		{
-			FNad fnad2 = new FNad();
-			fnad2.Read(path);
-			fnad2.ToMidiAndExport(outName + "_from_FNAD", speed);
+			Midi midi = new Midi();
+			midi.Read(path);
+			Nad nad = midi.ToNad();
+			FNad fnad = nad.ToFNad();
+			fnad.ToMidiAndExport(outName + "_FNAD", speed);
 			Logger.Log("Done.");
 		}
 	}

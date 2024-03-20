@@ -19,6 +19,7 @@
 
 		<ComboBox FontSize="20" Margin ="0,3,0,3" Name="combobox" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" SelectedIndex="0" Grid.Row="0" SelectionChanged="combobox_SelectionChanged">
 			<ComboBoxItem>MIDI_MNAD_WAV_exp</ComboBoxItem>
+			<ComboBoxItem>MID_MID_exp</ComboBoxItem>
 			<ComboBoxItem>FNAD_MID_exp</ComboBoxItem>
 			<ComboBoxItem>WAV_SORS_MNAD_WAV_exp</ComboBoxItem>
 			<ComboBoxItem>WAV_MNAD_NORS_WAV_exp</ComboBoxItem>

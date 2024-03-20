@@ -14,14 +14,14 @@ namespace MusGen
 	public static class TestsFiller1
 	{
 		public static List<FNadSample[]> _allQuestions;
-		public static List<FNadSample> _allAnswers;
+		public static List<FNadSample[]> _allAnswers;
 
 		public static void MakeAll()
 		{
 			ProgressShower.Show("Generating fnads for new tests...");
 
 			string[] _midis = Directory.GetFiles($"{DiskE._programFiles}MIDIS");
-			_allAnswers = new List<FNadSample>();
+			_allAnswers = new List<FNadSample[]>();
 			_allQuestions = new List<FNadSample[]>();
 
 			for (int m = 0; m < _midis.Length; m++)
@@ -36,12 +36,13 @@ namespace MusGen
 				Logger.Log($"Length: {length} fnad samples.");
 
 				for (int t = 100; t < length; t++)
-				{
-					_allAnswers.Add(fnad._samples[t]);
-					FNadSample[] subArray = new FNadSample[100];
-					Array.Copy(fnad._samples, t - 100, subArray, 0, 100);
-					_allQuestions.Add(subArray);
-				}
+					if (fnad._samples[t]._deltaTime > Params._accordMaxTime)
+					{ ////////////////////////////////////////
+						_allAnswers.Add(GetAccord(fnad, t));
+						FNadSample[] subArray = new FNadSample[100];
+						Array.Copy(fnad._samples, t - 100, subArray, 0, 100);
+						_allQuestions.Add(subArray);
+					}
 
 				ProgressShower.Set(1.0 * m / _midis.Length);
 			}
@@ -49,24 +50,35 @@ namespace MusGen
 			ProgressShower.Close();
 
 			Logger.Log($"Available {_allQuestions.Count} tests.");
+
+			FNadSample[] GetAccord(FNad fnad, int t)
+			{
+				List<FNadSample> accord = new List<FNadSample>();
+				accord.Add(fnad._samples[t]);
+
+				for (int i = t + 1; i < fnad._samples.Length; i++)
+					if (fnad._samples[i]._deltaTime <= Params._accordMaxTime) //////////////
+						accord.Add(fnad._samples[i]);
+					else
+						break;
+
+
+				return accord.ToArray();
+			}
 		}
 
-		public static void Filter()
+		public static void Filter() //////////////////
 		{
 			int removedCount = 0;
 			int allCount = _allQuestions.Count();
 
 			for (int test = 0; test < _allQuestions.Count(); test++)
 			{
-				float index01 = _allAnswers[test]._index;
-				int index = (int)(index01 * SpectrumFinder._frequenciesLg.Length);
-				float frequency = SpectrumFinder._frequenciesLg[index];
-				byte noteNumber = (byte)(69 + 12 * MathF.Log2(frequency / 440));
+				float index01 = _allAnswers[test][0]._index;
+				byte noteNumber = SpectrumFinder.NoteNumberByIndex01(index01);
 
 				float index01_2 = _allQuestions[test][99]._index;
-				int index_2 = (int)(index01_2 * SpectrumFinder._frequenciesLg.Length);
-				float frequency_2 = SpectrumFinder._frequenciesLg[index_2];
-				byte noteNumber_2 = (byte)(69 + 12 * MathF.Log2(frequency_2 / 440));
+				byte noteNumber_2 = SpectrumFinder.NoteNumberByIndex01(index01_2);
 
 				if (noteNumber == noteNumber_2)
 				{
@@ -76,7 +88,7 @@ namespace MusGen
 				}
 			}
 
-			Logger.Log($"REMOVED {removedCount} from {allCount}");
+			Logger.Log($"REMOVED {removedCount} from {allCount} because of repeating.");
 			Params._testsCount = _allQuestions.Count();
 		}
 
@@ -102,6 +114,7 @@ namespace MusGen
 			{
 				MakeAll();
 				Filter();
+
 				Params._testsCount = _allQuestions.Count;
 
 				ProgressShower.Show("Generating new tests...");
@@ -152,20 +165,14 @@ namespace MusGen
 		public static float[] CreateActualAnswer(int test)
 		{
 			float[] answer = new float[128];
-			for (int i = 0; i < 128; i++)
-				answer[i] = 0f;
 
-			float index01 = _allAnswers[test]._index;
-			int index = (int)(index01 * SpectrumFinder._frequenciesLg.Length);
-			float frequency = SpectrumFinder._frequenciesLg[index];
-			byte noteNumber = (byte)(69 + 12 * MathF.Log2(frequency / 440));
-			answer[noteNumber] = 1f;
-
-			float index01_2 = _allQuestions[test][99]._index;
-			int index_2 = (int)(index01_2 * SpectrumFinder._frequenciesLg.Length);
-			float frequency_2 = SpectrumFinder._frequenciesLg[index_2];
-			byte noteNumber_2 = (byte)(69 + 12 * MathF.Log2(frequency_2 / 440));
-			answer[noteNumber_2] = 0f;
+			for (int noteInAccord = 0; noteInAccord < _allAnswers[test].Length; noteInAccord++)
+			{
+				float index01 = _allAnswers[test][noteInAccord]._index;
+				byte noteNumber = SpectrumFinder.NoteNumberByIndex01(index01);
+				answer[noteNumber] = 1f;// / _allAnswers[test].Length;
+				//break;
+			}
 
 			return answer;
 		}

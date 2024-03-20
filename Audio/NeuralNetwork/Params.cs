@@ -16,5 +16,8 @@ namespace MusGen
 		public static int _batchSize = 3000;
 
 		public static int _savingEvery = 30;
+
+		public static float _accordMaxTime = 0.05f;
+		public static float _accordThreshold = 0.85f;
 	}
 }

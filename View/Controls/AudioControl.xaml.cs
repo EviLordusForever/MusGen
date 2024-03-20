@@ -121,6 +121,9 @@ namespace MusGen
 					else if (_s == "FNAD_MID_exp")
 						FNAD_MID_exp.Make(path, outName, _speed, _pitch);
 
+					else if (_s == "MID_MID_exp")
+						MID_MID_exp.Make(path, outName, _speed, _pitch);
+
 					else if (_s == "MIDI_MNAD_WAV_exp")
 						MID_MNAD_WAV_exp.Make(path, outName, _speed, _pitch);
 

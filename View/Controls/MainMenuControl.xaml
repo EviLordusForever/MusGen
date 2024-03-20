@@ -9,11 +9,12 @@
 	<Grid>
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="30*"/>
-			<ColumnDefinition Width="1*"/>
+			<ColumnDefinition Width="2*"/>
 			<ColumnDefinition Width="30*"/>
 		</Grid.ColumnDefinitions>
-		<Grid Height="350" Width="390" Grid.Column ="0">
+		<Grid Height="400" Width="390" Grid.Column ="0">
 			<Grid.RowDefinitions>
+				<RowDefinition/>
 				<RowDefinition/>
 				<RowDefinition/>
 				<RowDefinition/>
@@ -35,9 +36,11 @@
 			<Button FontSize="22" Margin ="0,3,0,3" Content="Evolve NN1" Grid.Row="4" Click="NNClick"></Button>
 			<Button FontSize="22" Margin ="0,3,0,3" Content="Evolve NN2" Grid.Row="5" Click="NN2Click"></Button>
 			<Button FontSize="22" Margin ="0,3,0,3" Content="Generate" Grid.Row="6" Click="GeneratorClick"></Button>
-			<Button FontSize="22" Margin ="0,3,0,3" Content="About" Grid.Row="7" Click="Button_Click_3"></Button>
+			<Button FontSize="22" Margin ="0,3,0,3" Content="Delete them" Grid.Row="7" Click="DeleteClick"></Button>
+			<Button FontSize="22" Margin ="0,3,0,3" Content="About" Grid.Row="8" Click="Button_Click_3"></Button>
 		</Grid>
-		<Grid Height="350" Width="390" Grid.Column="2">
+		<Grid Height="400" Width="25" Grid.Column="1"/>
+		<Grid Height="400" Width="390" Grid.Column="2">
 			<Grid.RowDefinitions>
 				<RowDefinition/>
 				<RowDefinition/>
@@ -47,8 +50,9 @@
 				<RowDefinition/>
 				<RowDefinition/>
 				<RowDefinition/>
+				<RowDefinition/>
 			</Grid.RowDefinitions>
-			<Button FontSize="22" Margin ="0,3,0,3" Content="Evolve RNN1" Grid.Row="4" Click="EvolveRNNClick"></Button>
+			<Button FontSize="22" Margin ="0,3,0,3" Content="Evolve RNN1" Grid.Row="0" Click="EvolveRNNClick"></Button>
 		</Grid>
 	</Grid>
 </UserControl>

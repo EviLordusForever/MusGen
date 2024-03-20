@@ -16,7 +16,7 @@ namespace MusGen
 			Nad nad = midi.ToNad();
 			Wav wav = EveryNadToWav.Make(nad);
 			wav.Export(outName);
-			nad.ToMidi(outName);
+			//nad.ToMidi(outName);
 			FNad fnad = nad.ToFNad();
 			fnad.Export(outName);
 			FNad fnad2 = new FNad();
