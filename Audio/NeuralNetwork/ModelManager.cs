@@ -12,6 +12,7 @@ using Tensorflow.Keras;
 using static Tensorflow.Binding;
 using static Tensorflow.KerasApi;
 using Tensorflow.Keras.Metrics;
+using Tensorflow.Keras.Text;
 
 namespace MusGen
 {
@@ -92,6 +93,92 @@ namespace MusGen
 			return _model2;
 		}
 
+		public static Sequential CreateTransformer(int maxSequenceLength)
+		{
+			// Параметры модели трансформера
+			int numLayers = 4;
+			int numHeads = 8;
+			int keyDim = 64;
+			int dff = 512;
+
+			model = keras.Sequential();
+
+			int vocabSize = 128;
+			var tokenizer = new Tokenizer(vocabSize);
+			var words = new List<string>();
+			for (int i = 0; i < 128; i++)
+				words.Add(i.ToString());
+			tokenizer.fit_on_texts(words);
+
+			var shape = new Shape(maxSequenceLength);
+			var inputLayer = keras.layers.Input(shape);
+			model.add(inputLayer);
+
+			// Добавление слоев трансформера
+			for (int i = 0; i < numLayers; i++)
+			{
+				var attentionLayer = keras.layers.MultiHeadAttention(numHeads, keyDim);
+				model.add(attentionLayer);
+
+				// Слой нормализации после слоя внимания
+				var normalizationLayer = keras.layers.LayerNormalization(axis: -1);
+				model.add(normalizationLayer);
+
+				// Полносвязный слой
+				var denseLayer = keras.layers.Dense(units: dff, activation: keras.activations.Tanh);
+				model.add(denseLayer);
+
+				// Еще один слой нормализации после полносвязного слоя
+				normalizationLayer = keras.layers.LayerNormalization(axis: -1);
+				model.add(normalizationLayer);
+			}
+
+			var act5 = keras.activations.Sigmoid;
+			var outputLayer = keras.layers.Dense(128, activation: act5, use_bias: true);
+			model.add(outputLayer);
+
+			var loss = "binary_crossentropy";
+			var optimizer = "adam";
+			var metrics = new[] { "mae", "accuracy" };
+
+			model.compile(optimizer, loss, metrics);
+
+			return model;
+		}
+
+		public static Sequential CreateHugeModel()
+		{
+			model = keras.Sequential();
+
+			var shape = new Shape(50 * 128); //100 * 4
+			var layer0 = keras.layers.InputLayer(shape);
+			model.add(layer0);
+
+			var act1 = keras.activations.Tanh;
+			var layer1 = keras.layers.Dense(100, activation: act1, use_bias: true);
+			model.add(layer1);
+
+			var act2 = keras.activations.Tanh;
+			var layer2 = keras.layers.Dense(100, activation: act2, use_bias: true);
+			model.add(layer2);
+
+			var act3 = keras.activations.Tanh;
+			var layer3 = keras.layers.Dense(100, activation: act3, use_bias: true);
+			model.add(layer3);
+
+			var act5 = keras.activations.Sigmoid;
+			var layer5 = keras.layers.Dense(128, activation: act5, use_bias: true);
+			model.add(layer5);
+
+			var loss = "binary_crossentropy";
+			var optimizer = "adam";
+			var metrics = new[] { "mae", "accuracy" };
+
+			model.compile(optimizer, loss, metrics);
+
+			return model;
+		}
+
 		public static Sequential CreateModelRNN(int maxSequenceLength)
 		{
 			//Does not work.
@@ -146,6 +233,34 @@ namespace MusGen
 			return model2;
 		}
 
+		public static Sequential LoadHugeModel()
+		{
+			Sequential model = CreateHugeModel();
+			Logger.Log("Huge model was initialized.", Brushes.Magenta);
+
+			if (File.Exists(Params._hugeModelPath))
+			{
+				model.load_weights(Params._hugeModelPath);
+				Logger.Log("Huge model weights were loaded!", Brushes.Magenta);
+			}
+
+			return model;
+		}
+
+		public static Sequential LoadTransformer(int maxSequenceLength)
+		{
+			Sequential model = CreateTransformer(maxSequenceLength);
+			Logger.Log("Transformer was initialized.", Brushes.Magenta);
+
+			if (File.Exists(Params._transformerPath))
+			{
+				model.load_weights(Params._transformerPath);
+				Logger.Log("Transformer weights were loaded!", Brushes.Magenta);
+			}
+
+			return model;
+		}
+
 		public static Sequential LoadRNN1(int maxSequenceLength)
 		{
 			Sequential model = CreateModelRNN(maxSequenceLength);
@@ -161,6 +276,3 @@ namespace MusGen
 		}
 	}
 }
-
-
-

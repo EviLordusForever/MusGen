@@ -35,7 +35,7 @@
 			<Button FontSize="22" Margin ="0,3,0,3" Content="Audio Processing" Grid.Row="3" Click="Button_Click"></Button>
 			<Button FontSize="22" Margin ="0,3,0,3" Content="Evolve NN1" Grid.Row="4" Click="NNClick"></Button>
 			<Button FontSize="22" Margin ="0,3,0,3" Content="Evolve NN2" Grid.Row="5" Click="NN2Click"></Button>
-			<Button FontSize="22" Margin ="0,3,0,3" Content="Generate" Grid.Row="6" Click="GeneratorClick"></Button>
+			<Button FontSize="22" Margin ="0,3,0,3" Content="Generate by Model 1" Grid.Row="6" Click="GeneratorClick"></Button>
 			<Button FontSize="22" Margin ="0,3,0,3" Content="Delete them" Grid.Row="7" Click="DeleteClick"></Button>
 			<Button FontSize="22" Margin ="0,3,0,3" Content="About" Grid.Row="8" Click="Button_Click_3"></Button>
 		</Grid>
@@ -52,7 +52,9 @@
 				<RowDefinition/>
 				<RowDefinition/>
 			</Grid.RowDefinitions>
-			<Button FontSize="22" Margin ="0,3,0,3" Content="Evolve RNN1" Grid.Row="0" Click="EvolveRNNClick"></Button>
+			<Button FontSize="22" Margin ="0,3,0,3" Content="Evolve Transformer" Grid.Row="0" Click="EvolveRNNClick"></Button>
+			<Button FontSize="22" Margin ="0,3,0,3" Content="Evolve Huge Model" Grid.Row="1" Click="EvolveHugeModelClick"></Button>
+			<Button FontSize="22" Margin ="0,3,0,3" Content="Generate by Huge Model" Grid.Row="2" Click="GenHugeClick"></Button>
 		</Grid>
 	</Grid>
 </UserControl>

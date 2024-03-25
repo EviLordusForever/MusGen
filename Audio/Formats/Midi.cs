@@ -75,16 +75,29 @@ namespace MusGen
 
             void FillNoteEvents()
             {
+                var mergedTrackChunk = new List<MidiEvent>();
+
                 foreach (var trackChunk in _midiFile.Events)
                 {
+                    int accumulatedTime = 0;
+
                     foreach (var midiEvent in trackChunk)
                     {
+                        accumulatedTime += midiEvent.DeltaTime;
+
                         if (midiEvent.CommandCode == MidiCommandCode.NoteOn)
                         {
                             var noteEvent = midiEvent as NoteEvent;
                             if (noteEvent != null)
                             {
-                                noteEvents.Add(noteEvent);
+                                if (noteEvent.Channel < 9)
+                                {
+                                    noteEvent.AbsoluteTime = accumulatedTime;
+                                    mergedTrackChunk.Add(noteEvent);
+                                }
+                                else
+                                {
+                                }
                             }
                         }
 
@@ -93,9 +106,41 @@ namespace MusGen
                             var noteEvent = midiEvent as NoteEvent;
                             if (noteEvent != null)
                             {
-                                noteEvent.Velocity = 0;
-                                noteEvents.Add(noteEvent);
+                                if (noteEvent.Channel < 9)
+                                {
+                                    noteEvent.AbsoluteTime = accumulatedTime;
+                                    noteEvent.Velocity = 0;
+                                    mergedTrackChunk.Add(noteEvent);
+                                }
+                                else
+                                {
+                                }
                             }
+                        }
+                    }
+                }
+
+                // Сортировка событий в объединенном trackChunk по absoluteTime
+                mergedTrackChunk.Sort((e1, e2) => e1.AbsoluteTime.CompareTo(e2.AbsoluteTime));
+
+                foreach (var midiEvent in mergedTrackChunk)
+                {
+                    if (midiEvent.CommandCode == MidiCommandCode.NoteOn)
+                    {
+                        var noteEvent = midiEvent as NoteEvent;
+                        if (noteEvent != null)
+                        {
+                            noteEvents.Add(noteEvent);
+                        }
+                    }
+
+                    if (midiEvent.CommandCode == MidiCommandCode.NoteOff)
+                    {
+                        var noteEvent = midiEvent as NoteEvent;
+                        if (noteEvent != null)
+                        {
+                            noteEvent.Velocity = 0;
+                            noteEvents.Add(noteEvent);
                         }
                     }
                 }

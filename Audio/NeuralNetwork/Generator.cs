@@ -30,10 +30,14 @@ namespace MusGen
 {
 	public static class Generator
 	{
-		public static int _count = 2000;
+		public static int _count = 300;
+		public static int _window = 50;
 
-		public static void Generate()
+		public static void Generate(string outname)
 		{
+			int lastNoteNumber = 0;
+			int lastNoteNumber2 = 0;
+			List<int> noteNumbers = new List<int>();
 			OpenFileDialog dialog = new OpenFileDialog();
 			dialog.Filter = "audio files |*.mid;";
 			dialog.Title = "Please select mid file";
@@ -51,9 +55,24 @@ namespace MusGen
 				for (int i = 0; i < 100; i++)
 					samples.Add(fnadSamples[i]);
 				
-				IModel model1 = ModelManager.LoadModel1();				
+				IModel model1 = ModelManager.LoadModel1();
+
+
+				float deltaTime = 0;
+				int deltasCount = 0;
+				for (int i = 0; i < fnadSamples.Length; i++)
+				{
+					if (fnadSamples[i]._deltaTime > Params._accordMaxTime)
+					{
+						deltaTime += fnadSamples[i]._deltaTime;
+						deltasCount++;
+					}
+				}
+				deltaTime /= deltasCount;
 
 				ProgressShower.Show("Generating...");
+
+				
 
 				for (int j = 0; j < _count; j++)
 				{
@@ -75,16 +94,13 @@ namespace MusGen
 
 					// Preventing repeating:
 
-					for (int i = 0; i < 100; i++)
+					for (int i = noteNumbers.Count - 1; i >= 0 && i > noteNumbers.Count - 101; i--)
 					{
-						float index01_2 = question[i];
-						int index_2 = (int)(index01_2 * SpectrumFinder._frequenciesLg.Length);
-						float frequency_2 = SpectrumFinder._frequenciesLg[index_2];
-						int noteNumber_2 = (int)(69 + 12 * MathF.Log2(frequency_2 / 440));
-						float x = 100 - i;
-						float decreaser = 1 - 1 / (x / 2 + 1);
-						answer[noteNumber_2] *= decreaser;
-					} ////////////////////////////////////////
+						float x = noteNumbers.Count - 1 - i;
+						//float decreaser = 1 - 1 / (x / 4 + 1);
+						float decreaser = 1 - MathF.Exp(-x / 6f);
+						answer[noteNumbers[i]] *= decreaser;
+					}
 
 					//Finding leading note:
 
@@ -94,22 +110,31 @@ namespace MusGen
 					{
 						FNadSample result = new FNadSample();
 						result._index = notes[i];
-						result._amplitude = -1;
-						result._duration = -1;
-						result._absoluteTime = -1;
+						result._amplitude = 1;						
 
-						result._deltaTime = -1;
+						result._deltaTime = deltaTime;
 						if (i > 0)
 							result._deltaTime = 0;
+
+						result._absoluteTime = samples.Last()._absoluteTime + result._deltaTime;
+						result._duration = result._deltaTime * 1.5f;
 
 						samples.Add(result);
 					}
 
-					ProgressShower.Set(j / (_count * 2.0));
+					ProgressShower.Set(1.0 * j / (_count));
 				}
 
-				SaveList(samples, $"{DiskE._programFiles}delme.bin");
-				Reboot();
+				ProgressShower.Close();
+
+				FNad music = new FNad();
+				samples.RemoveRange(0, 100);
+				music._samples = samples.ToArray();
+				music.Export(outname);
+				music.ToMidiAndExport(outname);//, 0.2f);
+				Logger.Log("DONE.");
+				//SaveList(samples, $"{DiskE._programFiles}delme.bin");
+				//Reboot();
 			}
 
 			List<float> FindLeadingNotes(float[] answer)
@@ -131,9 +156,172 @@ namespace MusGen
 						float index01 = 1f * index / SpectrumFinder._frequenciesLg.Length;
 
 						notes.Add(index01);
+						noteNumbers.Add(noteNumber);
 					}
 
 				return notes;
+			}
+		}
+
+		public static void GenerateByHugeModel(string outname)
+		{
+			List<int> noteNumbersGlobal = new List<int>();
+			OpenFileDialog dialog = new OpenFileDialog();
+			dialog.Filter = "audio files |*.mid;";
+			dialog.Title = "Please select mid file";
+			bool? success = dialog.ShowDialog();
+			if (success == true)
+			{
+				string path = dialog.FileName;
+				Midi midi = new Midi();
+				midi.Read(path);
+				Nad nad = midi.ToNad();
+				FNad fnad = nad.ToFNad();
+				FNadSample[] fnadSamples = fnad._samples;
+
+				float averageDeltaTime = FindAverageDeltaTime();
+
+				List<FNadSample> samples = new List<FNadSample>();
+				for (int i = 0; i < fnadSamples.Length; i++)
+					samples.Add(fnadSamples[i]);
+
+				List<float[]> accords = new List<float[]>();
+				for (int i = 0; i < _window; i++)
+					accords.Add(GetAccord());
+
+				samples.Clear();
+				samples.Add(new FNadSample());
+
+				IModel model1 = ModelManager.LoadHugeModel();
+
+				
+
+				ProgressShower.Show("Generating...");
+
+
+				for (int j = 0; j < _count; j++)
+				{
+					List<float> question = new List<float>();
+
+					for (int i = 0; i < _window; i++)
+						question.AddRange(accords[j + i]);
+
+					Shape shape = new Shape(1, _window * 128);
+					Tensor tensor = constant_op.constant(question.ToArray(), shape: shape);
+					tensor.shape = shape;
+
+					Tensor ts = model1.predict(tensor);
+					float[] answer = ts.ToArray<float>();
+
+					// Preventing repeating:
+
+					for (int i = noteNumbersGlobal.Count - 1; i >= 0 && i > noteNumbersGlobal.Count - 101; i--)
+					{
+						float x = noteNumbersGlobal.Count - 1 - i;
+						float decreaser = 1 - MathF.Exp(-x / 6f);
+						answer[noteNumbersGlobal[i]] *= decreaser;
+					}
+
+					//
+
+					List<int> notes = FindLeadingNotes(answer);
+
+					float[] accord = new float[128];
+					for (int i = 0; i < notes.Count; i++)
+					{
+						int noteNumber = notes[i];
+						accord[noteNumber] = 1;
+
+						FNadSample fnads = new FNadSample();
+						fnads._index = SpectrumFinder.Index01ByNoteNumber(noteNumber);
+						fnads._amplitude = 1;
+						fnads._deltaTime = averageDeltaTime;
+						if (i > 0)
+							fnads._deltaTime = 0;
+
+						fnads._absoluteTime = samples.Last()._absoluteTime + fnads._deltaTime;
+						fnads._duration = averageDeltaTime * 1.5f;
+
+						samples.Add(fnads);
+					}
+					accords.Add(accord);
+
+					ProgressShower.Set(1.0 * j / (_count));
+				}
+
+				ProgressShower.Close();
+
+				FNad music = new FNad();
+				music._samples = samples.ToArray();
+				music.Export(outname);
+				music.ToMidiAndExport(outname);
+				Logger.Log("DONE.");
+
+				float FindAverageDeltaTime()
+				{
+					float averageDeltaTime = 0;
+					int deltasCount = 0;
+					for (int i = 0; i < fnadSamples.Length; i++)
+					{
+						if (fnadSamples[i]._deltaTime > Params._accordMaxTime)
+						{
+							averageDeltaTime += fnadSamples[i]._deltaTime;
+							deltasCount++;
+						}
+					}
+					averageDeltaTime /= deltasCount;
+					return averageDeltaTime;
+				}
+
+				float[] GetAccord()
+				{
+					float[] accord = new float[128];
+					float summDeltaTime = 0;
+
+					float index01 = samples[0]._index;
+					int noteNumber = SpectrumFinder.NoteNumberByIndex01(index01);
+					accord[noteNumber] = 1;
+					summDeltaTime += samples[0]._deltaTime;
+					samples.RemoveAt(0);
+
+					while (samples.Count > 0)
+					{
+						if (summDeltaTime < averageDeltaTime * Params._minAverageDeltaTime)
+						{
+							summDeltaTime += samples[0]._deltaTime;
+
+							index01 = samples[0]._index;
+							noteNumber = SpectrumFinder.NoteNumberByIndex01(index01);
+							accord[noteNumber] = 1;
+							samples.RemoveAt(0);
+						}
+						else
+							break;
+					}
+
+					return accord;
+				}
+			}
+
+			List<int> FindLeadingNotes(float[] answer)
+			{
+				List<int> noteNumbers = new List<int>();
+
+				float max = 0;
+				for (int noteNumber = 0; noteNumber < 128; noteNumber++)
+					if (answer[noteNumber] > max)
+						max = answer[noteNumber];
+
+				float threshold = max * Params._accordThreshold;
+
+				for (int noteNumber = 0; noteNumber < 128; noteNumber++)
+					if (answer[noteNumber] > threshold)
+					{
+						noteNumbersGlobal.Add(noteNumber);
+						noteNumbers.Add(noteNumber);
+					}
+
+				return noteNumbers;
 			}
 		}
 
@@ -159,6 +347,16 @@ namespace MusGen
 			{
 				return (List<FNadSample>)formatter.Deserialize(fileStream);
 			}
+		}
+
+		private static FNadSample[] ListOfListsToArray(List<List<FNadSample>> list)
+		{
+			List<FNadSample> result = new List<FNadSample>();
+
+			foreach (List<FNadSample> sublist in list)
+				result.AddRange(sublist);
+
+			return result.ToArray();
 		}
 
 		public static void GeneratePart2()
@@ -248,15 +446,7 @@ namespace MusGen
 					Thread.Sleep(10000);
 					Environment.Exit(0);
 
-					FNadSample[] ListOfListsToArray(List<List<FNadSample>> list)
-					{
-						List<FNadSample> result = new List<FNadSample>();
 
-						foreach (List<FNadSample> sublist in list)
-							result.AddRange(sublist);
-
-						return result.ToArray();
-					}
 				}
 			}
 		}

@@ -106,11 +106,51 @@ namespace MusGen
 			}
 		}
 
-		public static void EVOLVE_RNN_1()
+		public static void EVOLVE_HUGE_MODEL()
 		{
-			Logger.Log("Started evolution for RNN1.", Brushes.Magenta);
+			Logger.Log("Started evolving HUGE Model.", Brushes.Magenta);
 
-			InputDataRNN data = TestsFillerRNN1.Fill();
+			InputData data = TestsFillerHuge.Fill();
+
+			NDArray xTrain = np.array(data.questions.SelectMany(x => x).ToArray());
+			xTrain = xTrain.reshape(new Shape(Params._testsCount, 50 * 128));
+
+			NDArray yTrain = np.array(data.answers.SelectMany(x => x).ToArray());
+			yTrain = yTrain.reshape(new Shape(Params._testsCount, 128));
+
+			Sequential model = ModelManager.LoadHugeModel();
+
+			float lossRecord = 10000;
+
+			for (int i = 0; ; i++)
+			{
+				var history = model.fit(xTrain, yTrain, epochs: 1);
+				float loss = history.history["loss"][0];
+				float mae = history.history["mean_absolute_error"][0];
+				float accuracy = history.history["accuracy"][0];
+				Logger.Log($"Epoch {i} done. Mae {mae}. Accuracy {accuracy}. Loss {loss}.");
+
+				DiskE.WriteToProgramFiles("historyHUGE", "csv", $"{mae};{accuracy};{loss}\n", true);
+
+				if (loss <= lossRecord)
+				{
+					lossRecord = loss;
+					Save();
+				}
+			}
+
+			void Save()
+			{
+				model.save_weights(Params._hugeModelPath);
+				Logger.Log($"Model was saved!", Brushes.Blue);
+			}
+		}
+
+		public static void EVOLVE_TRANSFORMER()
+		{
+			Logger.Log("Started evolution for transformer.", Brushes.Magenta);
+
+			InputDataRNN data = TestsFillerTransformer.Fill();
 
 			int maxSequenceLength = data.MaxSequenceLength;
 
@@ -122,7 +162,7 @@ namespace MusGen
 			NDArray yTrain = np.array(data.answers.SelectMany(x => x).ToArray());
 			yTrain = yTrain.reshape(shape2);
 
-			Sequential model = ModelManager.LoadRNN1(maxSequenceLength);
+			Sequential model = ModelManager.LoadTransformer(maxSequenceLength);
 
 			float accuracyRecord = 0;
 
@@ -153,7 +193,7 @@ namespace MusGen
 
 			void Save()
 			{
-				model.save_weights(Params._rnn1Path);
+				model.save_weights(Params._transformerPath);
 				Logger.Log($"RNN1 was saved!", Brushes.Blue);
 			}
 		}

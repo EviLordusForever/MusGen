@@ -183,6 +183,13 @@ namespace MusGen
 			}
 		}
 
+		public static float Index01ByNoteNumber(int noteNumber)
+		{
+			float frequency = 440f * MathF.Pow(2f, (noteNumber - 69) / 12f);
+			ushort index = IndexByFrequency(frequency);
+			float index01 = 1f * index / _frequenciesLg.Length;
+			return index01;
+		}
 
 		public static byte NoteNumberByIndex01(float index01)
 		{

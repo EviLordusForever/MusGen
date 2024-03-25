@@ -39,10 +39,13 @@ namespace MusGen
 			{
 				File.Delete($"{DiskE._programFiles}NNTests1.bin");
 				File.Delete($"{DiskE._programFiles}NNTests2.bin");
+				File.Delete($"{DiskE._programFiles}NNTestsHUGE.bin");
 				File.Delete($"{DiskE._programFiles}NNModel1");
 				File.Delete($"{DiskE._programFiles}NNModel2");
+				File.Delete($"{DiskE._programFiles}HugeModel");
 				File.Delete($"{DiskE._programFiles}historyM1.csv");
 				File.Delete($"{DiskE._programFiles}historyM2.csv");
+				File.Delete($"{DiskE._programFiles}historyHUGE.csv");
 				Logger.Log("Models and tests were deleted!", Brushes.Red);
 			}
 		}
@@ -55,7 +58,19 @@ namespace MusGen
 
 			void MyThread()
 			{
-				Evolution.EVOLVE_RNN_1();
+				Evolution.EVOLVE_TRANSFORMER();
+			}
+		}
+
+		private void EvolveHugeModelClick(object sender, RoutedEventArgs e)
+		{
+			Thread myThread = new Thread(MyThread);
+			myThread.Name = "EVOLUTION";
+			myThread.Start();
+
+			void MyThread()
+			{
+				Evolution.EVOLVE_HUGE_MODEL();
 			}
 		}
 
@@ -91,7 +106,19 @@ namespace MusGen
 
 			void MyThread()
 			{
-				Generator.Generate();
+				Generator.Generate("RESULT");
+			}
+		}
+
+		private void GenHugeClick(object sender, RoutedEventArgs e)
+		{
+			Thread myThread = new Thread(MyThread);
+			myThread.Name = "GENERATING";
+			myThread.Start();
+
+			void MyThread()
+			{
+				Generator.GenerateByHugeModel("RESULT");
 			}
 		}
 
