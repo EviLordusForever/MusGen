@@ -20,9 +20,6 @@ jobs:
         env:
           NODE_VERSION: 20
 
-      - name: Use .NET Framework version
-        run: dotnet tool install --global dotnet-msbuild-switcher --version 2.3.0
-
       - name: Set .NET Framework version
         run: dotnet msbuild-switcher global 4.8
 
