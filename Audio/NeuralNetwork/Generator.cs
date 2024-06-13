@@ -30,10 +30,10 @@ namespace MusGen
 {
 	public static class Generator
 	{
-		public static int _count = 300;
+		public static int _count = 1000;
 		public static int _window = 50;
 
-		public static void Generate(string outname)
+		public static void Generate()
 		{
 			int lastNoteNumber = 0;
 			int lastNoteNumber2 = 0;
@@ -45,6 +45,7 @@ namespace MusGen
 			if (success == true)
 			{				
 				string path = dialog.FileName;
+				string outname = dialog.SafeFileName;
 				Midi midi = new Midi();
 				midi.Read(path);
 				Nad nad = midi.ToNad();
@@ -163,7 +164,7 @@ namespace MusGen
 			}
 		}
 
-		public static void GenerateByHugeModel(string outname)
+		public static void GenerateByHugeModel()
 		{
 			List<int> noteNumbersGlobal = new List<int>();
 			OpenFileDialog dialog = new OpenFileDialog();
@@ -173,6 +174,7 @@ namespace MusGen
 			if (success == true)
 			{
 				string path = dialog.FileName;
+				string outname = TextE.StringBeforeLast(dialog.SafeFileName, ".");
 				Midi midi = new Midi();
 				midi.Read(path);
 				Nad nad = midi.ToNad();
@@ -185,75 +187,84 @@ namespace MusGen
 				for (int i = 0; i < fnadSamples.Length; i++)
 					samples.Add(fnadSamples[i]);
 
+				List<float> deltaTimes = new List<float>();
 				List<float[]> accords = new List<float[]>();
-				for (int i = 0; i < _window; i++)
-					accords.Add(GetAccord());
+
+				GetAccords();
+				Normalize();
+				accords.RemoveRange(_window, accords.Count - _window);
 
 				samples.Clear();
 				samples.Add(new FNadSample());
 
-				IModel model1 = ModelManager.LoadHugeModel();
-
-				
+				Sequential model1 = ModelManager.LoadHugeModel(false);
 
 				ProgressShower.Show("Generating...");
 
+				//Tensors inputs = model1.inputs;
+				//var outputLayer = model1.Layers.Last();
+				//Graph graph = new Graph();				
 
-				for (int j = 0; j < _count; j++)
+				using (var session = new Session())
 				{
-					List<float> question = new List<float>();
-
-					for (int i = 0; i < _window; i++)
-						question.AddRange(accords[j + i]);
-
-					Shape shape = new Shape(1, _window * 128);
-					Tensor tensor = constant_op.constant(question.ToArray(), shape: shape);
-					tensor.shape = shape;
-
-					Tensor ts = model1.predict(tensor);
-					float[] answer = ts.ToArray<float>();
-
-					// Preventing repeating:
-
-					for (int i = noteNumbersGlobal.Count - 1; i >= 0 && i > noteNumbersGlobal.Count - 101; i--)
+					for (int j = 0; j < _count; j++)
 					{
-						float x = noteNumbersGlobal.Count - 1 - i;
-						float decreaser = 1 - MathF.Exp(-x / 6f);
-						answer[noteNumbersGlobal[i]] *= decreaser;
+						List<float> question = new List<float>();
+
+						for (int i = 0; i < _window; i++)
+							question.AddRange(accords[j + i]);
+
+						Shape shape = new Shape(1, _window * 128);
+						Tensor tensor = constant_op.constant(question.ToArray(), shape: shape);
+						tensor.shape = shape;
+
+						Tensor ts = model1.predict(tensor, 1); //use_multiprocessing: true
+						//var res = outputLayer.
+						float[] answer = ts.ToArray<float>();
+
+
+						// Preventing repeating:
+
+						for (int i = noteNumbersGlobal.Count - 1; i >= 0 && i > noteNumbersGlobal.Count - 101; i--)
+						{
+							float x = noteNumbersGlobal.Count - 1 - i;
+							float decreaser = 1 - MathF.Exp(-(x + 7) / 6f);
+							answer[noteNumbersGlobal[i]] *= decreaser;
+						}
+
+						//
+
+						List<int> notes = FindLeadingNotes(answer);
+
+						float[] accord = new float[128];
+						for (int i = 0; i < notes.Count; i++)
+						{
+							int noteNumber = notes[i];
+							accord[noteNumber] = 1;
+
+							FNadSample fnads = new FNadSample();
+							fnads._index = SpectrumFinder.Index01ByNoteNumber(noteNumber);
+							fnads._amplitude = 1;
+							fnads._deltaTime = averageDeltaTime;
+							if (i > 0)
+								fnads._deltaTime = 0;
+
+							fnads._absoluteTime = samples.Last()._absoluteTime + fnads._deltaTime;
+							fnads._duration = averageDeltaTime * 7.975f; ////////////
+																////////////////////////
+							samples.Add(fnads);
+						}
+						accords.Add(accord);
+
+						ProgressShower.Set(1.0 * j / (_count));
 					}
-
-					//
-
-					List<int> notes = FindLeadingNotes(answer);
-
-					float[] accord = new float[128];
-					for (int i = 0; i < notes.Count; i++)
-					{
-						int noteNumber = notes[i];
-						accord[noteNumber] = 1;
-
-						FNadSample fnads = new FNadSample();
-						fnads._index = SpectrumFinder.Index01ByNoteNumber(noteNumber);
-						fnads._amplitude = 1;
-						fnads._deltaTime = averageDeltaTime;
-						if (i > 0)
-							fnads._deltaTime = 0;
-
-						fnads._absoluteTime = samples.Last()._absoluteTime + fnads._deltaTime;
-						fnads._duration = averageDeltaTime * 1.5f;
-
-						samples.Add(fnads);
-					}
-					accords.Add(accord);
-
-					ProgressShower.Set(1.0 * j / (_count));
 				}
 
 				ProgressShower.Close();
 
 				FNad music = new FNad();
 				music._samples = samples.ToArray();
-				music.Export(outname);
+				//music.Export(outname);
 				music.ToMidiAndExport(outname);
 				Logger.Log("DONE.");
 
@@ -273,33 +284,71 @@ namespace MusGen
 					return averageDeltaTime;
 				}
 
-				float[] GetAccord()
+				void GetAccords()
 				{
-					float[] accord = new float[128];
-					float summDeltaTime = 0;
-
-					float index01 = samples[0]._index;
-					int noteNumber = SpectrumFinder.NoteNumberByIndex01(index01);
-					accord[noteNumber] = 1;
-					summDeltaTime += samples[0]._deltaTime;
-					samples.RemoveAt(0);
-
-					while (samples.Count > 0)
+					for (int i = 0; i < samples.Count; i++)
 					{
-						if (summDeltaTime < averageDeltaTime * Params._minAverageDeltaTime)
+						float[] accord = new float[128];
+						float deltaTime = samples[0]._deltaTime;
+
+						float index01 = samples[0]._index;
+						int noteNumber = SpectrumFinder.NoteNumberByIndex01(index01);
+						accord[noteNumber] = 1;
+						
+						samples.RemoveAt(0);
+
+						while (samples.Count > 0)
 						{
-							summDeltaTime += samples[0]._deltaTime;
-
-							index01 = samples[0]._index;
-							noteNumber = SpectrumFinder.NoteNumberByIndex01(index01);
-							accord[noteNumber] = 1;
-							samples.RemoveAt(0);
+							if (samples[0]._deltaTime <= Params._accordMaxTime)
+							{
+								index01 = samples[0]._index;
+								noteNumber = SpectrumFinder.NoteNumberByIndex01(index01);
+								accord[noteNumber] = 1;
+								samples.RemoveAt(0);
+							}
+							else
+								break;
 						}
-						else
-							break;
-					}
 
-					return accord;
+						accords.Add(accord);
+						deltaTimes.Add(deltaTime);
+					}
+				}
+
+				void Normalize()
+				{
+					int lows = 0;
+					int highs = 0;
+
+					for (int i = 1; i < accords.Count; i++)
+						if (deltaTimes[i] <= averageDeltaTime * 0.5f)
+						{
+							float[] merged = new float[128];
+							for (int j = 0; j < merged.Length; j++)
+								if (accords[i - 1][j] > 0 || accords[i][j] > 0)
+									merged[j] = 1;
+
+							accords[i - 1] = merged;
+							accords.RemoveAt(i);
+							deltaTimes.RemoveAt(i);
+							lows++;
+							i--;
+						}
+
+					for (int i = 1; i < deltaTimes.Count; i++)
+						if (deltaTimes[i] > averageDeltaTime * 1.5f)
+						{
+							float[] clone = new float[128];
+							for (int j = 0; j < clone.Length; j++)
+								clone[j] = accords[i - 1][j];
+
+							accords.Insert(i, clone);
+							deltaTimes.Insert(i, averageDeltaTime);
+							deltaTimes[i + 1] -= averageDeltaTime;
+							highs++;
+						}
+
+					Logger.Log($"REMOVED {lows} LOWS & {highs} HIGHS!", Brushes.Magenta);
 				}
 			}
 

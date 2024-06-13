@@ -15,5 +15,17 @@ namespace MusGen
 		public float _duration; //in ticks / 2000
 
 		public float _absoluteTime; //in ticks / 2000
-	}
+
+        public FNadSample DeepClone()
+        {
+            return new FNadSample
+            {
+                _index = this._index,
+                _amplitude = this._amplitude,
+                _deltaTime = this._deltaTime,
+                _duration = this._duration,
+                _absoluteTime = this._absoluteTime
+            };
+        }
+    }
 }

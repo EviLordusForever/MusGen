@@ -124,7 +124,7 @@ namespace MusGen
 
 			for (int i = 0; ; i++)
 			{
-				var history = model.fit(xTrain, yTrain, epochs: 1);
+				var history = model.fit(xTrain, yTrain, batch_size: -1, epochs: 1);
 				float loss = history.history["loss"][0];
 				float mae = history.history["mean_absolute_error"][0];
 				float accuracy = history.history["accuracy"][0];

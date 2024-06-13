@@ -8,6 +8,7 @@ using Extensions;
 using MusGen;
 using Newtonsoft.Json;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Windows.Media;
 
 namespace MusGen
 {
@@ -61,24 +62,21 @@ namespace MusGen
 					while (samples.Count > 0)
 						accords.Add(GetAccord());
 
+					accords = Normalize(accords);
+
 					return accords;					
 				}
 
 				FNadSample[] GetAccord()
 				{
-					float summDeltaTime = 0;
-
 					List<FNadSample> accord = new List<FNadSample>();
 					accord.Add(samples[0]);
-					summDeltaTime += samples[0]._deltaTime;
 					samples.RemoveAt(0);
 
 					while (samples.Count > 0)
 					{
-						if (summDeltaTime < averageDeltaTime * Params._minAverageDeltaTime)
+						if (samples[0]._deltaTime <= Params._accordMaxTime)
 						{
-							summDeltaTime += samples[0]._deltaTime;
-
 							accord.Add(samples[0]);
 							samples.RemoveAt(0);
 						}
@@ -87,6 +85,49 @@ namespace MusGen
 					}
 
 					return accord.ToArray();
+				}
+
+				List<FNadSample[]> Normalize(List<FNadSample[]> accords)
+				{
+					int lows = 0;
+					int highs = 0;
+
+					float averageDelta = 0;
+					for (int i = 0; i < accords.Count; i++)
+						averageDelta += accords[i][0]._deltaTime;
+
+					averageDelta /= accords.Count;
+
+					Logger.Log($"Average delta = {averageDelta}");
+
+					for (int i = 1; i < accords.Count; i++)
+						if (accords[i][0]._deltaTime <= averageDelta * 0.5f)
+						{
+							List<FNadSample> merged = new List<FNadSample>();
+							merged.AddRange(accords[i - 1]);
+							merged.AddRange(accords[i]);
+							accords[i - 1] = merged.ToArray();
+							accords.RemoveAt(i);
+							lows++;
+							i--;
+						}
+
+					for (int i = 1; i < accords.Count; i++)
+						if (accords[i][0]._deltaTime > averageDelta * 1.5f)
+						{
+							FNadSample[] clone = new FNadSample[accords[i - 1].Length];
+							for (int j = 0; j < clone.Length; j++)
+								clone[j] = accords[i - 1][j].DeepClone();
+
+							clone[0]._deltaTime = averageDelta;
+							accords.Insert(i, clone);
+							accords[i + 1][0]._deltaTime -= averageDelta;
+							highs++;
+						}
+
+					Logger.Log($"REMOVED {lows} LOWS & {highs} HIGHS!", Brushes.Magenta);
+
+					return accords;
 				}
 
 				float FindAverageDeltaTime()

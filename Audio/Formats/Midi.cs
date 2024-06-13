@@ -80,36 +80,28 @@ namespace MusGen
                 foreach (var trackChunk in _midiFile.Events)
                 {
                     int accumulatedTime = 0;
+                    int[] instruments = new int[16];
 
                     foreach (var midiEvent in trackChunk)
                     {
                         accumulatedTime += midiEvent.DeltaTime;
 
-                        if (midiEvent.CommandCode == MidiCommandCode.NoteOn)
-                        {
-                            var noteEvent = midiEvent as NoteEvent;
-                            if (noteEvent != null)
+                        if (midiEvent.CommandCode == MidiCommandCode.PatchChange)
+                            if (midiEvent is PatchChangeEvent patchChangeEvent)
                             {
-                                if (noteEvent.Channel < 9)
-                                {
-                                    noteEvent.AbsoluteTime = accumulatedTime;
-                                    mergedTrackChunk.Add(noteEvent);
-                                }
-                                else
-                                {
-                                }
+                                int channel = patchChangeEvent.Channel;
+                                instruments[channel] = patchChangeEvent.Patch;
                             }
-                        }
 
-                        if (midiEvent.CommandCode == MidiCommandCode.NoteOff)
+                        if (midiEvent.CommandCode == MidiCommandCode.NoteOn || midiEvent.CommandCode == MidiCommandCode.NoteOff)
                         {
                             var noteEvent = midiEvent as NoteEvent;
                             if (noteEvent != null)
                             {
-                                if (noteEvent.Channel < 9)
+                                int channel = noteEvent.Channel;
+                                if (instruments[channel] < 96)
                                 {
                                     noteEvent.AbsoluteTime = accumulatedTime;
-                                    noteEvent.Velocity = 0;
                                     mergedTrackChunk.Add(noteEvent);
                                 }
                                 else

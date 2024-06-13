@@ -146,11 +146,11 @@ namespace MusGen
 			return model;
 		}
 
-		public static Sequential CreateHugeModel()
+		public static Sequential CreateHugeModel(bool needCompile)
 		{
 			model = keras.Sequential();
 
-			var shape = new Shape(50 * 128); //100 * 4
+			var shape = new Shape(50 * 128);
 			var layer0 = keras.layers.InputLayer(shape);
 			model.add(layer0);
 
@@ -174,7 +174,8 @@ namespace MusGen
 			var optimizer = "adam";
 			var metrics = new[] { "mae", "accuracy" };
 
-			model.compile(optimizer, loss, metrics);
+			if (needCompile)
+				model.compile(optimizer, loss, metrics);
 
 			return model;
 		}
@@ -235,7 +236,12 @@ namespace MusGen
 
 		public static Sequential LoadHugeModel()
 		{
-			Sequential model = CreateHugeModel();
+			return LoadHugeModel(true);
+		}
+
+		public static Sequential LoadHugeModel(bool needCompile)
+		{
+			Sequential model = CreateHugeModel(needCompile);
 			Logger.Log("Huge model was initialized.", Brushes.Magenta);
 
 			if (File.Exists(Params._hugeModelPath))

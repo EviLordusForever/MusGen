@@ -16,7 +16,7 @@ namespace MusGen
 		public static string _hugeModelPath = $"{DiskE._programFiles}HugeModel";
 		public static int _testsCount = -1;
 		public static int _batchSize = 3000;
-		public static float _minAverageDeltaTime = 0.85f;
+		public static float _minAverageDeltaTime = 0.95f;
 
 		public static int _savingEvery = 30;
 

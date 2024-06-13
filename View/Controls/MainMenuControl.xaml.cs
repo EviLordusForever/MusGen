@@ -106,7 +106,7 @@ namespace MusGen
 
 			void MyThread()
 			{
-				Generator.Generate("RESULT");
+				Generator.Generate();
 			}
 		}
 
@@ -118,7 +118,7 @@ namespace MusGen
 
 			void MyThread()
 			{
-				Generator.GenerateByHugeModel("RESULT");
+				Generator.GenerateByHugeModel();
 			}
 		}
 

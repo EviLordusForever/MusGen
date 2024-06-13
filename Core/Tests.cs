@@ -11,7 +11,7 @@ using System.Windows.Media;
 
 namespace MusGen
 {
-	public static class Tests
+	public static class TheUnitTests
 	{
 		public static void Curve()
 		{

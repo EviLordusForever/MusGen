@@ -18,6 +18,7 @@
 		</Grid.RowDefinitions>
 
 		<ComboBox FontSize="20" Margin ="0,3,0,3" Name="combobox" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" SelectedIndex="0" Grid.Row="0" SelectionChanged="combobox_SelectionChanged">
+			<ComboBoxItem>CheckMid</ComboBoxItem>
 			<ComboBoxItem>MIDI_MNAD_WAV_exp</ComboBoxItem>
 			<ComboBoxItem>MID_MID_exp</ComboBoxItem>
 			<ComboBoxItem>FNAD_MID_exp</ComboBoxItem>

@@ -115,7 +115,10 @@ namespace MusGen
 					if (path == "" || !File.Exists(path))
 						return;
 
-					if (_s == "WAV_SORS_MNAD_WAV_exp")
+					if (_s == "CheckMid")
+						CheckMid.Make(path, outName, _speed, _pitch);
+
+					else if (_s == "WAV_SORS_MNAD_WAV_exp")
 						WAV_SORS_MNAD_WAV_exp.Make(path, outName, _speed, _pitch);
 
 					else if (_s == "FNAD_MID_exp")

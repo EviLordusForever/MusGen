@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using Extensions;
 using Melanchall.DryWetMidi;
 using Melanchall.DryWetMidi.Core;
@@ -24,13 +26,14 @@ namespace MusGen
 			List<FNadSample> list = new List<FNadSample>();
 			list.AddRange(_samples);
 
-			for (int sample = 0; sample < _samples.Length; sample++)
+			for (int sample = 0; sample < list.Count; sample++)
 			{
 				if (list[sample]._amplitude > 0)
 				{
-					for (int subSample = sample; subSample < _samples.Length; subSample++)
+					float noteOffTime = list[sample]._absoluteTime + list[sample]._duration;
+
+					for (int subSample = sample + 1; subSample < list.Count; subSample++)
 					{
-						float noteOffTime = list[sample]._absoluteTime + list[sample]._duration;
 						if (list[subSample]._absoluteTime > noteOffTime)
 						{
 							FNadSample noteOff = new FNadSample();
@@ -38,8 +41,20 @@ namespace MusGen
 							noteOff._absoluteTime = noteOffTime;
 							noteOff._duration = 0;
 							noteOff._index = list[sample]._index;
-							
+
 							list.Insert(subSample, noteOff);
+							break;
+						}
+						else if (list[subSample]._index == list[sample]._index)
+						{
+							FNadSample noteOff = new FNadSample();
+							noteOff._amplitude = 0;
+							noteOff._absoluteTime = (list[subSample]._absoluteTime + list[subSample - 1]._absoluteTime) / 2f;
+							noteOff._duration = 0;
+							noteOff._index = list[sample]._index;
+
+							list.Insert(subSample, noteOff);
+							break;
 						}
 					}
 				}
@@ -98,6 +113,14 @@ namespace MusGen
 			midiFile.Write(path, true, MidiFileFormat.SingleTrack);
 			DialogE.ShowFile(path);
 
+			ProcessStartInfo startInfo = new ProcessStartInfo
+			{
+				FileName = path,
+				UseShellExecute = true
+			};
+
+			Process.Start(startInfo);
+
 			Logger.Log("FNad converted to midi. Midi exported.");
 		}
 
@@ -145,6 +168,124 @@ namespace MusGen
 
 			ProgressShower.Close();
 			Logger.Log("FNad was readed");
+		}
+
+		public void UltraNormalize()
+		{
+			List<FNadSample> samples = new List<FNadSample>();
+			samples.AddRange(_samples);
+			float averageDeltaTime = FindAverageDeltaTime();
+			List<FNadSample[]> accords = FillAccords();
+
+			samples.Clear();
+			float absoluteTime = 0;
+			foreach (FNadSample[] accord in accords)
+				for (int i = 0; i < accord.Length; i++)
+				{
+					if (i == 0)
+						accord[i]._deltaTime = averageDeltaTime;
+					else
+						accord[i]._deltaTime = 0;
+
+					absoluteTime += accord[i]._deltaTime;
+					accord[i]._absoluteTime = absoluteTime;
+					accord[i]._amplitude = 1;
+
+					samples.Add(accord[i]);
+				}
+
+			_samples = samples.ToArray();
+
+			List<FNadSample[]> FillAccords()
+			{
+				List<FNadSample[]> accords = new List<FNadSample[]>();
+
+				while (samples.Count > 0)
+					accords.Add(GetAccord());
+
+				accords = Normalize(accords);
+
+				return accords;
+			}
+
+			FNadSample[] GetAccord()
+			{
+				List<FNadSample> accord = new List<FNadSample>();
+				accord.Add(samples[0]);
+				samples.RemoveAt(0);
+
+				while (samples.Count > 0)
+				{
+					if (samples[0]._deltaTime <= Params._accordMaxTime)
+					{
+						accord.Add(samples[0]);
+						samples.RemoveAt(0);
+					}
+					else
+						break;
+				}
+
+				return accord.ToArray();
+			}
+
+			List<FNadSample[]> Normalize(List<FNadSample[]> accords)
+			{
+				int lows = 0;
+				int highs = 0;
+
+				float averageDelta = 0;
+				for (int i = 0; i < accords.Count; i++)
+					averageDelta += accords[i][0]._deltaTime;
+
+				averageDelta /= accords.Count;
+
+				Logger.Log($"Average delta = {averageDelta}");
+
+				for (int i = 1; i < accords.Count; i++)
+					if (accords[i][0]._deltaTime <= averageDelta * 0.5f)
+					{
+						List<FNadSample> merged = new List<FNadSample>();
+						merged.AddRange(accords[i - 1]);
+						merged.AddRange(accords[i]);
+						accords[i - 1] = merged.ToArray();
+						accords.RemoveAt(i);
+						lows++;
+						i--;
+					}
+
+				for (int i = 1; i < accords.Count; i++)
+					if (accords[i][0]._deltaTime > averageDelta * 1.5f)
+					{
+						FNadSample[] clone = new FNadSample[accords[i - 1].Length];
+						for (int j = 0; j < clone.Length; j++)
+							clone[j] = accords[i - 1][j].DeepClone();
+
+						clone[0]._deltaTime = averageDelta;
+						accords.Insert(i, clone);
+						accords[i + 1][0]._deltaTime -= averageDelta;
+						highs++;
+					}
+
+				Logger.Log($"REMOVED {lows} LOWS & {highs} HIGHS!", Brushes.Magenta);
+
+				return accords;
+			}
+			
+
+			float FindAverageDeltaTime()
+			{
+				float summ = 0;
+				float count = 0;
+
+				for (int i = 0; i < samples.Count; i++)
+					if (samples[i]._deltaTime > Params._accordMaxTime)
+					{
+						summ += samples[i]._deltaTime;
+						count++;
+					}
+
+				return summ / count;
+			}
 		}
 
 		public FNad()

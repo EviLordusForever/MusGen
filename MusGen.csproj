@@ -30,8 +30,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Accord" Version="3.8.0" />
-    <PackageReference Include="Accord.Neuro" Version="3.8.0" />
     <PackageReference Include="Keras.NET" Version="3.8.5" />
     <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
     <PackageReference Include="Melanchall.DryWetMidi" Version="6.1.4" />
@@ -42,6 +40,7 @@
     <PackageReference Include="TensorFlow.NET" Version="0.100.5" />
     <PackageReference Include="WPFFolderBrowser" Version="1.0.2" />
     <PackageReference Include="WriteableBitmapEx" Version="1.6.8" />
+    <PackageReference Include="xunit" Version="2.8.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -55,6 +54,10 @@
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include=".github\workflows\Tests.yaml" />
   </ItemGroup>
 
 </Project>
