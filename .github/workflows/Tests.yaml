@@ -17,6 +17,8 @@ jobs:
         dotnet-version: 6.0.x
     - name: Restore dependencies
       run: dotnet restore --runtime win-x64
+    - name: Change target framework
+      run: sed -i 's/net6.0-windows7.0/net6.0/' MusGen.csproj
     - name: Build
       run: dotnet build --no-restore
     - name: Test
