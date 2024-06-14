@@ -20,6 +20,6 @@ jobs:
     - name: Change target framework
       run: sed -i 's/net6.0-windows7.0/net6.0/' MusGen.csproj
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet msbuild -v:normal "MusGen.csproj" -p:Configuration=RELEASE
     - name: Test
       run: dotnet test --no-build --verbosity normal
