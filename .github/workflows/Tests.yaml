@@ -20,9 +20,6 @@ jobs:
         env:
           NODE_VERSION: 20
 
-      - name: Set .NET Framework version
-        run: dotnet msbuild-switcher global 4.8
-
       - name: Build and test
         run: |
           dotnet restore
